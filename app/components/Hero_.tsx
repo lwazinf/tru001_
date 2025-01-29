@@ -241,7 +241,7 @@ const Hero_ = () => {
               <div className="text-[16px] font-medium flex flex-col justify-center">
                 <p>
                   Our exclusive mobile fueling service is already trusted by
-                  Gauteng's most discerning professionals and businesses.
+                  Gauteng&apos;s most discerning professionals and businesses.
                   Experience the difference that comes with never having to
                   visit a fuel station again.
                 </p>
@@ -266,7 +266,7 @@ const Hero_ = () => {
               Fuel
             </p> */}
               <div className="text-[16px] text-end font-medium flex flex-col justify-center items-end">
-                <p>Need To Fuel's mobile app is</p>
+                <p>Need To Fuel&apos;s mobile app is</p>
                 <p>now available at your store</p>
               </div>
               <div
