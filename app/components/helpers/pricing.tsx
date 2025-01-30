@@ -49,6 +49,78 @@ const Pricing_ = () => {
                   className={`w-[200px] object-cover relative`}
                 />
               </motion.div>
+              <div className="w-full h-full overflow-y-auto absolute">
+                <div className="p-8">
+                  <div className="max-w-3xl space-y-8">
+                    {/* Header */}
+                    <div className="mb-4">
+                      <h2 className="text-2xl font-bold mb-2">
+                        Premium Mobile Fuel Delivery Services
+                      </h2>
+                      <p className="text-lg font-semibold">
+                        2 Vehicles registered
+                      </p>
+                    </div>
+
+                    {/* Fuel Services */}
+                    <div className="space-y-2">
+                      <ul className="list-decimal list-inside space-y-1">
+                        <li>On demand fuel delivery</li>
+                        <li>Scheduled delivery</li>
+                        <li>24 hour delivery</li>
+                        <li>Fuel station prices to your doorstep</li>
+                      </ul>
+                    </div>
+
+                    {/* Car Wash Services */}
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-bold mb-2">
+                        Premium Mobile Car Wash Services
+                      </h3>
+                      <ul className="list-decimal list-inside space-y-2">
+                        <li>
+                          4 Royal Valet washes valued at R1800.00 Per month
+                        </li>
+                        <li>
+                          <span className="font-semibold">
+                            Inner treatment:{" "}
+                          </span>
+                          Scrub and steam treatment for carpets, seats and all
+                          crevasses. Detailed clean of Inner doors, inner boot,
+                          badges, inner console, dashboard treatment and polish
+                        </li>
+                        <li>
+                          <span className="font-semibold">
+                            Outer treatment:{" "}
+                          </span>
+                          Pressure rinse, soap high pressure snow foam canon,
+                          detailed hand wash, dry, tyre polish, mags, mud flaps,
+                          black trim brightness
+                        </li>
+                      </ul>
+                    </div>
+
+                    {/* Tyre Services */}
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-bold mb-2">
+                        Premium Mobile Tyre Repair
+                      </h3>
+                      <ul className="list-decimal list-inside space-y-2">
+                        <li>
+                          Professional Tyre inspection valued at: R300.00 per
+                          month
+                        </li>
+                        <li>Repairs of tyres on site</li>
+                        <li>Discounts on all new tyre purchases</li>
+                        <li>
+                          Access to 24 hour road side assistance for all tyre
+                          related issues
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div className={`h-[75px] w-full`}>
@@ -57,7 +129,7 @@ const Pricing_ = () => {
               className={`w-full h-full flex flex-row justify-between items-center`}
             >
               <div className={`text-black/50 px-4 text-[13px] font-bold`}>
-                R2,000{" "}
+                R2,999.99{" "}
                 <span className={`text-black/20 font-medium`}>/month</span>
               </div>
               <div
@@ -121,7 +193,7 @@ const Pricing_ = () => {
               className={`w-full h-full flex flex-row justify-between items-center`}
             >
               <div className={`text-white/50 px-6 text-[13px] font-bold`}>
-                R2,000{" "}
+                R4,999.99{" "}
                 <span className={`text-white/20 font-medium`}>/month</span>
               </div>
               <div
@@ -144,12 +216,17 @@ const Pricing_ = () => {
           </div>
         </motion.div>
       </motion.div>
+
       <motion.div
         className={`flex flex-row justify-center items-center w-full min-h-2 mt-8`}
         style={{ y: yRange }}
       >
-        <p className={`text-center text-white/60 w-[600px] font-medium opacity-80`}>
-          Choose the Right Plan: Velit commodo adipisicing exercitation est aliquip sit proident eu ad. Consequat ex mollit nulla ea sint velit veniam culpa Lorem eiusmod proident est eiusmod.
+        <p
+          className={`text-center text-white/60 w-[600px] font-medium opacity-80`}
+        >
+          Choose the Right Plan: Velit commodo adipisicing exercitation est
+          aliquip sit proident eu ad. Consequat ex mollit nulla ea sint velit
+          veniam culpa Lorem eiusmod proident est eiusmod.
         </p>
       </motion.div>
     </div>

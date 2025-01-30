@@ -9,16 +9,16 @@ import {
   const Nav_ = ({}) => {
     return (
       <div
-        className={`w-full h-[70px] fixed top-0 flex flex-row justify-center items-center md:bg-white/5 md:backdrop-blur-md z-3`}
+        className={`w-full h-[70px] fixed top-0 flex flex-row justify-center items-center z-[5]`}
       >
         <div
           className={`w-[200px] h-full hover:h-[120%] flex flex-row justify-center items-center hover:text-orange-200/80 text-white/80 transition-all duration-200`}
         >
             <div
-            className={`bg-black/80 h-full px-4 flex flex-row justify-center items-end text-[20px] font-black cursor-default rounded-b-[2px] md:backdrop-blur-none backdrop-blur-md`}
+            className={`bg-orange-800/80 h-full px-4 flex flex-row justify-center items-end text-[20px] font-black cursor-default rounded-b-[2px] md:backdrop-blur-none backdrop-blur-md`}
           >
           <a href={`#hero`}>
-            Brand
+            NTF
           </a>
           </div>
         </div>
@@ -58,7 +58,7 @@ import {
   const Menu_ = ({}) => {
     return (
       <div
-        className={`w-full h-full flex flex-row justify-center items-center md:opacity-100 opacity-0 md:pointer-events-auto pointer-events-none`}
+        className={`w-full h-full flex flex-row justify-start items-center md:opacity-100 opacity-0 md:pointer-events-auto pointer-events-none`}
       >
         {/* <Link
               activeClass="active"
@@ -71,7 +71,7 @@ import {
             > */}
         <a href={`#hero`}>
           <p
-            className={`text-[14px] text-black/60 mx-4 hover:text-orange-600 hover:font-medium transition-all duration-200 cursor-pointer`}
+            className={`text-[14px] text-white/60 mx-4 hover:text-orange-600 hover:font-medium transition-all duration-200 cursor-pointer`}
           >
             Home
           </p>
@@ -79,25 +79,45 @@ import {
         {/* </Link> */}
         <a href={`#services`}>
           <p
-            className={`text-[14px] text-black/60 mx-4 hover:text-orange-600 hover:font-medium transition-all duration-200 cursor-pointer`}
+            className={`text-[14px] text-white/60 mx-4 hover:text-orange-600 hover:font-medium transition-all duration-200 cursor-pointer`}
           >
             Services
           </p>
         </a>
         <a href={`#study`}>
           <p
-            className={`text-[14px] text-black/60 mx-4 hover:text-orange-600 hover:font-medium transition-all duration-200 cursor-pointer`}
+            className={`text-[14px] text-white/60 mx-4 hover:text-orange-600 hover:font-medium transition-all duration-200 cursor-pointer`}
           >
             Case Studies
           </p>
         </a>
         <a href={`#cta`}>
           <p
-            className={`text-[14px] text-black/60 mx-4 hover:text-orange-600 hover:font-medium transition-all duration-200 cursor-pointer`}
+            className={`text-[14px] text-white/60 mx-4 hover:text-orange-600 hover:font-medium transition-all duration-200 cursor-pointer`}
           >
-            MOVE NOW
+            Pricing
           </p>
         </a>
+        {["Sign up"].map((obj_, idx_) => {
+                  return (
+                    <div
+                      key={idx_}
+                      className={`ml-auto min-w-8 h-8 px-4 text-[12px] text-black bg-white font-semibold flex flex-col justify-center items-center border-white border-[1px] rounded-[20px]`}
+                    >
+                      {obj_}
+                    </div>
+                  );
+                })}
+                {["Get app"].map((obj_, idx_) => {
+                  return (
+                    <div
+                      key={idx_}
+                      className={`ml-2 min-w-8 h-8 px-4 text-[12px] text-black bg-white font-semibold flex flex-col justify-center items-center border-white border-[1px] rounded-[20px]`}
+                    >
+                      {obj_}
+                    </div>
+                  );
+                })}
       </div>
     );
   };
