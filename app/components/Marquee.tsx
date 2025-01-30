@@ -36,6 +36,7 @@ const ELEMENTS = [...TECHNOLOGY_ICONS, ...TECHNOLOGY_ICONS]
 
 const Marquee: FC<Props> = ({ isReversed = false, className }) => {
   const movingContainer = useRef<HTMLDivElement>(null)
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const timeline = useRef<GSAPTimeline>()
 
@@ -62,6 +63,7 @@ const Marquee: FC<Props> = ({ isReversed = false, className }) => {
     },
     { dependencies: [isReversed] },
   )
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const timelineTimeScaleTween = useRef<GSAPTween>()
 
