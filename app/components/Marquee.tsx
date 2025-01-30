@@ -36,6 +36,7 @@ const ELEMENTS = [...TECHNOLOGY_ICONS, ...TECHNOLOGY_ICONS]
 
 const Marquee: FC<Props> = ({ isReversed = false, className }) => {
   const movingContainer = useRef<HTMLDivElement>(null)
+  // @ts-ignore
   const timeline = useRef<GSAPTimeline>()
 
   useGSAP(
@@ -61,7 +62,7 @@ const Marquee: FC<Props> = ({ isReversed = false, className }) => {
     },
     { dependencies: [isReversed] },
   )
-
+  // @ts-ignore
   const timelineTimeScaleTween = useRef<GSAPTween>()
 
   const onPointerEnter = () => {
