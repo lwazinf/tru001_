@@ -6,7 +6,7 @@ import React, { useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faApple, faFacebook, faGooglePlay, faInstagram, faLinkedinIn, faTiktok } from "@fortawesome/free-brands-svg-icons";
 import Pricing_ from "./helpers/pricing";
-import Marquee from "./marquee";
+import Marquee from "./Marquee";
 
 gsap.registerPlugin(ScrollTrigger);
 
