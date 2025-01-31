@@ -1,4 +1,4 @@
-import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 
@@ -8,22 +8,37 @@ const Pricing_ = () => {
 
   return (
     <div
-      className={`w-full h-[70vh] flex flex-col justify-center items-center top_fade`}
+      className={`w-full h-[90vh] flex flex-col justify-center items-center top_fade`}
     >
+      <div
+        className={`w-full min-h-2 flex flex-col mt-[30px] mb-[60px] justify-center items-center`}
+      >
+        <p className={`text-white text-[25px] font-black`}>
+          Packages and Pricing
+        </p>
+      </div>
       <motion.div
         className={`flex flex-row justify-center items-center w-full min-h-2 mb-2`}
         style={{ y: yRange }}
         // onMouseMove={(e) => y.set(e.clientY / window.innerHeight)}
       >
         <motion.div
-          className={`h-[475px] w-[350px] m-2 rounded-[5px] flex flex-col justify-start items-center bg-[#f0f0f0] relative overflow-hidden border-[1px] border-black/5`}
+          className={`h-[475px] w-[350px] m-2 rounded-[5px] flex flex-col justify-start items-center bg-gradient-to-br from-yellow-200 via-yellow-500 to-yellow-200 relative overflow-hidden border-[1px] border-black/5`}
           style={{ y: yRange }}
         >
           <div className={`h-[10px]`}></div>
-          <div
-            className={`h-[100px] w-full mb-[-20px] flex flex-col justify-center items-start px-4 text-black/50 text-[20px] font-bold`}
-          >
-            Gold
+          <div className={`flex flex-row justify-between items-center w-full`}>
+            <div
+              className={`h-[100px] w-full mb-[-20px] flex flex-col justify-center items-start px-4 text-black text-[20px] font-bold`}
+            >
+              Gold
+            </div>
+            <div
+              className={`text-black/80 px-4 text-[13px] font-bold w-[250px] relative top-[13px]`}
+            >
+              R2,999.99{" "}
+              <span className={`text-black/80 font-medium`}>/month</span>
+            </div>
           </div>
           <div className={`h-[300px] w-full`}>
             <div className={`h-[1px] w-[90%] bg-black/20 mx-auto`} />
@@ -49,76 +64,54 @@ const Pricing_ = () => {
                   className={`w-[200px] object-cover relative`}
                 />
               </motion.div>
+              <div className={`w-full h-full absolute p-1`}>
+                <div
+                  className={`h-full w-full flex flex-col items-start justify-start pl-4 pt-8`}
+                >
+                  {[
+
+{
+  feature: "2 vehicles registered",
+  status: true,
+},{
+  feature: "4 Royal Valet washes (R1,800 value/month)",
+  status: true,
+},{
+  feature: "Tyre inspection valued at R300/month",
+  status: true,
+},{
+  feature: "On-demand & scheduled fuel delivery",
+  status: true,
+},
+                    {
+                      feature: "24/7 fuel delivery at station prices",
+                      status: true,
+                    },
+                    {
+                      feature: "Interior steam clean & detailing",
+                      status: true,
+                    },
+                    { feature: "Full exterior wash & polish", status: true },
+                    { feature: "24/7 roadside assistance and repairs", status: true },
+                  ].map((obj_, idx_) => {
+                    return (
+                      <div
+                        className={`flex flex-row justify-start items-center w-full min-h-2 mb-1`}
+                        key={idx_}
+                      >
+                        <FontAwesomeIcon
+                          icon={faCheckCircle}
+                          className={`mx-1 mr-2 text-[12px]`}
+                        />
+                        <p className={`text-[13px]`}>{obj_.feature}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
               <div className="w-full h-full overflow-y-auto absolute">
                 <div className="p-8">
-                  <div className="max-w-3xl space-y-8">
-                    {/* Header */}
-                    <div className="mb-4">
-                      <h2 className="text-2xl font-bold mb-2">
-                        Premium Mobile Fuel Delivery Services
-                      </h2>
-                      <p className="text-lg font-semibold">
-                        2 Vehicles registered
-                      </p>
-                    </div>
-
-                    {/* Fuel Services */}
-                    <div className="space-y-2">
-                      <ul className="list-decimal list-inside space-y-1">
-                        <li>On demand fuel delivery</li>
-                        <li>Scheduled delivery</li>
-                        <li>24 hour delivery</li>
-                        <li>Fuel station prices to your doorstep</li>
-                      </ul>
-                    </div>
-
-                    {/* Car Wash Services */}
-                    <div className="space-y-2">
-                      <h3 className="text-xl font-bold mb-2">
-                        Premium Mobile Car Wash Services
-                      </h3>
-                      <ul className="list-decimal list-inside space-y-2">
-                        <li>
-                          4 Royal Valet washes valued at R1800.00 Per month
-                        </li>
-                        <li>
-                          <span className="font-semibold">
-                            Inner treatment:{" "}
-                          </span>
-                          Scrub and steam treatment for carpets, seats and all
-                          crevasses. Detailed clean of Inner doors, inner boot,
-                          badges, inner console, dashboard treatment and polish
-                        </li>
-                        <li>
-                          <span className="font-semibold">
-                            Outer treatment:{" "}
-                          </span>
-                          Pressure rinse, soap high pressure snow foam canon,
-                          detailed hand wash, dry, tyre polish, mags, mud flaps,
-                          black trim brightness
-                        </li>
-                      </ul>
-                    </div>
-
-                    {/* Tyre Services */}
-                    <div className="space-y-2">
-                      <h3 className="text-xl font-bold mb-2">
-                        Premium Mobile Tyre Repair
-                      </h3>
-                      <ul className="list-decimal list-inside space-y-2">
-                        <li>
-                          Professional Tyre inspection valued at: R300.00 per
-                          month
-                        </li>
-                        <li>Repairs of tyres on site</li>
-                        <li>Discounts on all new tyre purchases</li>
-                        <li>
-                          Access to 24 hour road side assistance for all tyre
-                          related issues
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
+                  <div className="max-w-3xl space-y-8"></div>
                 </div>
               </div>
             </div>
@@ -128,15 +121,14 @@ const Pricing_ = () => {
             <div
               className={`w-full h-full flex flex-row justify-between items-center`}
             >
-              <div className={`text-black/50 px-4 text-[13px] font-bold`}>
-                R2,999.99{" "}
-                <span className={`text-black/20 font-medium`}>/month</span>
+              <div className={`text-black/80 px-4 text-[13px] font-bold`}>
+                Limited to 50 members
               </div>
               <div
-                className={`min-w-[100px] h-[30px] mr-4 bg-[#131313] rounded-[15px] flex flex-row justify-center items-center cursor-pointer`}
+                className={`min-w-[100px] h-[30px] mr-4 bg-black rounded-[15px] flex flex-row justify-center items-center cursor-pointer`}
               >
                 <div
-                  className={`min-w-[100px] h-[30px] scale-[0.3] opacity-50 absolute hover:animate-ping bg-black rounded-[15px] flex flex-row justify-center items-center cursor-pointer z-[0]`}
+                  className={`min-w-[100px] h-[30px] scale-[0.3] opacity-50 absolute hover:animate-ping bg-whit rounded-[15px] flex flex-row justify-center items-center cursor-pointer z-[0]`}
                 />
                 <p
                   className={`text-white/80 font-medium text-[12px] pointer-events-none z-[1]`}
@@ -156,10 +148,18 @@ const Pricing_ = () => {
           style={{ y: yRange }}
         >
           <div className={`h-[10px]`}></div>
-          <div
-            className={`h-[100px] w-full mb-[-20px] flex flex-col justify-center items-start px-6 text-white/50 text-[20px] font-bold`}
-          >
-            Black
+          <div className={`flex flex-row justify-between items-center w-full`}>
+            <div
+              className={`h-[100px] w-full mb-[-20px] flex flex-col justify-center items-start px-6 text-white/50 text-[20px] font-bold`}
+            >
+              Black
+            </div>
+            <div
+              className={`text-white/50 px-6 text-[13px] font-bold w-[250px] relative top-[13px]`}
+            >
+              R4,999.99{" "}
+              <span className={`text-white/20 font-medium`}>/month</span>
+            </div>
           </div>
           <div className={`h-[300px] w-full`}>
             <div className={`h-[1px] w-[90%] bg-white/20 mx-auto`} />
@@ -185,6 +185,50 @@ const Pricing_ = () => {
                   className={`w-[200px] object-cover relative`}
                 />
               </motion.div>
+              <div className={`w-full h-full absolute p-1`}>
+                <div
+                  className={`h-full w-full flex flex-col items-start justify-start pl-4 pt-8`}
+                >
+                  {[
+                    {
+                      feature: "4 vehicles registered",
+                      status: true,
+                    },{
+                      feature: "8 Royal Valet washes (R3,600 value/month)",
+                      status: true,
+                    },{
+                      feature: "Tyre inspection valued at R600/month",
+                      status: true,
+                    },{
+                      feature: "On-demand & scheduled fuel delivery",
+                      status: true,
+                    },
+                    {
+                      feature: "24/7 fuel delivery at station prices",
+                      status: true,
+                    },
+                    {
+                      feature: "Interior steam clean & detailing",
+                      status: true,
+                    },
+                    { feature: "Full exterior wash & polish", status: true },
+                    { feature: "24/7 roadside assistance and repairs", status: true },
+                  ].map((obj_, idx_) => {
+                    return (
+                      <div
+                        className={`flex flex-row justify-start items-center w-full min-h-2 mb-1 text-white`}
+                        key={idx_}
+                      >
+                        <FontAwesomeIcon
+                          icon={faCheckCircle}
+                          className={`mx-1 mr-2 text-[12px]`}
+                        />
+                        <p className={`text-[13px]`}>{obj_.feature}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
           <div className={`h-[75px] w-full`}>
@@ -193,8 +237,7 @@ const Pricing_ = () => {
               className={`w-full h-full flex flex-row justify-between items-center`}
             >
               <div className={`text-white/50 px-6 text-[13px] font-bold`}>
-                R4,999.99{" "}
-                <span className={`text-white/20 font-medium`}>/month</span>
+                Limited to 50 members
               </div>
               <div
                 className={`min-w-[100px] h-[30px] mr-6 bg-orange-600 rounded-[15px] flex flex-row justify-center items-center cursor-pointer`}
@@ -218,7 +261,7 @@ const Pricing_ = () => {
       </motion.div>
 
       <motion.div
-        className={`flex flex-row justify-center items-center w-full min-h-2 mt-8`}
+        className={`flex flex-row justify-center items-center w-full min-h-2 mt-[40px]`}
         style={{ y: yRange }}
       >
         <p

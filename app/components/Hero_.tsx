@@ -2,11 +2,19 @@
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import ReactLenis from "lenis/react";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faApple, faFacebook, faGooglePlay, faInstagram, faLinkedinIn, faTiktok } from "@fortawesome/free-brands-svg-icons";
+import {
+  faApple,
+  faFacebook,
+  faGooglePlay,
+  faInstagram,
+  faLinkedinIn,
+  faTiktok,
+} from "@fortawesome/free-brands-svg-icons";
 import Pricing_ from "./helpers/pricing";
 import Marquee from "./Marquee";
+import { motion } from "framer-motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -20,6 +28,7 @@ const Hero_ = () => {
   const thirdSectionRef = useRef(null);
   const mainImgRef = useRef(null);
   const heroImgRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const scrollTriggerSettings = {
@@ -177,7 +186,18 @@ const Hero_ = () => {
     });
     animations.push(lastSectionZoom);
 
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768); // Using 768px as the breakpoint
+    };
+
+    // Check initially
+    checkIfMobile();
+
+    // Add event listener
+    window.addEventListener('resize', checkIfMobile);
+
     return () => {
+      window.removeEventListener('resize', checkIfMobile)
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
       animations.forEach((animation) => animation.kill());
     };
@@ -187,25 +207,54 @@ const Hero_ = () => {
     const rows = [];
     for (let i = 1; i <= 3; i++) {
       rows.push(
-        <div className="row flex flex-col md:flex-row gap-4 mb-8 px-4 md:px-0" key={i}>
-          <div className="card card-left cursor-pointer w-full md:w-1/2 relative">
+        <div className="row" key={i}>
+          <div className="card card-left cursor-pointer">
             <img
               src={`/assets/images/img-${2 * i - 1}.jpg`}
               alt={`Card left ${i}`}
-              className="w-full h-full object-cover rounded-lg"
             />
-            <div className="flex flex-col justify-center items-center rounded-[3px] backdrop-blur-md bg-white/10 text-white/50 font-bold absolute right-2 bottom-2 px-4 md:px-6 py-2 text-sm md:text-base">
-              {i == 1 ? '1st Frame' : i == 2 ? '2nd Frame' : '3rd Frame'}
+            <div className="flex flex-col justify-center items-center rounded-[3px] backdrop-blur-md bg-white/10 text-white/50 font-bold absolute right-2 bottom-2 px-6 py-2">
+              {i == 1 ? "1st Frame" : i == 2 ? "2nd Frame" : "3rd Frame"}
             </div>
           </div>
-          <div className="card card-right cursor-pointer w-full md:w-1/2 relative">
+          <div className="card card-right cursor-pointer">
             <img
               src={`/assets/images/img-${2 * i}.jpg`}
               alt={`Card right ${i}`}
-              className="w-full h-full object-cover rounded-lg"
             />
-            <div className="flex flex-col justify-center items-center rounded-[3px] backdrop-blur-md bg-white/10 text-white/50 font-bold absolute left-2 bottom-2 px-4 md:px-6 py-2 text-sm md:text-base">
-              {i == 1 ? '1st Frame' : i == 2 ? '2nd Frame' : '3rd Frame'}
+            <div className="flex flex-col justify-center items-center rounded-[3px] backdrop-blur-md bg-white/10 text-white/50 font-bold absolute left-2 bottom-2 px-6 py-2">
+              {i == 1 ? "1st Frame" : i == 2 ? "2nd Frame" : "3rd Frame"}
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return rows;
+  };
+
+  const generateRows2 = () => {
+    const rows = [];
+    for (let i = 1; i <= 3; i++) {
+      rows.push(
+        <div className="row flex flex-col gap-4" key={i}>
+          <div className="card card-left cursor-pointer w-full relative">
+            <img
+              src={`/assets/images/img-${2 * i - 1}.jpg`}
+              alt={`Card left ${i}`}
+              className="w-full"
+            />
+            <div className="flex flex-col justify-center items-center rounded backdrop-blur-md bg-white/10 text-white/50 font-bold absolute right-2 bottom-2 px-6 py-2">
+              {i === 1 ? "1st Frame" : i === 2 ? "2nd Frame" : "3rd Frame"}
+            </div>
+          </div>
+          <div className="card card-right cursor-pointer w-full relative">
+            <img
+              src={`/assets/images/img-${2 * i}.jpg`}
+              alt={`Card right ${i}`}
+              className="w-full"
+            />
+            <div className="flex flex-col justify-center items-center rounded backdrop-blur-md bg-white/10 text-white/50 font-bold absolute left-2 bottom-2 px-6 py-2">
+              {i === 1 ? "1st Frame" : i === 2 ? "2nd Frame" : "3rd Frame"}
             </div>
           </div>
         </div>
@@ -224,42 +273,38 @@ const Hero_ = () => {
           ref={mainImgRef}
           src="/assets/images/main.jpg"
           className="w-full h-full object-cover"
-          alt="Main background"
         />
         <div className="topFade absolute top-0 w-full h-full" />
         <div className="leftFade absolute top-0 w-full h-full" />
         <div className="rotate-180 topFade absolute top-0 w-full h-full" />
         <div className="absolute top-0 w-full h-full flex flex-col justify-end items-start text-white">
-          <div className="first-section-logo text-[100px] md:text-[200px] w-full h-full flex flex-col justify-center items-center absolute font-black text-white">
-            <div className="first-section-text flex flex-row justify-center items-center h-[350px] md:h-[750px] w-full opacity-[.99] rotate-3 absolute">
+          <div className="first-section-logo text-[200px] w-full h-full flex flex-col justify-center items-center absolute font-black text-white">
+            <div className="first-section-text flex flex-row justify-center items-center h-[750px] w-full opacity-[.99] rotate-3 absolute">
               <img
                 src="/assets/mockups/profile.png"
-                alt="Profile mockup"
-                className="w-full h-full object-contain ml-0 md:ml-[450px]"
+                alt="Main logo"
+                className="w-full h-full object-contain ml-[450px]"
               />
             </div>
-            <div className="first-section-text flex flex-row justify-center items-center h-[350px] md:h-[750px] w-full opacity-[.99] rotate-6 absolute">
+            <div className="first-section-text flex flex-row justify-center items-center h-[750px] w-full opacity-[.99] rotate-6 absolute">
               <img
                 src="/assets/mockups/orders.png"
-                alt="Orders mockup"
-                className="w-full h-full object-contain scale-[0.5] md:scale-[0.7] ml-[200px] md:ml-[900px]"
+                alt="Main logo"
+                className="w-full h-full object-contain scale-[0.7] ml-[900px]"
               />
             </div>
-            <div className="w-[250px] md:w-[650px] h-[250px] md:h-[650px] z-[4]">
+            <div className="w-[650px] h-[650px] z-[4]">
               <img
                 src="/assets/images/white_logo.png"
-                alt="White logo"
+                alt="Main logo"
                 className="w-full h-full object-contain"
               />
             </div>
           </div>
-          
-          <div className="first-section-text flex flex-col justify-center items-center w-full md:w-[600px] px-4 md:px-0 h-auto md:h-[250px]">
-            <div className="first-section-text flex flex-col justify-center items-start w-full md:w-[390px] md:ml-[70px] h-auto md:h-[250px] mt-[-150px] md:mt-[-350px] mb-[30px] md:mb-[70px]">
-              <div className="text-[36px] md:text-[50px] font-black">
-                Need To Fuel
-              </div>              
-              <div className="text-[14px] md:text-[16px] font-bold flex flex-col justify-center">
+          <div className="first-section-text flex flex-col justify-center items-center w-[600px] h-[250px]">
+            <div className="first-section-text flex flex-col justify-center items-start w-[390px] ml-[70px] h-[250px] mt-[-350px] mb-[70px]">
+              <div className={`text-[50px] font-black`}>Need To Fuel</div>
+              <div className="text-[16px] font-bold flex flex-col justify-center">
                 <p>
                   Our exclusive mobile fueling service is already trusted by
                   Gauteng&apos;s most discerning professionals and businesses.
@@ -267,40 +312,143 @@ const Hero_ = () => {
                   visit a fuel station again.
                 </p>
               </div>
-              <div className="min-w-2 min-h-2 flex flex-row justify-center items-center mt-4">
-                <div className="min-w-8 h-8 px-4 text-[12px] text-black bg-white font-semibold flex flex-col justify-center items-center border-white border-[1px] rounded-[20px]">
-                  Get Started
-                </div>
+              <div
+                className={`min-w-2 min-h-2 flex flex-row justify-center items-center mt-4`}
+              >
+                {["Get Started"].map((obj_, idx_) => {
+                  return (
+                    <div
+                      key={idx_}
+                      className={`min-w-8 h-8 px-4 text-[12px] text-black bg-white font-semibold flex flex-col justify-center items-center border-white border-[1px] rounded-[20px]`}
+                    >
+                      {obj_}
+                    </div>
+                  );
+                })}
               </div>
             </div>
-
-            <div className="first-section-text flex flex-col md:flex-row justify-center items-center w-full md:w-[600px] h-auto md:h-[250px] space-y-4 md:space-y-0">
-              <div className="text-[14px] md:text-[16px] text-center md:text-end font-medium flex flex-col justify-center items-center md:items-end">
+            <div className="first-section-text flex flex-row justify-center items-center w-[600px] h-[250px]">
+              {/* <p className="text-[65px] font-black -rotate-90 text-yellow-700">
+              Fuel
+              </p> */}
+              <div className="text-[16px] text-end font-medium flex flex-col justify-center items-end">
                 <p>Need To Fuel&apos;s mobile app is</p>
                 <p>now available at your store</p>
               </div>
-              <div className="min-w-2 min-h-2 flex flex-row justify-center md:ml-6 items-center">
-                {[faApple, faGooglePlay].map((obj_, idx_) => (
-                  <div
-                    key={idx_}
-                    className="mx-1 w-8 h-8 flex flex-col justify-center items-center border-white border-[1px] rounded-[50%]"
-                  >
-                    <FontAwesomeIcon icon={obj_} />
-                  </div>
-                ))}
+              <div
+                className={`min-w-2 min-h-2 flex flex-row justify-center ml-6 items-center z-[5]`}
+              >
+                {[
+                  { icon: faApple, func: () => {} },
+                  {
+                    icon: faGooglePlay,
+                    func: () => {
+                      window.open("/assets/apps/app-release.apk");
+                    },
+                  },
+                ].map((obj_, idx_) => {
+                  return (
+                    <div
+                      key={idx_}
+                      onClick={obj_.func}
+                      className={`cursor-pointer mx-1 w-8 h-8 flex flex-col justify-center items-center border-white border-[1px] rounded-[50%]`}
+                    >
+                      <FontAwesomeIcon icon={obj_.icon} />
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
-
-          <div className="w-full md:w-[400px] relative bottom-[50px] md:bottom-[100px] md:ml-[95px] min-h-2 flex flex-col justify-center items-center scale-[0.7] md:scale-[0.8]">
+          <div
+            className={`w-[400px] opacity-0 relative bottom-[100px] ml-[95px] min-h-2 flex flex-col justify-center items-center scale-[0.8]`}
+          >
             <Marquee />
+          </div>
+        </div>
+      </section>
+
+
+
+      <section className={`min-h-screen`}>
+        <Pricing_ />
+      </section>
+
+      <section
+        ref={thirdSectionRef}
+        className="w-full h-screen relative overflow-hidden"
+      >
+        <img
+          ref={heroImgRef}
+          src="/assets/images/hero.jpg"
+          className="w-full h-full object-cover"
+        />
+        <div className="topFade absolute top-0 w-full h-full" />
+        <div className="rotate-180 topFade absolute top-0 w-full h-full" />
+        <div className="absolute top-0 w-full h-full flex flex-col justify-end items-start text-white">
+          <div className="w-full h-full flex flex-col justify-center items-center absolute">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="max-w-4xl mx-auto p-12"
+            >
+              <div className="relative px-8">
+                {/* Top quotes */}
+                <span className="absolute -top-8 -left-4 text-yellow-400 text-6xl font-serif">
+                  ❝
+                </span>
+
+                {/* Quote text */}
+                <motion.p
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-center text-4xl md:text-5xl lg:text-6xl font-light tracking-wide leading-tight text-white mb-8"
+                >
+                  I can buy anything I want, basically, but I can&apos;t buy
+                  time
+                </motion.p>
+
+                {/* Bottom quotes */}
+                <span className="absolute -bottom-8 -right-4 text-yellow-400 text-6xl font-serif">
+                  ❞
+                </span>
+
+                {/* Divider */}
+                <div className="flex items-center justify-center space-x-4 mb-6">
+                  <div className="w-12 h-0.5 bg-yellow-400"></div>
+                  <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
+                  <div className="w-12 h-0.5 bg-yellow-400"></div>
+                </div>
+
+                {/* Attribution */}
+                <motion.p
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-center text-white text-xl md:text-2xl font-medium"
+                >
+                  — Warren Buffett
+                </motion.p>
+              </div>
+            </motion.div>
+          </div>
+          <div className="flex flex-row justify-center items-center w-[600px] h-[250px]">
+            <p className="text-[65px] font-black -rotate-90 text-yellow-700">
+              Fuel
+            </p>
+            <p className="text-[14px]">
+              Whether you need a fill-up, detailed cleaning, or roadside
+              assistance, our professional team comes to you. Get started today
+              and experience car care that fits your lifestyle.
+            </p>
           </div>
         </div>
       </section>
 
       <section
         ref={secondSectionRef}
-        className="main w-full flex flex-col justify-end items-center mt-[45px] md:mt-[90px] mb-[-75px] md:mb-[-150px] z-[4]"
+        className="main w-full flex flex-col justify-end items-center mt-[90px] mb-[-150px] z-[4]"
       >
         <div
           className="absolute top-0 left-0 w-full h-full opacity-5"
@@ -312,91 +460,74 @@ const Hero_ = () => {
             pointerEvents: "none",
           }}
         />
-        {generateRows()}
+        {isMobile ? generateRows2() : generateRows()}
       </section>
 
-      <section
-        ref={thirdSectionRef}
-        className="w-full h-screen relative overflow-hidden"
-      >
-        <img
-          ref={heroImgRef}
-          src="/assets/images/hero.jpg"
-          className="w-full h-full object-cover"
-          alt="Hero background"
-        />
-        <div className="topFade absolute top-0 w-full h-full" />
-        <div className="rotate-180 topFade absolute top-0 w-full h-full" />
-        <div className="absolute top-0 w-full h-full flex flex-col justify-end items-start text-white">
-          <div className="text-[100px] md:text-[200px] w-full h-full flex flex-col justify-center items-center absolute font-black text-white">
-            Fuel
-          </div>
-          <div className="flex flex-col md:flex-row justify-center items-center w-full md:w-[600px] h-auto md:h-[250px] px-4 md:px-0 pb-8 md:pb-0">
-            <p className="text-[45px] md:text-[65px] font-black md:-rotate-90 text-yellow-700 mb-4 md:mb-0">
-              Fuel
-            </p>
-            <p className="text-[14px] text-center md:text-left">
-              Whether you need a fill-up, detailed cleaning, or roadside
-              assistance, our professional team comes to you. Get started today
-              and experience car care that fits your lifestyle.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <Pricing_ />
-      </section>
-
-      <section className="footer text-[14px] text-white relative flex flex-col justify-end items-center pb-8 px-4 md:px-8">
-        <div>
-          <img 
-            className="absolute bottom-[-200px] w-[300px] md:w-[600px] opacity-5" 
+      <section className="footer text-[14px] text-white relative flex flex-col justify-end items-center pb-8 mt-8">
+        <div className={``}>
+          <img
+            className={`absolute bottom-[-200px] w-[600px] opacity-5`}
             src="/assets/images/white_logo.png"
-            alt="Footer logo"
           />
         </div>
-        <div className="flex flex-col md:flex-row justify-evenly items-center mb-8 w-full min-h-2 space-y-6 md:space-y-0">
-          <div className="flex flex-col text-center md:text-left md:relative md:right-[55px]">
-            <p>The Green Room</p>
-            <p>124 Normal Ave</p>
-            <p className="mb-4">7692, South Africa</p>
+        <div
+          className={`flex flex-row justify-evenly items-center mb-8 w-full min-h-2`}
+        >
+          <div className={`flec flex-col relative right-[55px]`}>
+            <p className={``}>The Green Room</p>
+            <p className={``}>124 Normal Ave</p>
+            <p className={`mb-4`}>7692, South Africa</p>
 
-            <p>support@needtofuel.com</p>
-            <p className="mb-4">+27 71 220 4794</p>
+            <p className={``}>support@needtofuel.com</p>
+            <p className={`mb-4`}>+27 71 220 4794</p>
 
-            <div className="space-y-1">
-              <p className="flex flex-col md:flex-row items-center">
-                Monday - Friday 
-                <span className="ml-0 md:ml-[8px]">08:00 - 23:00</span>
-              </p>
-              <p className="flex flex-col md:flex-row items-center">
-                Saturday 
-                <span className="ml-0 md:ml-[53px]">08:00 - 17:00</span>
-              </p>
-              <p className="flex flex-col md:flex-row items-center mb-4">
-                Sunday 
-                <span className="ml-0 md:ml-[60px]">Closed</span>
-              </p>
-            </div>
+            <p className={``}>
+              Monday - Friday <span className={`ml-[8px]`}>08:00 - 23:00</span>
+            </p>
+            <p className={``}>
+              Saturday <span className={`ml-[53px]`}>08:00 - 17:00</span>
+            </p>
+            <p className={`mb-4`}>
+              Sunday <span className={`ml-[60px]`}>Closed</span>
+            </p>
           </div>
+          <div
+            className={`min-w-2 min-h-2 flex flex-row justify-center items-center`}
+          ></div>
+          <div
+            className={`min-w-2 min-h-2 flex flex-row justify-center items-center`}
+          ></div>
         </div>
-
-        <div className="w-full md:w-[80%] h-[1px] bg-white/20 mb-4" />
-        
-        <div className="flex flex-col md:flex-row justify-evenly items-center w-full min-h-2 space-y-4 md:space-y-0">
-          <p className="text-center">© 2025 - Need To Fuel</p>
-          
-          <div className="flex flex-row justify-center items-center space-x-3">
-            <FontAwesomeIcon icon={faFacebook} className="text-[18px] cursor-pointer hover:text-white/80 transition-colors"/>
-            <FontAwesomeIcon icon={faLinkedinIn} className="text-[18px] cursor-pointer hover:text-white/80 transition-colors"/>
-            <FontAwesomeIcon icon={faInstagram} className="text-[18px] cursor-pointer hover:text-white/80 transition-colors"/>
-            <FontAwesomeIcon icon={faTiktok} className="text-[18px] cursor-pointer hover:text-white/80 transition-colors"/>
+        <div className={`w-[80%] h-[1px] bg-white/20 mb-4`} />
+        <div
+          className={`flex flex-row justify-evenly items-center w-full min-h-2`}
+        >
+          <p className={``}>© 2025 - Need To Fuel</p>
+          <div
+            className={`min-w-2 min-h-2 flex flex-row justify-center items-center`}
+          >
+            <FontAwesomeIcon
+              icon={faFacebook}
+              className={`text-[18px] mx-1 cursor-pointer`}
+            />
+            <FontAwesomeIcon
+              icon={faLinkedinIn}
+              className={`text-[18px] mx-1 cursor-pointer`}
+            />
+            <FontAwesomeIcon
+              icon={faInstagram}
+              className={`text-[18px] mx-1 cursor-pointer`}
+            />
+            <FontAwesomeIcon
+              icon={faTiktok}
+              className={`text-[18px] mx-1 cursor-pointer`}
+            />
           </div>
-          
-          <div className="flex flex-row justify-center items-center space-x-4">
-            <p className="hover:text-white/80 transition-colors cursor-pointer">Terms</p>
-            <p className="hover:text-white/80 transition-colors cursor-pointer">Privacy</p>
+          <div
+            className={`min-w-2 min-h-2 flex flex-row justify-center items-center`}
+          >
+            <p className={`mx-2`}>Terms & Conditions</p>
+            <p className={`mx-2`}>Privacy Ploicy</p>
           </div>
         </div>
       </section>

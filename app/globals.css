@@ -80,8 +80,8 @@ section{
   }
 
   .card{
-    width: 40%;
-    height: 360px;
+    width: 30%;
+    height: 330px;
     position: relative;
     border-radius: 0.75em;
     overflow: hidden;
@@ -141,5 +141,8 @@ section{
     opacity: 0;
    }
 
+   html {
+    scroll-behavior: smooth;
+  }
    
 }
