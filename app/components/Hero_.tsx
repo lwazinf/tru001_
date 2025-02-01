@@ -15,7 +15,7 @@ import {
 import Pricing_ from "./helpers/pricing";
 import Marquee from "./Marquee";
 import { motion } from "framer-motion";
-import VerticalGallery from "./helpers/sideSwipe";
+// import VerticalGallery from "./helpers/sideSwipe";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -25,7 +25,7 @@ interface CardElement extends HTMLElement {
 
 const Hero_ = () => {
   const firstSectionRef = useRef(null);
-  const secondSectionRef = useRef(null);
+  // const secondSectionRef = useRef(null);
   const thirdSectionRef = useRef(null);
   const mainImgRef = useRef(null);
   const heroImgRef = useRef(null);
@@ -190,42 +190,13 @@ const Hero_ = () => {
       },
     });
     animations.push(lastSectionZoom);
-    
+
     return () => {
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
       animations.forEach((animation) => animation.kill());
       clearInterval(timer);
     };
   }, []);
-
-  const generateRows = () => {
-    const rows = [];
-    for (let i = 1; i <= 3; i++) {
-      rows.push(
-        <div className="xl:row hidden" key={i}>
-          <div className="card card-left cursor-pointer">
-            <img
-              src={`/assets/images/img-${2 * i - 1}.jpg`}
-              alt={`Card left ${i}`}
-            />
-            <div className="flex flex-col justify-center items-center rounded-[3px] backdrop-blur-md bg-white/10 text-white/50 font-bold absolute right-2 bottom-2 px-6 py-2">
-              {i == 1 ? "1st Frame" : i == 2 ? "2nd Frame" : "3rd Frame"}
-            </div>
-          </div>
-          <div className="card card-right cursor-pointer">
-            <img
-              src={`/assets/images/img-${2 * i}.jpg`}
-              alt={`Card right ${i}`}
-            />
-            <div className="flex flex-col justify-center items-center rounded-[3px] backdrop-blur-md bg-white/10 text-white/50 font-bold absolute left-2 bottom-2 px-6 py-2">
-              {i == 1 ? "1st Frame" : i == 2 ? "2nd Frame" : "3rd Frame"}
-            </div>
-          </div>
-        </div>
-      );
-    }
-    return rows;
-  };
 
   return (
     <ReactLenis root>
@@ -243,38 +214,38 @@ const Hero_ = () => {
         <div className="rotate-180 topFade absolute top-0 w-full h-full" />
         <div className="absolute top-0 w-full h-full flex flex-col justify-end items-start text-white">
           <div className="first-section-logo text-[200px] w-full h-full flex flex-col justify-center items-center absolute font-black text-white">
-            <div className="first-section-text xl:flex flex-row justify-center items-center h-[750px] w-full opacity-[.99] xl:rotate-3 absolute">
+            <div className="first-section-text mb-[100px] xl:flex flex-row justify-center items-center h-[750px] w-full opacity-[.99] xl:scale-[1] scale-[0.8] xl:rotate-3 absolute">
               <img
                 src="/assets/mockups/profile.png"
                 alt="Main logo"
                 className={`${
                   isVisible
                     ? "opacity-0 duration-[1000ms]"
-                    : "opacity-100 duration-[1000ms]"
-                } xl:opacity-100 floating-image animate-float transition-all w-full h-full object-contain xl:scale-[1] scale-[0.8] xl:ml-[450px]`}
+                    : "opacity-100 duration-[200ms]"
+                } xl:opacity-100 floating-image animate-float transition-all w-full h-full object-contain xl:ml-[450px]`}
               />
             </div>
-            <div className="first-section-text xl:flex flex-row justify-center items-center h-[750px] w-full opacity-[.99] xl:rotate-6 absolute">
+            <div className="first-section-text mb-[100px] xl:flex flex-row justify-center items-center h-[750px] w-full opacity-[.99] xl:scale-[1] scale-[0.8] xl:rotate-6 absolute">
               <img
                 src="/assets/mockups/orders.png"
                 alt="Main logo"
                 className={`${
                   !isVisible
                     ? "opacity-0 duration-[1000ms]"
-                    : "opacity-100 duration-[1000ms]"
-                } xl:opacity-100 floating-image animate-float transition-all w-full h-full object-contain scale-[0.7] xl:ml-[900px]`}
+                    : "opacity-100 duration-[200ms]"
+                } xl:opacity-100 floating-image animate-float transition-all w-full h-full object-contain xl:ml-[900px]`}
               />
             </div>
-            <div className="w-[650px] xl:h-[650px] h-[350px] xl:flex xl:scale-[1] xl:relative absolute top-[-80px] pointer-events-none scale-[0.7] z-[4]">
+            <div className="mr-[0px] w-[650px] xl:h-[650px] h-[350px] xl:flex xl:scale-[1] xl:relative absolute pointer-events-none z-[4]">
               <img
-                src="/assets/images/white_logo.png"
+                src="/assets/images/main_logo.png"
                 alt="Main logo"
                 className="w-full h-full object-contain"
               />
             </div>
           </div>
           <div className="first-section-text xl:flex hidden flex-col justify-center items-center w-[600px] h-[250px]">
-            <div className="first-section-text flex flex-col justify-center items-start w-[390px] ml-[70px] h-[250px] mt-[-350px] mb-[70px]">
+            {/* <div className="first-section-text flex flex-col justify-center items-start w-[390px] ml-[70px] h-[250px] mt-[-350px] mb-[70px]">
               <div className={`text-[50px] font-black`}>Need To Fuel</div>
               <div className="text-[16px] font-bold flex flex-col justify-center">
                 <p>
@@ -298,7 +269,7 @@ const Hero_ = () => {
                   );
                 })}
               </div>
-            </div>
+            </div> */}
             <div className="first-section-text flex flex-row justify-center items-center w-[600px] h-[250px]">
               {/* <p className="text-[65px] font-black -rotate-90 text-yellow-700">
               Fuel
@@ -337,11 +308,50 @@ const Hero_ = () => {
           >
             <Marquee />
           </div>
+          <div className={`w-full min-h-2 px-6 mb-10 block xl:hidden`}>
+            {["Get Started"].map((obj_, idx_) => {
+              return (
+                <div
+                  key={idx_}
+                  className={`min-w-8 h-12 px-4 text-[12px] text-black bg-white font-semibold flex flex-col justify-center items-center border-white border-[1px] rounded-[20px]`}
+                >
+                  {obj_}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
-      <section className={`min-h-screen xl:scale-[1] scale-[1]`}>
-        <Pricing_ />
+      <section
+        ref={thirdSectionRef}
+        className="w-full h-screen relative overflow-hidden"
+      >
+        <div className="first-section-text flex flex-col justify-center items-start w-[390px] text-center h-[250px] mt-[-350px] mb-[70px] text-white">
+          <div className={`text-[50px] font-black`}>Need To Fuel</div>
+          <div className="text-[16px] font-bold flex flex-col justify-center">
+            <p>
+              Our exclusive mobile fueling service is already trusted by
+              Gauteng&apos;s most discerning professionals and businesses.
+              Experience the difference that comes with never having to visit a
+              fuel station again.
+            </p>
+          </div>
+          <div
+            className={`min-w-2 min-h-2 flex flex-row justify-center items-center mt-4`}
+          >
+            {["Get Started"].map((obj_, idx_) => {
+              return (
+                <div
+                  key={idx_}
+                  className={`min-w-8 h-8 px-4 text-[12px] text-black bg-white font-semibold flex flex-col justify-center items-center border-white border-[1px] rounded-[20px]`}
+                >
+                  {obj_}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </section>
 
       <section
@@ -416,7 +426,11 @@ const Hero_ = () => {
         </div>
       </section>
 
-      <section
+      <section className={`min-h-screen xl:scale-[1] scale-[1]`}>
+        <Pricing_ />
+      </section>
+
+      {/* <section
         ref={secondSectionRef}
         className="main w-full flex flex-col justify-start p-4 items-center xl:mt-[90px] xl:mb-[-150px] z-[4]"
       >
@@ -433,7 +447,7 @@ const Hero_ = () => {
 
         {generateRows()}
         <VerticalGallery />
-      </section>
+      </section> */}
 
       <section className="footer text-[14px] text-white relative flex flex-col xl:justify-end justify-center items-center pb-8 xl:mt-[150px]">
         <div className={``}>
