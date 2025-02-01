@@ -15,6 +15,7 @@ import {
 import Pricing_ from "./helpers/pricing";
 import Marquee from "./Marquee";
 import { motion } from "framer-motion";
+import VerticalGallery from "./helpers/sideSwipe";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -28,9 +29,13 @@ const Hero_ = () => {
   const thirdSectionRef = useRef(null);
   const mainImgRef = useRef(null);
   const heroImgRef = useRef(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
+    const timer = setInterval(() => {
+      setIsVisible((prev) => !prev);
+    }, 5000);
+
     const scrollTriggerSettings = {
       trigger: ".main",
       start: "top 75%",
@@ -185,21 +190,11 @@ const Hero_ = () => {
       },
     });
     animations.push(lastSectionZoom);
-
-    const checkIfMobile = () => {
-      setIsMobile(window.innerWidth < 768); // Using 768px as the breakpoint
-    };
-
-    // Check initially
-    checkIfMobile();
-
-    // Add event listener
-    window.addEventListener('resize', checkIfMobile);
-
+    
     return () => {
-      window.removeEventListener('resize', checkIfMobile)
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
       animations.forEach((animation) => animation.kill());
+      clearInterval(timer);
     };
   }, []);
 
@@ -207,7 +202,7 @@ const Hero_ = () => {
     const rows = [];
     for (let i = 1; i <= 3; i++) {
       rows.push(
-        <div className="row" key={i}>
+        <div className="xl:row hidden" key={i}>
           <div className="card card-left cursor-pointer">
             <img
               src={`/assets/images/img-${2 * i - 1}.jpg`}
@@ -232,37 +227,6 @@ const Hero_ = () => {
     return rows;
   };
 
-  const generateRows2 = () => {
-    const rows = [];
-    for (let i = 1; i <= 3; i++) {
-      rows.push(
-        <div className="row flex flex-col gap-4" key={i}>
-          <div className="card card-left cursor-pointer w-full relative">
-            <img
-              src={`/assets/images/img-${2 * i - 1}.jpg`}
-              alt={`Card left ${i}`}
-              className="w-full"
-            />
-            <div className="flex flex-col justify-center items-center rounded backdrop-blur-md bg-white/10 text-white/50 font-bold absolute right-2 bottom-2 px-6 py-2">
-              {i === 1 ? "1st Frame" : i === 2 ? "2nd Frame" : "3rd Frame"}
-            </div>
-          </div>
-          <div className="card card-right cursor-pointer w-full relative">
-            <img
-              src={`/assets/images/img-${2 * i}.jpg`}
-              alt={`Card right ${i}`}
-              className="w-full"
-            />
-            <div className="flex flex-col justify-center items-center rounded backdrop-blur-md bg-white/10 text-white/50 font-bold absolute left-2 bottom-2 px-6 py-2">
-              {i === 1 ? "1st Frame" : i === 2 ? "2nd Frame" : "3rd Frame"}
-            </div>
-          </div>
-        </div>
-      );
-    }
-    return rows;
-  };
-
   return (
     <ReactLenis root>
       <section
@@ -279,21 +243,29 @@ const Hero_ = () => {
         <div className="rotate-180 topFade absolute top-0 w-full h-full" />
         <div className="absolute top-0 w-full h-full flex flex-col justify-end items-start text-white">
           <div className="first-section-logo text-[200px] w-full h-full flex flex-col justify-center items-center absolute font-black text-white">
-            <div className="first-section-text flex flex-row justify-center items-center h-[750px] w-full opacity-[.99] rotate-3 absolute">
+            <div className="first-section-text xl:flex flex-row justify-center items-center h-[750px] w-full opacity-[.99] xl:rotate-3 absolute">
               <img
                 src="/assets/mockups/profile.png"
                 alt="Main logo"
-                className="w-full h-full object-contain ml-[450px]"
+                className={`${
+                  isVisible
+                    ? "opacity-0 duration-[1000ms]"
+                    : "opacity-100 duration-[1000ms]"
+                } xl:opacity-100 floating-image animate-float transition-all w-full h-full object-contain xl:scale-[1] scale-[0.8] xl:ml-[450px]`}
               />
             </div>
-            <div className="first-section-text flex flex-row justify-center items-center h-[750px] w-full opacity-[.99] rotate-6 absolute">
+            <div className="first-section-text xl:flex flex-row justify-center items-center h-[750px] w-full opacity-[.99] xl:rotate-6 absolute">
               <img
                 src="/assets/mockups/orders.png"
                 alt="Main logo"
-                className="w-full h-full object-contain scale-[0.7] ml-[900px]"
+                className={`${
+                  !isVisible
+                    ? "opacity-0 duration-[1000ms]"
+                    : "opacity-100 duration-[1000ms]"
+                } xl:opacity-100 floating-image animate-float transition-all w-full h-full object-contain scale-[0.7] xl:ml-[900px]`}
               />
             </div>
-            <div className="w-[650px] h-[650px] z-[4]">
+            <div className="w-[650px] xl:h-[650px] h-[350px] xl:flex xl:scale-[1] xl:relative absolute top-[-80px] pointer-events-none scale-[0.7] z-[4]">
               <img
                 src="/assets/images/white_logo.png"
                 alt="Main logo"
@@ -301,7 +273,7 @@ const Hero_ = () => {
               />
             </div>
           </div>
-          <div className="first-section-text flex flex-col justify-center items-center w-[600px] h-[250px]">
+          <div className="first-section-text xl:flex hidden flex-col justify-center items-center w-[600px] h-[250px]">
             <div className="first-section-text flex flex-col justify-center items-start w-[390px] ml-[70px] h-[250px] mt-[-350px] mb-[70px]">
               <div className={`text-[50px] font-black`}>Need To Fuel</div>
               <div className="text-[16px] font-bold flex flex-col justify-center">
@@ -368,9 +340,7 @@ const Hero_ = () => {
         </div>
       </section>
 
-
-
-      <section className={`min-h-screen`}>
+      <section className={`min-h-screen xl:scale-[1] scale-[1]`}>
         <Pricing_ />
       </section>
 
@@ -448,10 +418,10 @@ const Hero_ = () => {
 
       <section
         ref={secondSectionRef}
-        className="main w-full flex flex-col justify-end items-center mt-[90px] mb-[-150px] z-[4]"
+        className="main w-full flex flex-col justify-start p-4 items-center xl:mt-[90px] xl:mb-[-150px] z-[4]"
       >
         <div
-          className="absolute top-0 left-0 w-full h-full opacity-5"
+          className="absolute z-[0] top-0 left-0 w-full h-full opacity-5"
           style={{
             backgroundImage: "url(/assets/images/main_logo.png)",
             backgroundSize: "100px",
@@ -460,18 +430,20 @@ const Hero_ = () => {
             pointerEvents: "none",
           }}
         />
-        {isMobile ? generateRows2() : generateRows()}
+
+        {generateRows()}
+        <VerticalGallery />
       </section>
 
-      <section className="footer text-[14px] text-white relative flex flex-col justify-end items-center pb-8 mt-8">
+      <section className="footer text-[14px] text-white relative flex flex-col xl:justify-end justify-center items-center pb-8 xl:mt-[150px]">
         <div className={``}>
           <img
-            className={`absolute bottom-[-200px] w-[600px] opacity-5`}
+            className={`absolute xl:bottom-[-200px] w-[600px] opacity-5`}
             src="/assets/images/white_logo.png"
           />
         </div>
         <div
-          className={`flex flex-row justify-evenly items-center mb-8 w-full min-h-2`}
+          className={`flex flex-row xl:justify-evenly justify-center items-center mb-8 w-full min-h-2`}
         >
           <div className={`flec flex-col relative right-[55px]`}>
             <p className={``}>The Green Room</p>
@@ -492,31 +464,31 @@ const Hero_ = () => {
             </p>
           </div>
           <div
-            className={`min-w-2 min-h-2 flex flex-row justify-center items-center`}
+            className={`min-w-2 min-h-2 xl:flex hidden flex-row justify-center items-center`}
           ></div>
           <div
-            className={`min-w-2 min-h-2 flex flex-row justify-center items-center`}
+            className={`min-w-2 min-h-2 xl:flex hidden flex-row justify-center items-center`}
           ></div>
         </div>
         <div className={`w-[80%] h-[1px] bg-white/20 mb-4`} />
         <div
-          className={`flex flex-row justify-evenly items-center w-full min-h-2`}
+          className={`flex xl:flex-row flex-col justify-evenly items-center w-full min-h-2`}
         >
-          <p className={``}>© 2025 - Need To Fuel</p>
+          <p className={`xl:mb-0 mb-4`}>© 2025 - Need To Fuel</p>
           <div
-            className={`min-w-2 min-h-2 flex flex-row justify-center items-center`}
+            className={`min-w-2 min-h-2 flex flex-row justify-center items-center xl:mb-0 mb-4`}
           >
             <FontAwesomeIcon
               icon={faFacebook}
-              className={`text-[18px] mx-1 cursor-pointer`}
+              className={`text-[18px] mx-1 cursor-pointer xl:mr-0 mr-4`}
             />
             <FontAwesomeIcon
               icon={faLinkedinIn}
-              className={`text-[18px] mx-1 cursor-pointer`}
+              className={`text-[18px] mx-1 cursor-pointer xl:mr-0 mr-4`}
             />
             <FontAwesomeIcon
               icon={faInstagram}
-              className={`text-[18px] mx-1 cursor-pointer`}
+              className={`text-[18px] mx-1 cursor-pointer xl:mr-0 mr-4`}
             />
             <FontAwesomeIcon
               icon={faTiktok}

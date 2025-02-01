@@ -19,7 +19,7 @@ const Nav_ = ({}) => {
         <div
           className={`bg-orange-800/80 h-full px-4 flex flex-row justify-center items-end text-[20px] font-black cursor-default rounded-b-[2px] md:backdrop-blur-none backdrop-blur-md`}
         >
-          <a href={`#hero`}>NTF</a>
+          <a href={`#hero`}>NTF</a> 
         </div>
       </div>
       <Menu_ />

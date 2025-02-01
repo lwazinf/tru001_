@@ -145,4 +145,37 @@ section{
     scroll-behavior: smooth;
   }
    
+  .floating-image {
+    opacity: 0;
+    transition: all 1000ms;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+  @media (min-width: 1280px) {
+    .floating-image {
+      margin-left: 900px;
+    }
+  }
+  
+  .floating-image.visible {
+    opacity: 1;
+  }
+  
+  @keyframes floatAndRotate {
+    0% {
+      transform: translateY(0px) rotate(-1deg);
+    }
+    50% {
+      transform: translateY(-10px) rotate(1deg);
+    }
+    100% {
+      transform: translateY(0px) rotate(-1deg);
+    }
+  }
+  
+  .animate-float {
+    animation: floatAndRotate 3s ease-in-out infinite;
+  }
 }
