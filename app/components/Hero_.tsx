@@ -207,17 +207,17 @@ const Hero_ = () => {
         <img
           ref={mainImgRef}
           src="/assets/images/main.jpg"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover grayscale-[0.6]"
         />
         <div className="topFade absolute top-0 w-full h-full" />
         <div className="leftFade absolute top-0 w-full h-full" />
         <div className="rotate-180 topFade absolute top-0 w-full h-full" />
         <div className="absolute top-0 w-full h-full flex flex-col justify-end items-start text-white">
           <div className="first-section-logo text-[200px] w-full h-full flex flex-col justify-center items-center absolute font-black text-white">
-            <div className="first-section-text mb-[100px] xl:flex flex-row justify-center items-center h-[750px] w-full opacity-[.99] xl:scale-[1] scale-[0.8] xl:rotate-3 absolute">
+            <div className="first-section-text mb-[100px] xl:flex flex-row justify-center items-center h-[750px] w-full opacity-[.99] xl:scale-[1] scale-[0.8] xl:rotate-3 absolute left-0">
               <img
                 src="/assets/mockups/profile.png"
-                alt="Main logo"
+                alt="Phone"
                 className={`${
                   isVisible
                     ? "opacity-0 duration-[1000ms]"
@@ -225,10 +225,10 @@ const Hero_ = () => {
                 } xl:opacity-100 floating-image animate-float transition-all w-full h-full object-contain xl:ml-[450px]`}
               />
             </div>
-            <div className="first-section-text mb-[100px] xl:flex flex-row justify-center items-center h-[750px] w-full opacity-[.99] xl:scale-[1] scale-[0.8] xl:rotate-6 absolute">
+            <div className="first-section-text mb-[-150px] xl:flex flex-row justify-center items-center h-[750px] w-full opacity-[.99] xl:scale-[1] scale-[0.8] xl:rotate-6 absolute left-0">
               <img
                 src="/assets/mockups/orders.png"
-                alt="Main logo"
+                alt="Phone"
                 className={`${
                   !isVisible
                     ? "opacity-0 duration-[1000ms]"
@@ -236,7 +236,7 @@ const Hero_ = () => {
                 } xl:opacity-100 floating-image animate-float transition-all w-full h-full object-contain xl:ml-[900px]`}
               />
             </div>
-            <div className="mr-[0px] w-[650px] xl:h-[650px] h-[350px] xl:flex xl:scale-[1] xl:relative absolute pointer-events-none z-[4]">
+            <div className="mr-[0px] xl:bottom-[250px] w-[650px] xl:h-[650px] h-[350px] xl:flex xl:scale-[1] xl:relative absolute pointer-events-none z-[4]">
               <img
                 src="/assets/images/main_logo.png"
                 alt="Main logo"
@@ -245,9 +245,9 @@ const Hero_ = () => {
             </div>
           </div>
           <div className="first-section-text xl:flex hidden flex-col justify-center items-center w-[600px] h-[250px]">
-            {/* <div className="first-section-text flex flex-col justify-center items-start w-[390px] ml-[70px] h-[250px] mt-[-350px] mb-[70px]">
-              <div className={`text-[50px] font-black`}>Need To Fuel</div>
-              <div className="text-[16px] font-bold flex flex-col justify-center">
+            <div className="first-section-text flex flex-col justify-center items-start min-w-[390px] ml-[150px] h-[250px] mt-[-350px] mb-[70px]">
+              <div className={`text-[80px] font-black lobster`}>Need To Fuel</div>
+              <div className="text-[16px] font-bold flex flex-col justify-center tinos-regular-italic">
                 <p>
                   Our exclusive mobile fueling service is already trusted by
                   Gauteng&apos;s most discerning professionals and businesses.
@@ -262,14 +262,14 @@ const Hero_ = () => {
                   return (
                     <div
                       key={idx_}
-                      className={`min-w-8 h-8 px-4 text-[12px] text-black bg-white font-semibold flex flex-col justify-center items-center border-white border-[1px] rounded-[20px]`}
+                      className={`min-w-8 h-8 px-4 text-[12px] text-white bg-orange-600 font-semibold flex flex-col justify-center items-center rounded-[20px]`}
                     >
                       {obj_}
                     </div>
                   );
                 })}
               </div>
-            </div> */}
+            </div>
             <div className="first-section-text flex flex-row justify-center items-center w-[600px] h-[250px]">
               {/* <p className="text-[65px] font-black -rotate-90 text-yellow-700">
               Fuel
@@ -286,7 +286,9 @@ const Hero_ = () => {
                   {
                     icon: faGooglePlay,
                     func: () => {
-                      window.open("/assets/apps/app-release.apk");
+                      window.open(
+                        "https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-release.apk?alt=media&token=c4885d23-b5c4-4ff7-b438-eca7cff59a30"
+                      );
                     },
                   },
                 ].map((obj_, idx_) => {
@@ -327,37 +329,6 @@ const Hero_ = () => {
         ref={thirdSectionRef}
         className="w-full h-screen relative overflow-hidden"
       >
-        <div className="first-section-text flex flex-col justify-center items-start w-[390px] text-center h-[250px] mt-[-350px] mb-[70px] text-white">
-          <div className={`text-[50px] font-black`}>Need To Fuel</div>
-          <div className="text-[16px] font-bold flex flex-col justify-center">
-            <p>
-              Our exclusive mobile fueling service is already trusted by
-              Gauteng&apos;s most discerning professionals and businesses.
-              Experience the difference that comes with never having to visit a
-              fuel station again.
-            </p>
-          </div>
-          <div
-            className={`min-w-2 min-h-2 flex flex-row justify-center items-center mt-4`}
-          >
-            {["Get Started"].map((obj_, idx_) => {
-              return (
-                <div
-                  key={idx_}
-                  className={`min-w-8 h-8 px-4 text-[12px] text-black bg-white font-semibold flex flex-col justify-center items-center border-white border-[1px] rounded-[20px]`}
-                >
-                  {obj_}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section
-        ref={thirdSectionRef}
-        className="w-full h-screen relative overflow-hidden"
-      >
         <img
           ref={heroImgRef}
           src="/assets/images/hero.jpg"
@@ -383,7 +354,7 @@ const Hero_ = () => {
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.2 }}
-                  className="text-center text-4xl md:text-5xl lg:text-6xl font-light tracking-wide leading-tight text-white mb-8"
+                  className="text-center text-4xl md:text-5xl lg:text-6xl font-light tracking-wide leading-tight text-white lobster mb-8"
                 >
                   I can buy anything I want, basically, but I can&apos;t buy
                   time
@@ -406,23 +377,51 @@ const Hero_ = () => {
                   initial={{ y: 10, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.4 }}
-                  className="text-center text-white text-xl md:text-2xl font-medium"
+                  className="text-center text-white/50 text-xl md:text-2xl font-medium tinos-regular-italic"
                 >
                   — Warren Buffett
                 </motion.p>
               </div>
             </motion.div>
           </div>
-          <div className="flex flex-row justify-center items-center w-[600px] h-[250px]">
-            <p className="text-[65px] font-black -rotate-90 text-yellow-700">
-              Fuel
-            </p>
+          {/* <div className="flex flex-row justify-center items-center w-[600px] h-[250px]">
             <p className="text-[14px]">
               Whether you need a fill-up, detailed cleaning, or roadside
               assistance, our professional team comes to you. Get started today
               and experience car care that fits your lifestyle.
             </p>
-          </div>
+          </div> */}
+        </div>
+        <div className={`absolute top-0 flex flex-col justify-end items-center w-full h-full`}>
+        <div
+          className={`flex flex-row w-full h-full justify-center items-end absolute mb-[60px]`}
+        >
+          {[
+            "https://images.pexels.com/photos/6873123/pexels-photo-6873123.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "https://images.pexels.com/photos/20500734/pexels-photo-20500734/free-photo-of-distributor-on-a-petrol-station.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
+            "https://images.pexels.com/photos/12555015/pexels-photo-12555015.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
+          ].map((obj_, idx_) => {
+            return (
+              <div
+                key={idx_}
+                className="first-section-text flex flex-col justify-center items-start w-[390px] text-center h-[250px] mx-2 text-white"
+              >
+                <div
+                  className={`w-[400px] h-[750px] rounded-[6px] flex flex-col justify-center items-center relative overflow-hidden bg-white/5 backdrop-blur-sm`}
+                >
+                  <img className={`w-full h-full object-cover`} src={obj_} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <p
+          className={`text-center text-white/60 w-[600px] font-medium opacity-80 tinos-regular xl:scale-[1] scale-[0.8] relative top-[0px]`}
+        >
+          If you don&apos;t have more free time, feel safer and more in control
+          when it comes to your vehicle needs after the first month of joining,
+          we will give you a full refund.
+        </p>
         </div>
       </section>
 
@@ -450,7 +449,7 @@ const Hero_ = () => {
       </section> */}
 
       <section className="footer text-[14px] text-white relative flex flex-col xl:justify-end justify-center items-center pb-8 xl:mt-[150px]">
-        <div className={``}>
+        <div className={`pointer-events-none`}>
           <img
             className={`absolute xl:bottom-[-200px] w-[600px] opacity-5`}
             src="/assets/images/white_logo.png"
@@ -494,26 +493,26 @@ const Hero_ = () => {
           >
             <FontAwesomeIcon
               icon={faFacebook}
-              className={`text-[18px] mx-1 cursor-pointer xl:mr-0 mr-4`}
+              className={`text-[18px] mx-4 cursor-pointer xl:mr-0 mr-4`}
             />
             <FontAwesomeIcon
               icon={faLinkedinIn}
-              className={`text-[18px] mx-1 cursor-pointer xl:mr-0 mr-4`}
+              className={`text-[18px] mx-4 cursor-pointer xl:mr-0 mr-4`}
             />
             <FontAwesomeIcon
               icon={faInstagram}
-              className={`text-[18px] mx-1 cursor-pointer xl:mr-0 mr-4`}
+              className={`text-[18px] mx-4 cursor-pointer xl:mr-0 mr-4`}
             />
             <FontAwesomeIcon
               icon={faTiktok}
-              className={`text-[18px] mx-1 cursor-pointer`}
+              className={`text-[18px] mx-4 cursor-pointer`}
             />
           </div>
           <div
             className={`min-w-2 min-h-2 flex flex-row justify-center items-center`}
           >
-            <p className={`mx-2`}>Terms & Conditions</p>
-            <p className={`mx-2`}>Privacy Ploicy</p>
+            <p className={`mx-2 cursor-pointer`}>Terms & Conditions</p>
+            <p className={`mx-2 cursor-pointer`}>Privacy Ploicy</p>
           </div>
         </div>
       </section>

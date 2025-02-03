@@ -13,7 +13,7 @@ const Pricing_ = () => {
       <div
         className={`w-full min-h-2 flex flex-col mt-[30px] mb-[60px] justify-center items-center`}
       >
-        <p className={`text-white text-[50px] text-center font-black`}>
+        <p className={`text-white text-[50px] tinos-regular-italic text-center font-black`}>
           Exclusive Offers
         </p>
       </div>
@@ -29,12 +29,12 @@ const Pricing_ = () => {
           <div className={`h-[10px]`}></div>
           <div className={`flex flex-row justify-between items-center w-full`}>
             <div
-              className={`h-[100px] w-full mb-[-20px] flex flex-col justify-center items-start px-4 text-black text-[20px] font-bold`}
+              className={`h-[100px] w-full tinos-regular-italic mb-[-20px] flex flex-col justify-center items-start px-4 text-black text-[20px] font-bold`}
             >
               Gold
             </div>
             <div
-              className={`text-black/80 px-4 text-[13px] font-bold w-[250px] relative top-[13px]`}
+              className={`text-black/80 px-4 text-[13px] font-bold w-[250px] tinos-regular-italic relative top-[13px]`}
             >
               R2,999.99{" "}
               <span className={`text-black/80 font-medium`}>/month</span>
@@ -101,7 +101,7 @@ const Pricing_ = () => {
                   ].map((obj_, idx_) => {
                     return (
                       <div
-                        className={`flex flex-row justify-start items-center w-full min-h-2 mb-1`}
+                        className={`flex flex-row justify-start items-center w-full min-h-2 mb-1 tinos-regular`}
                         key={idx_}
                       >
                         <FontAwesomeIcon
@@ -126,7 +126,9 @@ const Pricing_ = () => {
             <div
               className={`w-full h-full flex flex-row justify-between items-center`}
             >
-              <div className={`text-black/80 px-4 text-[13px] font-bold`}>
+              <div
+                className={`text-black/80 px-4 text-[13px] font-bold tinos-regular-italic`}
+              >
                 Limited to 50 members
               </div>
               <div
@@ -136,7 +138,7 @@ const Pricing_ = () => {
                   className={`min-w-[100px] h-[30px] scale-[0.3] opacity-50 absolute hover:animate-ping bg-whit rounded-[15px] flex flex-row justify-center items-center cursor-pointer z-[0]`}
                 />
                 <p
-                  className={`text-white/80 font-medium text-[12px] pointer-events-none z-[1]`}
+                  className={`text-white/80 font-medium text-[12px] pointer-events-none z-[1] tinos-regular-italic`}
                 >
                   Start Now
                 </p>
@@ -155,12 +157,12 @@ const Pricing_ = () => {
           <div className={`h-[10px]`}></div>
           <div className={`flex flex-row justify-between items-center w-full`}>
             <div
-              className={`h-[100px] w-full mb-[-20px] flex flex-col justify-center items-start px-6 text-white/50 text-[20px] font-bold`}
+              className={`h-[100px] tinos-regular-italic w-full mb-[-20px] flex flex-col justify-center items-start px-6 text-white/50 text-[20px] font-bold`}
             >
               Black
             </div>
             <div
-              className={`text-white/50 px-6 text-[13px] font-bold w-[250px] relative top-[13px]`}
+              className={`text-white/50 tinos-regular-italic px-6 text-[13px] font-bold w-[250px] relative top-[13px]`}
             >
               R4,999.99{" "}
               <span className={`text-white/20 font-medium`}>/month</span>
@@ -227,7 +229,7 @@ const Pricing_ = () => {
                   ].map((obj_, idx_) => {
                     return (
                       <div
-                        className={`flex flex-row justify-start items-center w-full min-h-2 mb-1 text-white`}
+                        className={`flex flex-row justify-start items-center w-full tinos-regular min-h-2 mb-1 text-white`}
                         key={idx_}
                       >
                         <FontAwesomeIcon
@@ -247,7 +249,9 @@ const Pricing_ = () => {
             <div
               className={`w-full h-full flex flex-row justify-between items-center`}
             >
-              <div className={`text-white/50 px-6 text-[13px] font-bold`}>
+              <div
+                className={`text-white/50 px-6 text-[13px] tinos-regular-italic font-bold`}
+              >
                 Limited to 50 members
               </div>
               <div
@@ -257,7 +261,7 @@ const Pricing_ = () => {
                   className={`min-w-[100px] h-[30px] scale-[0.3] opacity-50 absolute hover:animate-ping bg-orange-600 rounded-[15px] flex flex-row justify-center items-center cursor-pointer z-[0]`}
                 />
                 <p
-                  className={`text-white/80 font-medium text-[12px] z-[1] pointer-events-none`}
+                  className={`text-white/80 font-medium text-[12px] tinos-regular-italic z-[1] pointer-events-none`}
                 >
                   Start Now
                 </p>
@@ -270,21 +274,21 @@ const Pricing_ = () => {
           </div>
         </motion.div>
         <motion.div
-          className={`h-[475px] xl:w-[450px] w-[360px] m-2 rounded-[5px] flex flex-col justify-start items-center bg-[ghostwhite] relative overflow-hidden`}
+          className={`h-[475px] w-[360px] m-2 rounded-[5px] flex flex-col justify-start items-center bg-[#7C0A01] relative overflow-hidden`}
           style={{ y: yRange }}
         >
           <div className={`h-[10px]`}></div>
           <div className={`flex flex-row justify-between items-center w-full`}>
             <div
-              className={`h-[100px] w-full mb-[-20px] flex flex-col justify-center items-start px-6 text-black/50 text-[20px] font-bold`}
+              className={`h-[100px] w-full mb-[-20px] flex tinos-regular-italic flex-col justify-center items-start px-6 text-white/50 text-[20px] font-bold`}
             >
-              Black
+              CEO
             </div>
             <div
-              className={`text-black/50 px-6 text-[13px] font-bold w-[250px] relative top-[13px]`}
+              className={`text-white/50 px-6 tinos-regular-italic text-[13px] font-bold w-[250px] relative top-[13px]`}
             >
               R4,999.99{" "}
-              <span className={`text-black/20 font-medium`}>/month</span>
+              <span className={`text-white/20 font-medium`}>/month</span>
             </div>
           </div>
           <div className={`h-[300px] w-full`}>
@@ -348,7 +352,7 @@ const Pricing_ = () => {
                   ].map((obj_, idx_) => {
                     return (
                       <div
-                        className={`flex flex-row justify-start items-center w-full min-h-2 mb-1 text-black`}
+                        className={`flex flex-row justify-start tinos-regular items-center w-full min-h-2 mb-1 text-white`}
                         key={idx_}
                       >
                         <FontAwesomeIcon
@@ -368,42 +372,54 @@ const Pricing_ = () => {
             <div
               className={`w-full h-full flex flex-row justify-between items-center`}
             >
-              <div className={`text-black/50 px-6 text-[13px] font-bold`}>
+              <div
+                className={`text-white/50 px-6 tinos-regular-italic text-[13px] font-bold`}
+              >
                 Limited to 50 members
               </div>
               <div
-                className={`min-w-[100px] h-[30px] mr-6 bg-orange-600 rounded-[15px] flex flex-row justify-center items-center cursor-pointer`}
+                className={`min-w-[100px] h-[30px] mr-6 bg-white rounded-[15px] flex flex-row justify-center items-center cursor-pointer`}
               >
                 <div
-                  className={`min-w-[100px] h-[30px] scale-[0.3] opacity-50 absolute hover:animate-ping bg-orange-600 rounded-[15px] flex flex-row justify-center items-center cursor-pointer z-[0]`}
+                  className={`min-w-[100px] h-[30px] scale-[0.3] opacity-50 absolute hover:animate-ping bg-white rounded-[15px] flex flex-row justify-center items-center cursor-pointer z-[0]`}
                 />
                 <p
-                  className={`text-white/80 font-medium text-[12px] z-[1] pointer-events-none`}
+                  className={`text-black/80 font-medium text-[12px] tinos-regular-italic z-[1] pointer-events-none`}
                 >
                   Start Now
                 </p>
                 <FontAwesomeIcon
                   icon={faArrowRight}
-                  className={`text-white/80 ml-2 text-[12px] z-[1] pointer-events-none`}
+                  className={`text-black/80 ml-2 text-[12px] z-[1] pointer-events-none`}
                 />
               </div>
             </div>
           </div>
+          <div
+            className={`w-full h-full flex flex-col justify-center items-center bg-white/10 backdrop-blur-sm tinos-regular absolute top-0 z-[1]`}
+          >
+            <p className={`text-[50px] text-white/80 z-[1] font-bold`}>
+              CEO Offer
+            </p>
+
+            <p className={`text-[50px] text-white/80 z-[1] font-bold`}>
+              Coming Soon
+            </p>
+          </div>
         </motion.div>
-        
       </motion.div>
 
       <motion.div
         className={`flex flex-col justify-center items-center w-full min-h-2 mt-[40px]`}
         style={{ y: yRange }}
       >
-        <p className={`text-[30px] font-black text-white`}>
-          Risk-Free Offer
-        </p>
+        <p className={`text-[30px] font-black text-white tinos-regular-italic`}>Risk-Free Offer</p>
         <p
-          className={`text-center text-white/60 w-[600px] font-medium opacity-80 xl:scale-[1] scale-[0.8]`}
+          className={`text-center text-white/60 w-[600px] font-medium opacity-80 tinos-regular xl:scale-[1] scale-[0.8]`}
         >
-          If you don&apos;t have more free time, feel safer and more in control when it comes to your vehicle needs after the first month of joining, we will give you a full refund.
+          If you don&apos;t have more free time, feel safer and more in control
+          when it comes to your vehicle needs after the first month of joining,
+          we will give you a full refund.
         </p>
       </motion.div>
     </div>

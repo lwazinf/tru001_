@@ -16,11 +16,7 @@ const Nav_ = ({}) => {
       <div
         className={`w-[200px] h-full hover:h-[120%] flex flex-row justify-center items-center hover:text-orange-200/80 text-white/80 transition-all duration-200`}
       >
-        <div
-          className={`bg-orange-800/80 h-full px-4 flex flex-row justify-center items-end text-[20px] font-black cursor-default rounded-b-[2px] md:backdrop-blur-none backdrop-blur-md`}
-        >
-          <a href={`#hero`}>NTF</a> 
-        </div>
+        <img className={`mt-8`} src="/assets/images/white_logo.png" />
       </div>
       <Menu_ />
       <div
@@ -52,7 +48,7 @@ const Nav_ = ({}) => {
           <div
             key={idx_}
             onClick={() => {
-              window.open("/assets/apps/app-release.apk")
+              window.open("https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-release.apk?alt=media&token=c4885d23-b5c4-4ff7-b438-eca7cff59a30")
             }}
             className={`cursor-pointer ml-2 mr-4 min-w-8 h-8 px-4 text-[12px] text-black bg-white font-semibold flex xl:hidden flex-col justify-center items-center border-white border-[1px] rounded-[20px]`}
           >
@@ -126,7 +122,7 @@ const Menu_ = ({}) => {
           <div
             key={idx_}
             onClick={() => {
-              window.open("/assets/apps/app-release.apk")
+              window.open("https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-release.apk?alt=media&token=c4885d23-b5c4-4ff7-b438-eca7cff59a30")
             }}
             className={`cursor-pointer ml-2 min-w-8 h-8 px-4 text-[12px] text-black bg-white font-semibold flex flex-col justify-center items-center border-white border-[1px] rounded-[20px]`}
           >
