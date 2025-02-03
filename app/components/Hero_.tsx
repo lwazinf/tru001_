@@ -246,7 +246,9 @@ const Hero_ = () => {
           </div>
           <div className="first-section-text xl:flex hidden flex-col justify-center items-center w-[600px] h-[250px]">
             <div className="first-section-text flex flex-col justify-center items-start min-w-[390px] ml-[150px] h-[250px] mt-[-350px] mb-[70px]">
-              <div className={`text-[80px] font-black lobster`}>Need To Fuel</div>
+              <div className={`text-[80px] font-black lobster`}>
+                Need To Fuel
+              </div>
               <div className="text-[16px] font-bold flex flex-col justify-center tinos-regular-italic">
                 <p>
                   Our exclusive mobile fueling service is already trusted by
@@ -381,6 +383,7 @@ const Hero_ = () => {
                 >
                   — Warren Buffett
                 </motion.p>
+                
               </div>
             </motion.div>
           </div>
@@ -392,37 +395,78 @@ const Hero_ = () => {
             </p>
           </div> */}
         </div>
-        <div className={`absolute top-0 flex flex-col justify-end items-center w-full h-full`}>
         <div
-          className={`flex flex-row w-full h-full justify-center items-end absolute mb-[60px]`}
+          className={`absolute top-0 xl:flex hidden flex-col justify-end items-center w-full h-full`}
         >
-          {[
-            "https://images.pexels.com/photos/6873123/pexels-photo-6873123.jpeg?auto=compress&cs=tinysrgb&w=600",
-            "https://images.pexels.com/photos/20500734/pexels-photo-20500734/free-photo-of-distributor-on-a-petrol-station.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
-            "https://images.pexels.com/photos/12555015/pexels-photo-12555015.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
-          ].map((obj_, idx_) => {
-            return (
-              <div
-                key={idx_}
-                className="first-section-text flex flex-col justify-center items-start w-[390px] text-center h-[250px] mx-2 text-white"
-              >
+          <div
+            className={`flex xl:flex-row w-full h-full justify-center items-end absolute mb-[60px]`}
+          >
+            {[
+              "https://images.pexels.com/photos/6873123/pexels-photo-6873123.jpeg?auto=compress&cs=tinysrgb&w=600",
+              "https://images.pexels.com/photos/20500734/pexels-photo-20500734/free-photo-of-distributor-on-a-petrol-station.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
+              "https://images.pexels.com/photos/3807167/pexels-photo-3807167.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+            ].map((obj_, idx_) => {
+              return (
                 <div
-                  className={`w-[400px] h-[750px] rounded-[6px] flex flex-col justify-center items-center relative overflow-hidden bg-white/5 backdrop-blur-sm`}
+                  key={idx_}
+                  className="first-section-text flex flex-col justify-center items-start w-[390px] text-center h-[250px] mx-2 text-white"
                 >
-                  <img className={`w-full h-full object-cover`} src={obj_} />
+                  <div
+                    className={`w-[400px] h-[750px] rounded-[6px] flex flex-col justify-center items-center relative overflow-hidden bg-white/5 backdrop-blur-sm`}
+                  >
+                    <img className={`w-full h-full object-cover`} src={obj_} />
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+          <p
+            className={`text-center text-white/60 w-[600px] font-medium opacity-80 tinos-regular xl:scale-[1] scale-[0.8] relative top-[0px]`}
+          >
+            If you don&apos;t have more free time, feel safer and more in
+            control when it comes to your vehicle needs after the first month of
+            joining, we will give you a full refund.
+          </p>
         </div>
-        <p
-          className={`text-center text-white/60 w-[600px] font-medium opacity-80 tinos-regular xl:scale-[1] scale-[0.8] relative top-[0px]`}
-        >
-          If you don&apos;t have more free time, feel safer and more in control
-          when it comes to your vehicle needs after the first month of joining,
-          we will give you a full refund.
-        </p>
-        </div>
+      </section>
+
+      <section className={`xl:hidden flex`}>
+      <div
+                  className={`flex flex-col justify-center items-center w-full h-full`}
+                >
+                  <div
+                    className={`flex flex-col w-full h-full justify-center items-center relative`}
+                  >
+                    {[
+                      "https://images.pexels.com/photos/6873123/pexels-photo-6873123.jpeg?auto=compress&cs=tinysrgb&w=600",
+                      "https://images.pexels.com/photos/20500734/pexels-photo-20500734/free-photo-of-distributor-on-a-petrol-station.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
+                      "https://images.pexels.com/photos/3807167/pexels-photo-3807167.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+                    ].map((obj_, idx_) => {
+                      return (
+                        <div
+                          key={idx_}
+                          className="flex flex-col justify-center items-start w-[390px] text-center h-[250px] my-2 text-white"
+                        >
+                          <div
+                            className={`w-[400px] h-[750px] rounded-[6px] flex flex-col justify-center items-center relative overflow-hidden bg-white/5 backdrop-blur-sm`}
+                          >
+                            <img
+                              className={`w-full h-full object-cover`}
+                              src={obj_}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <p
+                    className={`text-center text-white/60 w-[400px] font-medium opacity-80 tinos-regular xl:scale-[1] scale-[0.8] relative top-[0px]`}
+                  >
+                    If you don&apos;t have more free time, feel safer and more
+                    in control when it comes to your vehicle needs after the
+                    first month of joining, we will give you a full refund.
+                  </p>
+                </div>
       </section>
 
       <section className={`min-h-screen xl:scale-[1] scale-[1]`}>
