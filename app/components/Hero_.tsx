@@ -236,31 +236,35 @@ const Hero_ = () => {
                 } xl:opacity-100 floating-image animate-float transition-all w-full h-full object-contain xl:ml-[900px]`}
               />
             </div>
-            {/* <div className="mr-[0px] xl:bottom-[250px] w-[650px] xl:h-[650px] h-[350px] xl:flex xl:scale-[1] xl:relative absolute pointer-events-none z-[4]">
+            <div className="mr-[0px] xl:bottom-[250px] w-[650px] xl:h-[650px] h-[350px] flex xl:scale-[1] xl:hidden absolute pointer-events-none z-[4]">
               <img
                 src="/assets/images/main_logo.png"
                 alt="Main logo"
                 className="w-full h-full object-contain"
               />
-            </div> */}
+            </div>
           </div>
-          <div className="flex flex-col justify-center items-center w-full min-h-screen z-[0] relative right-[200px]">
+          <div className="flex-col justify-center items-center w-full min-h-screen z-[0] relative right-[200px] xl:flex hidden">
             <div className="flex flex-col justify-center items-start min-w-[450px] ml-[150px] min-h-[250px] p-4 pl-12 rounded-[6px] bg-white/10 backdrop-blur-lg">
-              <div className={`relative h-[200px] w-[200px] overflow-hidden flex flex-col justify-center items-center ml-[50px]`}>
-              <img
-                src="/assets/images/main_logo.png"
-                alt="Main logo"
-                className="w-[300px] h-[300px] object-cover scale-[1.8]"
-              />
+              <div
+                className={`relative h-[200px] w-[200px] overflow-hidden flex flex-col justify-center items-center ml-[50px]`}
+              >
+                <img
+                  src="/assets/images/main_logo.png"
+                  alt="Main logo"
+                  className="w-[300px] h-[300px] object-cover scale-[1.8]"
+                />
               </div>
               <div
                 className={`xl:flex hidden text-[35px] font-black lobster text-white/80 gabarito w-[350px]`}
               >
                 All your vehicles needs met.
               </div>
-              <div className={`text-[60px] xl:flex hidden font-black lobster bg-gradient-to-r from-orange-500/80 to-[#9f2d01] bg-clip-text text-transparent`}>
-  You&apos;re covered!
-</div>
+              <div
+                className={`text-[60px] xl:flex hidden font-black lobster bg-gradient-to-r from-orange-500/80 to-[#9f2d01] bg-clip-text text-transparent`}
+              >
+                You&apos;re covered!
+              </div>
               <div className="text-[16px] xl:flex hidden flex-col w-[350px] relative justify-center tinos-regular">
                 <p>
                   Our exclusive mobile fueling service is already trusted by
@@ -345,57 +349,69 @@ const Hero_ = () => {
 
       <section
         ref={thirdSectionRef}
-        className="w-full h-screen relative xl:hidden overflow-hidden flex flex-col justify-start items-center"
+        className="w-full h-screen relative xl:hidden overflow-hidden flex flex-col justify-center items-center"
       >
-        <div className="flex-col justify-start items-center w-full mt-[-60px] scale-[0.7] absolute top-0">
-          <img
-            src="/assets/mockups/profile.png"
-            alt=""
-            className={`${
-              isVisible
-                ? "opacity-0 duration-[1000ms]"
-                : "opacity-100 duration-[200ms]"
-            } xl:opacity-100 floating-image animate-float transition-all w-full h-full object-contain xl:ml-[450px]`}
-          />
-        </div>
-        <div className="flex-col justify-start items-center w-full mt-[-60px] scale-[0.7] absolute top-0">
-          <img
-            src="/assets/mockups/orders.png"
-            alt=""
-            className={`${
-              !isVisible
-                ? "opacity-0 duration-[1000ms]"
-                : "opacity-100 duration-[200ms]"
-            } xl:opacity-100 floating-image animate-float transition-all w-full h-full object-contain xl:ml-[900px]`}
-          />
-        </div>
         <div
-          className={`flex flex-col justify-center items-center w-full min-h-2 absolute bottom-0 text-white text-center`}
+          className={`flex flex-col justify-center items-center w-full min-h-2 text-white text-center`}
         >
-          <div className={`tinos-regular text-white/80 text-[13px] p-8`}>
-            At Need To Fuel, we understand that time is your most valuable
-            asset. That’s why we’ve crafted a suite of bespoke services—mobile
-            refueling, vehicle valet, tyre inspections, and roadside
-            assistance—designed to offer you unparalleled convenience and peace
-            of mind, all at the touch of a button.
-          </div>
+          <img
+                src="/assets/mockups/profile.png"
+                alt=""
+                className={`${
+                  isVisible
+                    ? "opacity-0 duration-[1000ms]"
+                    : "opacity-100 duration-[200ms]"
+                } xl:opacity-100 floating-image animate-float transition-all h-[450px] object-contain scale-[0.5]`}
+              />
+              <img
+                src="/assets/mockups/orders.png"
+                alt=""
+                className={`${
+                  !isVisible
+                    ? "opacity-0 duration-[1000ms]"
+                    : "opacity-100 duration-[200ms]"
+                } xl:opacity-100 floating-image animate-float transition-all h-[450px] object-contain scale-[0.5] absolute top-4`}
+              />
+          {/* <div className={`relative min-w-2 flex bg-white w-full h-[300px]`}>
+            <div className="flex-col justify-start items-center w-full scale-[0.5] top-0">
+              
+            </div>
+            <div className="flex-col justify-start items-center w-full scale-[0.5] absolute top-0">
+              <img
+                src="/assets/mockups/orders.png"
+                alt=""
+                className={`${
+                  !isVisible
+                    ? "opacity-0 duration-[1000ms]"
+                    : "opacity-100 duration-[200ms]"
+                } xl:opacity-100 floating-image animate-float transition-all w-full h-full object-cover`}
+              />
+            </div>
+          </div> */}
           <div
-            className={`flex flex-row justify-center items-center w-full min-h-2 p-4 scale-[0.8]`}
+            className={`flex flex-col justify-center items-center w-full min-h-2 text-white text-center`}
           >
-            <img
-              onClick={() => {
-                window.open(
-                  "https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-release.apk?alt=media&token=c4885d23-b5c4-4ff7-b438-eca7cff59a30"
-                );
-              }}
-              className={`mx-2`}
-              src={`/assets/icons/PlayStore.png`}
-            />
-            <img
-              className={`mx-2 opacity-20`}
-              src={`/assets/icons/AppStore.png`}
-            />
-          </div>
+            <div className={`tinos-regular text-white/80 text-[13px] p-8`}>
+              At Need To Fuel, we understand that time is your most valuable
+              asset. That’s why we’ve crafted a suite of bespoke services—mobile
+              refueling, vehicle valet, tyre inspections, and roadside
+              assistance—designed to offer you unparalleled convenience and
+              peace of mind, all at the touch of a button.
+            </div>
+              <img
+                onClick={() => {
+                  window.open(
+                    "https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-release.apk?alt=media&token=c4885d23-b5c4-4ff7-b438-eca7cff59a30"
+                  );
+                }}
+                className={`my-1 scale-[0.7]`}
+                src={`/assets/icons/PlayStore.png`}
+              />
+              <img
+                className={`my-1 scale-[0.7] opacity-20`}
+                src={`/assets/icons/AppStore.png`}
+              />
+            </div>
         </div>
       </section>
 
@@ -534,18 +550,12 @@ const Hero_ = () => {
             Our Commitment
           </p>
           <p
-            className={`text-center text-white/80 text-[13px] font-medium tinos-regular p-4 relative top-[0px] xl:hidden`}
+            className={`text-center text-white/80 text-[13px] font-medium tinos-regular p-4 relative top-[0px]`}
           >
-            If you don&apos;t have more free time, feel safer and more in
-            control when it comes to your vehicle needs after the first month of
-            joining, we will give you a full refund.
-          </p>
-          <p
-            className={`text-center text-white/60 w-[400px] font-medium opacity-80 tinos-regular xl:scale-[1] xl:flex hidden relative top-[0px]`}
-          >
-            If you don&apos;t have more free time, feel safer and more in
-            control when it comes to your vehicle needs after the first month of
-            joining, we will give you a full refund.
+            Our commitment is to provide exceptional, seamless service, allowing
+            you to focus on what truly matters—whether it’s your business, your
+            passions, or your loved ones. Because for those who demand
+            excellence, time should never be a compromise.
           </p>
         </div>
       </section>
