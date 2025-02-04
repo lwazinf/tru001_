@@ -415,12 +415,19 @@ const Pricing_ = () => {
       >
         <p className={`text-[25px] font-black text-orange-500 tinos-regular-italic`}>Experience Our Service with Total Piece Of Mind</p>
         <p
-          className={`text-center text-[13px] text-white/80 font-medium tinos-regular xl:scale-[1] p-4`}
+          className={`text-center text-[13px] text-white/80 font-medium tinos-regular xl:scale-[1] p-4 xl:hidden flex`}
         >
           If you don&apos;t have more free time, feel safer and more in control
           when it comes to your vehicle needs after the first month of joining,
           we will give you a full refund.
         </p>
+        <p
+            className={`text-center text-white/60 w-[600px] font-medium opacity-80 tinos-regular xl:scale-[1] xl:flex hidden relative top-[0px]`}
+          >
+            If you don&apos;t have more free time, feel safer and more in control
+          when it comes to your vehicle needs after the first month of joining,
+          we will give you a full refund.
+          </p>
       </motion.div>
     </div>
   );

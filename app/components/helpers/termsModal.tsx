@@ -186,7 +186,7 @@ const TermsModal = () => {
           <div className="p-4 flex justify-end">
             <div
               onClick={handleAccept}
-              className="bg-orange-600 text-white px-6 py-2 rounded-md font-medium"
+              className="bg-orange-600 text-white px-6 py-2 rounded-md font-medium scale-[0.8]"
             >
               ACCEPT & CONTINUE
             </div>

@@ -534,7 +534,14 @@ const Hero_ = () => {
             Our Commitment
           </p>
           <p
-            className={`text-center text-white/80 text-[13px] font-medium tinos-regular p-4 relative top-[0px]`}
+            className={`text-center text-white/80 text-[13px] font-medium tinos-regular p-4 relative top-[0px] xl:hidden`}
+          >
+            If you don&apos;t have more free time, feel safer and more in
+            control when it comes to your vehicle needs after the first month of
+            joining, we will give you a full refund.
+          </p>
+          <p
+            className={`text-center text-white/60 w-[400px] font-medium opacity-80 tinos-regular xl:scale-[1] xl:flex hidden relative top-[0px]`}
           >
             If you don&apos;t have more free time, feel safer and more in
             control when it comes to your vehicle needs after the first month of
