@@ -350,7 +350,7 @@ const Hero_ = () => {
         <div className="flex-col justify-start items-center w-full mt-[-60px] scale-[0.7] absolute top-0">
           <img
             src="/assets/mockups/profile.png"
-            alt="Phone"
+            alt=""
             className={`${
               isVisible
                 ? "opacity-0 duration-[1000ms]"
@@ -361,7 +361,7 @@ const Hero_ = () => {
         <div className="flex-col justify-start items-center w-full mt-[-60px] scale-[0.7] absolute top-0">
           <img
             src="/assets/mockups/orders.png"
-            alt="Phone"
+            alt=""
             className={`${
               !isVisible
                 ? "opacity-0 duration-[1000ms]"
