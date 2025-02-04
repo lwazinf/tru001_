@@ -15,6 +15,7 @@ import {
 import Pricing_ from "./helpers/pricing";
 import Marquee from "./Marquee";
 import { motion } from "framer-motion";
+import { faAngleDoubleDown } from "@fortawesome/free-solid-svg-icons";
 // import VerticalGallery from "./helpers/sideSwipe";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -213,8 +214,8 @@ const Hero_ = () => {
         <div className="leftFade absolute top-0 w-full h-full" />
         <div className="rotate-180 topFade absolute top-0 w-full h-full" />
         <div className="absolute top-0 w-full h-full flex flex-col justify-end items-start text-white">
-          <div className="first-section-logo text-[200px] w-full h-full flex flex-col justify-center items-center absolute font-black text-white">
-            <div className="first-section-text mb-[100px] xl:flex flex-row justify-center items-center h-[750px] w-full opacity-[.99] xl:scale-[1] scale-[0.8] xl:rotate-3 absolute left-0">
+          <div className="first-section-logo text-[200px] w-full h-full flex flex-col justify-center items-center absolute font-black text-white z-[1]">
+            <div className="first-section-text xl:flex flex-row justify-center items-center h-[650px] w-full opacity-[.99] xl:rotate-3 xl:absolute hidden left-0">
               <img
                 src="/assets/mockups/profile.png"
                 alt="Phone"
@@ -225,7 +226,7 @@ const Hero_ = () => {
                 } xl:opacity-100 floating-image animate-float transition-all w-full h-full object-contain xl:ml-[450px]`}
               />
             </div>
-            <div className="first-section-text mb-[-150px] xl:flex flex-row justify-center items-center h-[750px] w-full opacity-[.99] xl:scale-[1] scale-[0.8] xl:rotate-6 absolute left-0">
+            <div className="first-section-text xl:flex flex-row justify-center items-center h-[650px] w-full opacity-[.99] xl:rotate-6 xl:absolute hidden left-0">
               <img
                 src="/assets/mockups/orders.png"
                 alt="Phone"
@@ -244,12 +245,19 @@ const Hero_ = () => {
               />
             </div>
           </div>
-          <div className="first-section-text xl:flex hidden flex-col justify-center items-center w-[600px] h-[250px]">
-            <div className="first-section-text flex flex-col justify-center items-start min-w-[390px] ml-[150px] h-[250px] mt-[-350px] mb-[70px]">
-              <div className={`text-[80px] font-black lobster`}>
-                Need To Fuel
+          <div className="flex flex-col justify-center items-center w-full min-h-screen z-[0]">
+            <div className="flex flex-col justify-center items-start min-w-[450px] ml-[150px] h-[250px]">
+              <div
+                className={`xl:flex hidden text-[80px] font-black lobster text-white/80 gabarito`}
+              >
+                Looking for peace of mind <br /> for your vehicles?
               </div>
-              <div className="text-[16px] font-bold flex flex-col justify-center tinos-regular-italic">
+              <div
+                className={`text-[80px] xl:flex hidden font-black lobster text-white/80 gabarito`}
+              >
+                Piece of Cake!
+              </div>
+              <div className="text-[16px] xl:flex hidden font-bold flex-col justify-center tinos-regular-italic">
                 <p>
                   Our exclusive mobile fueling service is already trusted by
                   Gauteng&apos;s most discerning professionals and businesses.
@@ -258,7 +266,7 @@ const Hero_ = () => {
                 </p>
               </div>
               <div
-                className={`min-w-2 min-h-2 flex flex-row justify-center items-center mt-4`}
+                className={`min-w-2 min-h-2 flex-row justify-center items-center mt-4 xl:flex hidden`}
               >
                 {["Get Started"].map((obj_, idx_) => {
                   return (
@@ -272,7 +280,7 @@ const Hero_ = () => {
                 })}
               </div>
             </div>
-            <div className="first-section-text flex flex-row justify-center items-center w-[600px] h-[250px]">
+            <div className="first-section-text xl:flex hidden flex-row justify-center items-center w-[600px] h-[250px]">
               {/* <p className="text-[65px] font-black -rotate-90 text-yellow-700">
               Fuel
               </p> */}
@@ -298,7 +306,7 @@ const Hero_ = () => {
                     <div
                       key={idx_}
                       onClick={obj_.func}
-                      className={`cursor-pointer mx-1 w-8 h-8 flex flex-col justify-center items-center border-white border-[1px] rounded-[50%]`}
+                      className={`cursor-pointer mx-1 w-8 h-8 flex flex-col justify-center items-center border-orange-500 text-orange-500 border-[1px] rounded-[50%]`}
                     >
                       <FontAwesomeIcon icon={obj_.icon} />
                     </div>
@@ -313,16 +321,76 @@ const Hero_ = () => {
             <Marquee />
           </div>
           <div className={`w-full min-h-2 px-6 mb-10 block xl:hidden`}>
-            {["Get Started"].map((obj_, idx_) => {
+            {["Learn About Our App.."].map((obj_, idx_) => {
               return (
                 <div
                   key={idx_}
-                  className={`min-w-8 h-12 px-4 text-[12px] text-black bg-white font-semibold flex flex-col justify-center items-center border-white border-[1px] rounded-[20px]`}
+                  className={`min-w-8 h-12 px-4 text-[12px] text-white flex flex-row justify-center font-semibold items-center`}
                 >
-                  {obj_}
+                  <p className={`mr-2`}>{obj_}</p>
+                  <FontAwesomeIcon
+                    icon={faAngleDoubleDown}
+                    className="text-orange-500"
+                  />
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      <section
+        ref={thirdSectionRef}
+        className="w-full h-screen relative xl:hidden overflow-hidden flex flex-col justify-start items-center"
+      >
+        <div className="flex-col justify-start items-center w-full mt-[-60px] scale-[0.7] absolute top-0">
+          <img
+            src="/assets/mockups/profile.png"
+            alt="Phone"
+            className={`${
+              isVisible
+                ? "opacity-0 duration-[1000ms]"
+                : "opacity-100 duration-[200ms]"
+            } xl:opacity-100 floating-image animate-float transition-all w-full h-full object-contain xl:ml-[450px]`}
+          />
+        </div>
+        <div className="flex-col justify-start items-center w-full mt-[-60px] scale-[0.7] absolute top-0">
+          <img
+            src="/assets/mockups/orders.png"
+            alt="Phone"
+            className={`${
+              !isVisible
+                ? "opacity-0 duration-[1000ms]"
+                : "opacity-100 duration-[200ms]"
+            } xl:opacity-100 floating-image animate-float transition-all w-full h-full object-contain xl:ml-[900px]`}
+          />
+        </div>
+        <div
+          className={`flex flex-col justify-center items-center w-full min-h-2 absolute bottom-0 text-white text-center`}
+        >
+          <div className={`tinos-regular text-white/80 text-[13px] p-8`}>
+            At Need To Fuel, we understand that time is your most valuable
+            asset. That’s why we’ve crafted a suite of bespoke services—mobile
+            refueling, vehicle valet, tyre inspections, and roadside
+            assistance—designed to offer you unparalleled convenience and peace
+            of mind, all at the touch of a button.
+          </div>
+          <div
+            className={`flex flex-row justify-center items-center w-full min-h-2 p-4 scale-[0.8]`}
+          >
+            <img
+              onClick={() => {
+                window.open(
+                  "https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-release.apk?alt=media&token=c4885d23-b5c4-4ff7-b438-eca7cff59a30"
+                );
+              }}
+              className={`mx-2`}
+              src={`/assets/icons/PlayStore.png`}
+            />
+            <img
+              className={`mx-2 opacity-20`}
+              src={`/assets/icons/AppStore.png`}
+            />
           </div>
         </div>
       </section>
@@ -383,7 +451,6 @@ const Hero_ = () => {
                 >
                   — Warren Buffett
                 </motion.p>
-                
               </div>
             </motion.div>
           </div>
@@ -423,50 +490,53 @@ const Hero_ = () => {
           <p
             className={`text-center text-white/60 w-[600px] font-medium opacity-80 tinos-regular xl:scale-[1] scale-[0.8] relative top-[0px]`}
           >
-            If you don&apos;t have more free time, feel safer and more in
-            control when it comes to your vehicle needs after the first month of
-            joining, we will give you a full refund.
+            Our commitment is to provide exceptional, seamless service, allowing
+            you to focus on what truly matters—whether it’s your business, your
+            passions, or your loved ones. Because for those who demand
+            excellence, time should never be a compromise.
           </p>
         </div>
       </section>
 
       <section className={`xl:hidden flex`}>
-      <div
-                  className={`flex flex-col justify-center items-center w-full h-full`}
+        <div
+          className={`flex flex-col justify-center items-center w-full h-full`}
+        >
+          <div
+            className={`flex flex-col w-full h-full justify-center items-center relative`}
+          >
+            {[
+              "https://images.pexels.com/photos/6873123/pexels-photo-6873123.jpeg?auto=compress&cs=tinysrgb&w=600",
+              "https://images.pexels.com/photos/20500734/pexels-photo-20500734/free-photo-of-distributor-on-a-petrol-station.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
+              "https://images.pexels.com/photos/3807167/pexels-photo-3807167.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+            ].map((obj_, idx_) => {
+              return (
+                <div
+                  key={idx_}
+                  className="flex flex-col justify-center items-start w-[390px] text-center h-[250px] my-2 text-white"
                 >
                   <div
-                    className={`flex flex-col w-full h-full justify-center items-center relative`}
+                    className={`w-[400px] h-[750px] rounded-[6px] flex flex-col justify-center items-center relative overflow-hidden bg-white/5 backdrop-blur-sm`}
                   >
-                    {[
-                      "https://images.pexels.com/photos/6873123/pexels-photo-6873123.jpeg?auto=compress&cs=tinysrgb&w=600",
-                      "https://images.pexels.com/photos/20500734/pexels-photo-20500734/free-photo-of-distributor-on-a-petrol-station.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
-                      "https://images.pexels.com/photos/3807167/pexels-photo-3807167.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-                    ].map((obj_, idx_) => {
-                      return (
-                        <div
-                          key={idx_}
-                          className="flex flex-col justify-center items-start w-[390px] text-center h-[250px] my-2 text-white"
-                        >
-                          <div
-                            className={`w-[400px] h-[750px] rounded-[6px] flex flex-col justify-center items-center relative overflow-hidden bg-white/5 backdrop-blur-sm`}
-                          >
-                            <img
-                              className={`w-full h-full object-cover`}
-                              src={obj_}
-                            />
-                          </div>
-                        </div>
-                      );
-                    })}
+                    <img className={`w-full h-full object-cover`} src={obj_} />
                   </div>
-                  <p
-                    className={`text-center text-white/60 w-[400px] font-medium opacity-80 tinos-regular xl:scale-[1] scale-[0.8] relative top-[0px]`}
-                  >
-                    If you don&apos;t have more free time, feel safer and more
-                    in control when it comes to your vehicle needs after the
-                    first month of joining, we will give you a full refund.
-                  </p>
                 </div>
+              );
+            })}
+          </div>
+          <p
+            className={`text-[30px] font-black text-orange-500 tinos-regular-italic`}
+          >
+            Our Commitment
+          </p>
+          <p
+            className={`text-center text-white/80 text-[13px] font-medium tinos-regular p-4 relative top-[0px]`}
+          >
+            If you don&apos;t have more free time, feel safer and more in
+            control when it comes to your vehicle needs after the first month of
+            joining, we will give you a full refund.
+          </p>
+        </div>
       </section>
 
       <section className={`min-h-screen xl:scale-[1] scale-[1]`}>

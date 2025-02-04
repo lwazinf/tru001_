@@ -410,12 +410,12 @@ const Pricing_ = () => {
       </motion.div>
 
       <motion.div
-        className={`flex flex-col justify-center items-center w-full min-h-2 mt-[40px]`}
+        className={`flex flex-col justify-center items-center w-full min-h-2 mt-[40px] p-4 text-center`}
         style={{ y: yRange }}
       >
-        <p className={`text-[30px] font-black text-white tinos-regular-italic`}>Risk-Free Offer</p>
+        <p className={`text-[25px] font-black text-orange-500 tinos-regular-italic`}>Experience Our Service with Total Piece Of Mind</p>
         <p
-          className={`text-center text-white/60 w-[600px] font-medium opacity-80 tinos-regular xl:scale-[1] scale-[0.8]`}
+          className={`text-center text-[13px] text-white/80 font-medium tinos-regular xl:scale-[1] p-4`}
         >
           If you don&apos;t have more free time, feel safer and more in control
           when it comes to your vehicle needs after the first month of joining,
