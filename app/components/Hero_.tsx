@@ -14,6 +14,7 @@ import Pricing_ from "./helpers/pricing";
 import Marquee from "./Marquee";
 import { motion } from "framer-motion";
 import { faAngleDoubleDown } from "@fortawesome/free-solid-svg-icons";
+import TermsModal from "./helpers/termsModal";
 // import VerticalGallery from "./helpers/sideSwipe";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -253,15 +254,13 @@ const Hero_ = () => {
               />
               </div>
               <div
-                className={`xl:flex hidden text-[40px] font-black lobster text-white/80 gabarito`}
+                className={`xl:flex hidden text-[35px] font-black lobster text-white/80 gabarito w-[350px]`}
               >
-                Peace of mind <br /> for your vehicles?
+                All your vehicles needs met.
               </div>
-              <div
-                className={`text-[60px] xl:flex hidden font-black lobster text-orange-500/80 lobster`}
-              >
-                Piece of Cake!
-              </div>
+              <div className={`text-[60px] xl:flex hidden font-black lobster bg-gradient-to-r from-orange-500/80 to-[#9f2d01] bg-clip-text text-transparent`}>
+  You&apos;re covered!
+</div>
               <div className="text-[16px] xl:flex hidden flex-col w-[350px] relative justify-center tinos-regular">
                 <p>
                   Our exclusive mobile fueling service is already trusted by
@@ -635,6 +634,7 @@ const Hero_ = () => {
           </div>
         </div>
       </section>
+      <TermsModal />
     </ReactLenis>
   );
 };
