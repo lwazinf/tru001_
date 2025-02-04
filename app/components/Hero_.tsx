@@ -5,9 +5,7 @@ import ReactLenis from "lenis/react";
 import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faApple,
   faFacebook,
-  faGooglePlay,
   faInstagram,
   faLinkedinIn,
   faTiktok,
@@ -237,27 +235,34 @@ const Hero_ = () => {
                 } xl:opacity-100 floating-image animate-float transition-all w-full h-full object-contain xl:ml-[900px]`}
               />
             </div>
-            <div className="mr-[0px] xl:bottom-[250px] w-[650px] xl:h-[650px] h-[350px] xl:flex xl:scale-[1] xl:relative absolute pointer-events-none z-[4]">
+            {/* <div className="mr-[0px] xl:bottom-[250px] w-[650px] xl:h-[650px] h-[350px] xl:flex xl:scale-[1] xl:relative absolute pointer-events-none z-[4]">
               <img
                 src="/assets/images/main_logo.png"
                 alt="Main logo"
                 className="w-full h-full object-contain"
               />
-            </div>
+            </div> */}
           </div>
-          <div className="flex flex-col justify-center items-center w-full min-h-screen z-[0]">
-            <div className="flex flex-col justify-center items-start min-w-[450px] ml-[150px] h-[250px]">
-              <div
-                className={`xl:flex hidden text-[80px] font-black lobster text-white/80 gabarito`}
-              >
-                Looking for peace of mind <br /> for your vehicles?
+          <div className="flex flex-col justify-center items-center w-full min-h-screen z-[0] relative right-[200px]">
+            <div className="flex flex-col justify-center items-start min-w-[450px] ml-[150px] min-h-[250px] p-4 pl-12 rounded-[6px] bg-white/10 backdrop-blur-lg">
+              <div className={`relative h-[200px] w-[200px] overflow-hidden flex flex-col justify-center items-center ml-[50px]`}>
+              <img
+                src="/assets/images/main_logo.png"
+                alt="Main logo"
+                className="w-[300px] h-[300px] object-cover scale-[1.8]"
+              />
               </div>
               <div
-                className={`text-[80px] xl:flex hidden font-black lobster text-white/80 gabarito`}
+                className={`xl:flex hidden text-[40px] font-black lobster text-white/80 gabarito`}
+              >
+                Peace of mind <br /> for your vehicles?
+              </div>
+              <div
+                className={`text-[60px] xl:flex hidden font-black lobster text-orange-500/80 lobster`}
               >
                 Piece of Cake!
               </div>
-              <div className="text-[16px] xl:flex hidden font-bold flex-col justify-center tinos-regular-italic">
+              <div className="text-[16px] xl:flex hidden flex-col w-[350px] relative justify-center tinos-regular">
                 <p>
                   Our exclusive mobile fueling service is already trusted by
                   Gauteng&apos;s most discerning professionals and businesses.
@@ -280,10 +285,10 @@ const Hero_ = () => {
                 })}
               </div>
             </div>
-            <div className="first-section-text xl:flex hidden flex-row justify-center items-center w-[600px] h-[250px]">
-              {/* <p className="text-[65px] font-black -rotate-90 text-yellow-700">
+            {/* <div className="first-section-text xl:flex hidden flex-row justify-center items-center w-[600px] h-[250px]">
+              <p className="text-[65px] font-black -rotate-90 text-yellow-700">
               Fuel
-              </p> */}
+              </p>
               <div className="text-[16px] text-end font-medium flex flex-col justify-center items-end">
                 <p>Need To Fuel&apos;s mobile app is</p>
                 <p>now available at your store</p>
@@ -313,7 +318,7 @@ const Hero_ = () => {
                   );
                 })}
               </div>
-            </div>
+            </div> */}
           </div>
           <div
             className={`w-[400px] opacity-0 relative bottom-[100px] ml-[95px] min-h-2 flex flex-col justify-center items-center scale-[0.8]`}
