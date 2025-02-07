@@ -15,6 +15,8 @@ import Marquee from "./Marquee";
 import { motion } from "framer-motion";
 import { faAngleDoubleDown } from "@fortawesome/free-solid-svg-icons";
 import TermsModal from "./helpers/termsModal";
+import { PolicyState } from "./atoms/atoms";
+import { useAtom } from "jotai";
 // import VerticalGallery from "./helpers/sideSwipe";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -26,6 +28,7 @@ interface CardElement extends HTMLElement {
 const Hero_ = () => {
   const firstSectionRef = useRef(null);
   // const secondSectionRef = useRef(null);
+  const [, setIsOpen] = useAtom(PolicyState);
   const thirdSectionRef = useRef(null);
   const mainImgRef = useRef(null);
   const heroImgRef = useRef(null);
@@ -236,12 +239,19 @@ const Hero_ = () => {
                 } xl:opacity-100 floating-image animate-float transition-all w-full h-full object-contain xl:ml-[900px]`}
               />
             </div>
-            <div className="mr-[0px] xl:bottom-[250px] w-[650px] xl:h-[650px] h-[350px] flex xl:scale-[1] xl:hidden absolute pointer-events-none z-[4]">
+            <div className="mr-[0px] xl:bottom-[250px] w-[650px] xl:h-[650px] h-[350px] flex flex-col justify-center items-center xl:scale-[1] xl:hidden absolute pointer-events-none z-[4]">
               <img
                 src="/assets/images/main_logo.png"
                 alt="Main logo"
-                className="w-full h-full object-contain"
+                className="w-[450px] h-[250px] object-cover"
               />
+              <div className="flex flex-col justify-center items-start min-w-[450px] h-[150px] rounded-[6px] bg-white/15 backdrop-blur-sm">
+              <img
+                src="/assets/images/logoText.png"
+                alt="Main logo"
+                className="w-[450px] object-cover"
+              />
+              </div>
             </div>
           </div>
           <div className="flex-col justify-center items-center w-full min-h-screen z-[0] relative right-[200px] xl:flex hidden">
@@ -594,9 +604,9 @@ const Hero_ = () => {
           className={`flex flex-row xl:justify-evenly justify-center items-center mb-8 w-full min-h-2`}
         >
           <div className={`flec flex-col relative right-[55px]`}>
-            <p className={``}>The Green Room</p>
-            <p className={``}>124 Normal Ave</p>
-            <p className={`mb-4`}>7692, South Africa</p>
+            <p className={``}>97 Sun valley place</p>
+            <p className={``}>Oakdene, Johannesburg</p>
+            <p className={`mb-4`}>2190 - South Africa</p>
 
             <p className={``}>support@needtofuel.com</p>
             <p className={`mb-4`}>+27 71 220 4794</p>
@@ -646,8 +656,12 @@ const Hero_ = () => {
           <div
             className={`min-w-2 min-h-2 flex flex-row justify-center items-center`}
           >
-            <p className={`mx-2 cursor-pointer`}>Terms & Conditions</p>
-            <p className={`mx-2 cursor-pointer`}>Privacy Ploicy</p>
+            <p onClick={() => {
+              setIsOpen(true)
+            }} className={`mx-2 cursor-pointer`}>Terms & Conditions</p>
+            <p onClick={() => {
+              setIsOpen(true)
+            }} className={`mx-2 cursor-pointer`}>Privacy Ploicy</p>
           </div>
         </div>
       </section>

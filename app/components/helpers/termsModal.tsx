@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
+import { useAtom } from 'jotai';
+import { PolicyState } from '../atoms/atoms';
 
 const policyText = `privacy policy
 Cookies Policy, Privacy Policy and POPIA disclaimer
@@ -196,7 +198,7 @@ The Fuel Sale Agreement and all of the documents referred to in it, in the agree
 `;
 
 const TermsModal = () => {
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useAtom(PolicyState);
     const [showTerms, setShowTerms] = useState(true);
     const [isAnimating, setIsAnimating] = useState(false);
   
