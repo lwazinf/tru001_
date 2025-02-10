@@ -93,9 +93,9 @@ const Pricing_ = () => {
                       feature: "Interior steam clean & detailing",
                       status: true,
                     },
-                    { feature: "Full exterior wash & polish", status: true },
+                    { feature: "Full exterior high pressure foam wash", status: true },
                     {
-                      feature: "24/7 roadside assistance and repairs",
+                      feature: "24/7 roadside assistance and repairs (Tyre-related issues only)",
                       status: true,
                     },
                   ].map((obj_, idx_) => {
@@ -221,9 +221,9 @@ const Pricing_ = () => {
                       feature: "Interior steam clean & detailing",
                       status: true,
                     },
-                    { feature: "Full exterior wash & polish", status: true },
+                    { feature: "Full exterior high pressure foam wash", status: true },
                     {
-                      feature: "24/7 roadside assistance and repairs",
+                      feature: "24/7 roadside assistance and repairs (Tyre-related issues only)",
                       status: true,
                     },
                   ].map((obj_, idx_) => {
@@ -344,9 +344,9 @@ const Pricing_ = () => {
                       feature: "Interior steam clean & detailing",
                       status: true,
                     },
-                    { feature: "Full exterior wash & polish", status: true },
+                    { feature: "Full exterior high pressure foam wash", status: true },
                     {
-                      feature: "24/7 roadside assistance and repairs",
+                      feature: "24/7 roadside assistance and repairs (Tyre-related issues only)",
                       status: true,
                     },
                   ].map((obj_, idx_) => {
