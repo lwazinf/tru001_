@@ -78,10 +78,6 @@ const Pricing_ = () => {
                       status: true,
                     },
                     {
-                      feature: "Tyre inspection valued at R300/month",
-                      status: true,
-                    },
-                    {
                       feature: "On-demand & scheduled fuel delivery",
                       status: true,
                     },
@@ -94,10 +90,6 @@ const Pricing_ = () => {
                       status: true,
                     },
                     { feature: "Full exterior high pressure foam wash", status: true },
-                    {
-                      feature: "24/7 roadside assistance and repairs (Tyre-related issues only)",
-                      status: true,
-                    },
                   ].map((obj_, idx_) => {
                     return (
                       <div
@@ -206,10 +198,6 @@ const Pricing_ = () => {
                       status: true,
                     },
                     {
-                      feature: "Tyre inspection valued at R600/month",
-                      status: true,
-                    },
-                    {
                       feature: "On-demand & scheduled fuel delivery",
                       status: true,
                     },
@@ -222,10 +210,6 @@ const Pricing_ = () => {
                       status: true,
                     },
                     { feature: "Full exterior high pressure foam wash", status: true },
-                    {
-                      feature: "24/7 roadside assistance and repairs (Tyre-related issues only)",
-                      status: true,
-                    },
                   ].map((obj_, idx_) => {
                     return (
                       <div
@@ -329,10 +313,6 @@ const Pricing_ = () => {
                       status: true,
                     },
                     {
-                      feature: "Tyre inspection valued at R600/month",
-                      status: true,
-                    },
-                    {
                       feature: "On-demand & scheduled fuel delivery",
                       status: true,
                     },
@@ -345,10 +325,6 @@ const Pricing_ = () => {
                       status: true,
                     },
                     { feature: "Full exterior high pressure foam wash", status: true },
-                    {
-                      feature: "24/7 roadside assistance and repairs (Tyre-related issues only)",
-                      status: true,
-                    },
                   ].map((obj_, idx_) => {
                     return (
                       <div
