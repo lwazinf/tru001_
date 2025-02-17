@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import { redirect } from "next/navigation";
 
 interface PageProps {
   params: {
@@ -7,13 +7,11 @@ interface PageProps {
 }
 
 export default function CatchAllPage({ params }: PageProps) {
-  const path = params.slug.join('/');
-  
-  // Only allow specific paths
-  if (path === 'privacy' || path === 'terms') {
-    redirect('/?path=' + path);
+  const path = params.slug?.join("/") || "";
+
+  if (path === "privacy" || path === "terms") {
+    redirect(`/?path=${path}`);
   }
-  
-  // For any other paths, redirect to home
-  redirect('/');
+
+  redirect("/");
 }
