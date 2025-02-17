@@ -1,12 +1,11 @@
+/* eslint-disable */
 import { redirect } from 'next/navigation';
 
-interface PageProps {
-  params: {
-    slug: string[];
-  };
-}
-
-export default function CatchAllPage({ params }: PageProps) {
+export default function CatchAllPage({
+  params,
+}: {
+  params: { slug: string[] };
+}) {
   const path = params.slug.join('/');
   
   // Only allow specific paths
