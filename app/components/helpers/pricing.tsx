@@ -415,7 +415,7 @@ const ElegantTicketGuarantee = () => {
                 </span>
               </h2>
               <p className="text-[#e8e6e3]/70 text-lg leading-relaxed max-w-2xl mx-auto scale-[1.1]">
-                If you don't have more free time, feel safer and more in control when it comes to your vehicle needs after the first month of joining,{" "}
+                If you don&apos;t have more free time, feel safer and more in control when it comes to your vehicle needs after the first month of joining,{" "}
                 <span className="text-[#deb887]/80 block mt-4 font-serif italic scale-[1.5]">
                   we will give you a full package refund.
                 </span>
