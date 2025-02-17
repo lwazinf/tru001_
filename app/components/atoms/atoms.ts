@@ -1,3 +1,11 @@
 import { atom } from 'jotai';
-  export const PolicyState = atom(false);
-  
+
+interface PolicyState {
+  isOpen: boolean;
+  section: 'terms' | 'privacy' | null;
+}
+
+export const PolicyState = atom<PolicyState>({
+  isOpen: false,
+  section: null
+});

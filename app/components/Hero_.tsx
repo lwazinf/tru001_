@@ -17,7 +17,7 @@ import { faAngleDoubleDown } from "@fortawesome/free-solid-svg-icons";
 import TermsModal from "./helpers/termsModal";
 import { PolicyState } from "./atoms/atoms";
 import { useAtom } from "jotai";
-// import VerticalGallery from "./helpers/sideSwipe";
+import { useSearchParams } from "next/navigation";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -26,13 +26,26 @@ interface CardElement extends HTMLElement {
 }
 
 const Hero_ = () => {
+  const searchParams = useSearchParams();
   const firstSectionRef = useRef(null);
-  // const secondSectionRef = useRef(null);
-  const [, setIsOpen] = useAtom(PolicyState);
   const thirdSectionRef = useRef(null);
   const mainImgRef = useRef(null);
   const heroImgRef = useRef(null);
   const [isVisible, setIsVisible] = useState(true);
+  const [, setPolicy] = useAtom(PolicyState);
+
+  useEffect(() => {
+    const path = searchParams.get('path');
+    
+    switch (path) {
+      case 'privacy':
+        setPolicy({ isOpen: true, section: 'privacy' });
+        break;
+      case 'terms':
+        setPolicy({ isOpen: true, section: 'terms' });
+        break;
+    }
+  }, [searchParams, setPolicy]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -100,7 +113,6 @@ const Hero_ = () => {
       const cardRight = rowElement.querySelector<CardElement>(".card-right");
 
       if (cardLeft && cardRight) {
-        // Set initial positions
         gsap.set(cardLeft, {
           x: "-100vw",
           opacity: 0,
@@ -122,7 +134,6 @@ const Hero_ = () => {
           },
         });
 
-        // Animate cards inward with fade
         cardTimeline
           .to(cardLeft, {
             x: 0,
@@ -147,7 +158,7 @@ const Hero_ = () => {
       }
     });
 
-    // Logo and content animations in middle section
+    // Logo and content animations
     const logoAnimation = gsap.to(".logo", {
       scale: 3,
       duration: 0.5,
@@ -175,7 +186,7 @@ const Hero_ = () => {
     });
     animations.push(buttonAnimation);
 
-    // Last section zoom and animations
+    // Last section zoom
     gsap.set(heroImgRef.current, {
       scale: 1,
       transformOrigin: "center center",
@@ -200,6 +211,16 @@ const Hero_ = () => {
       clearInterval(timer);
     };
   }, []);
+
+  const handleTermsClick = () => {
+    window.history.pushState({}, '', '/?path=terms');
+    setPolicy({ isOpen: true, section: 'terms' });
+  };
+
+  const handlePrivacyClick = () => {
+    window.history.pushState({}, '', '/?path=privacy');
+    setPolicy({ isOpen: true, section: 'privacy' });
+  };
 
   return (
     <ReactLenis root>
@@ -246,11 +267,11 @@ const Hero_ = () => {
                 className="w-[450px] h-[250px] object-cover"
               />
               <div className="flex flex-col justify-center items-start min-w-[450px] h-[150px] rounded-[6px] bg-white/15 backdrop-blur-sm">
-              <img
-                src="/assets/images/logoText.png"
-                alt="Main logo"
-                className="w-[450px] object-cover"
-              />
+                <img
+                  src="/assets/images/logoText.png"
+                  alt="Main logo"
+                  className="w-[450px] object-cover"
+                />
               </div>
             </div>
           </div>
@@ -298,40 +319,6 @@ const Hero_ = () => {
                 })}
               </div>
             </div>
-            {/* <div className="first-section-text xl:flex hidden flex-row justify-center items-center w-[600px] h-[250px]">
-              <p className="text-[65px] font-black -rotate-90 text-yellow-700">
-              Fuel
-              </p>
-              <div className="text-[16px] text-end font-medium flex flex-col justify-center items-end">
-                <p>Need To Fuel&apos;s mobile app is</p>
-                <p>now available at your store</p>
-              </div>
-              <div
-                className={`min-w-2 min-h-2 flex flex-row justify-center ml-6 items-center z-[5]`}
-              >
-                {[
-                  { icon: faApple, func: () => {} },
-                  {
-                    icon: faGooglePlay,
-                    func: () => {
-                      window.open(
-                        "https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-release.apk?alt=media&token=c4885d23-b5c4-4ff7-b438-eca7cff59a30"
-                      );
-                    },
-                  },
-                ].map((obj_, idx_) => {
-                  return (
-                    <div
-                      key={idx_}
-                      onClick={obj_.func}
-                      className={`cursor-pointer mx-1 w-8 h-8 flex flex-col justify-center items-center border-orange-500 text-orange-500 border-[1px] rounded-[50%]`}
-                    >
-                      <FontAwesomeIcon icon={obj_.icon} />
-                    </div>
-                  );
-                })}
-              </div>
-            </div> */}
           </div>
           <div
             className={`w-[400px] opacity-0 relative bottom-[100px] ml-[95px] min-h-2 flex flex-col justify-center items-center scale-[0.8]`}
@@ -365,63 +352,46 @@ const Hero_ = () => {
           className={`flex flex-col justify-center items-center w-full min-h-2 text-white text-center`}
         >
           <img
-                src="/assets/mockups/profile.png"
-                alt=""
-                className={`${
-                  isVisible
-                    ? "opacity-0 duration-[1000ms]"
-                    : "opacity-100 duration-[200ms]"
-                } xl:opacity-100 floating-image animate-float transition-all h-[450px] object-contain scale-[0.5]`}
-              />
-              <img
-                src="/assets/mockups/orders.png"
-                alt=""
-                className={`${
-                  !isVisible
-                    ? "opacity-0 duration-[1000ms]"
-                    : "opacity-100 duration-[200ms]"
-                } xl:opacity-100 floating-image animate-float transition-all h-[450px] object-contain scale-[0.5] absolute top-4`}
-              />
-          {/* <div className={`relative min-w-2 flex bg-white w-full h-[300px]`}>
-            <div className="flex-col justify-start items-center w-full scale-[0.5] top-0">
-              
-            </div>
-            <div className="flex-col justify-start items-center w-full scale-[0.5] absolute top-0">
-              <img
-                src="/assets/mockups/orders.png"
-                alt=""
-                className={`${
-                  !isVisible
-                    ? "opacity-0 duration-[1000ms]"
-                    : "opacity-100 duration-[200ms]"
-                } xl:opacity-100 floating-image animate-float transition-all w-full h-full object-cover`}
-              />
-            </div>
-          </div> */}
+            src="/assets/mockups/profile.png"
+            alt=""
+            className={`${
+              isVisible
+                ? "opacity-0 duration-[1000ms]"
+                : "opacity-100 duration-[200ms]"
+            } xl:opacity-100 floating-image animate-float transition-all h-[450px] object-contain scale-[0.5]`}
+          />
+          <img
+            src="/assets/mockups/orders.png"
+            alt=""
+            className={`${
+              !isVisible
+                ? "opacity-0 duration-[1000ms]"
+                : "opacity-100 duration-[200ms]"
+            } xl:opacity-100 floating-image animate-float transition-all h-[450px] object-contain scale-[0.5] absolute top-4`}
+          />
           <div
             className={`flex flex-col justify-center items-center w-full min-h-2 text-white text-center`}
           >
             <div className={`tinos-regular text-white/80 text-[13px] p-8`}>
               At Need To Fuel, we understand that time is your most valuable
-              asset. That’s why we’ve crafted a suite of bespoke services—mobile
+              asset. That&apos;s why we&apos;ve crafted a suite of bespoke services—mobile
               refueling, vehicle valet, tyre inspections, and roadside
               assistance—designed to offer you unparalleled convenience and
-              peace of mind, all at the touch of a button.
-            </div>
-              <img
-                onClick={() => {
-                  window.open(
-                    "https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-release.apk?alt=media&token=c4885d23-b5c4-4ff7-b438-eca7cff59a30"
-                  );
-                }}
-                className={`my-1 scale-[0.7]`}
-                src={`/assets/icons/PlayStore.png`}
-              />
-              <img
-                className={`my-1 scale-[0.7] opacity-20`}
-                src={`/assets/icons/AppStore.png`}
-              />
-            </div>
+              peace of mind, all at the touch of a button.</div>
+            <img
+              onClick={() => {
+                window.open(
+                  "https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-release.apk?alt=media&token=c4885d23-b5c4-4ff7-b438-eca7cff59a30"
+                );
+              }}
+              className={`my-1 scale-[0.7]`}
+              src={`/assets/icons/PlayStore.png`}
+            />
+            <img
+              className={`my-1 scale-[0.7] opacity-20`}
+              src={`/assets/icons/AppStore.png`}
+            />
+          </div>
         </div>
       </section>
 
@@ -441,15 +411,13 @@ const Hero_ = () => {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="max-w-4xl mx-auto p-12"
+              className="max-w-4xl mx-auto p-12 relative bottom-[150px]"
             >
               <div className="relative px-8">
-                {/* Top quotes */}
                 <span className="absolute -top-8 -left-4 text-yellow-400 text-6xl font-serif">
                   ❝
                 </span>
 
-                {/* Quote text */}
                 <motion.p
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
@@ -460,19 +428,16 @@ const Hero_ = () => {
                   time
                 </motion.p>
 
-                {/* Bottom quotes */}
                 <span className="absolute -bottom-8 -right-4 text-yellow-400 text-6xl font-serif">
                   ❞
                 </span>
 
-                {/* Divider */}
                 <div className="flex items-center justify-center space-x-4 mb-6">
                   <div className="w-12 h-0.5 bg-yellow-400"></div>
                   <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
                   <div className="w-12 h-0.5 bg-yellow-400"></div>
                 </div>
 
-                {/* Attribution */}
                 <motion.p
                   initial={{ y: 10, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
@@ -484,19 +449,12 @@ const Hero_ = () => {
               </div>
             </motion.div>
           </div>
-          {/* <div className="flex flex-row justify-center items-center w-[600px] h-[250px]">
-            <p className="text-[14px]">
-              Whether you need a fill-up, detailed cleaning, or roadside
-              assistance, our professional team comes to you. Get started today
-              and experience car care that fits your lifestyle.
-            </p>
-          </div> */}
         </div>
         <div
           className={`absolute top-0 xl:flex hidden flex-col justify-end items-center w-full h-full`}
         >
           <div
-            className={`flex xl:flex-row w-full h-full justify-center items-end absolute mb-[60px]`}
+            className={`flex xl:flex-row w-full h-full justify-center items-end `}
           >
             {[
               "https://images.pexels.com/photos/6873123/pexels-photo-6873123.jpeg?auto=compress&cs=tinysrgb&w=600",
@@ -521,7 +479,7 @@ const Hero_ = () => {
             className={`text-center text-white/60 w-[600px] font-medium opacity-80 tinos-regular xl:scale-[1] scale-[0.8] relative top-[0px]`}
           >
             Our commitment is to provide exceptional, seamless service, allowing
-            you to focus on what truly matters—whether it’s your business, your
+            you to focus on what truly matters—whether it&apos;s your business, your
             passions, or your loved ones. Because for those who demand
             excellence, time should never be a compromise.
           </p>
@@ -563,7 +521,7 @@ const Hero_ = () => {
             className={`text-center text-white/80 text-[13px] font-medium tinos-regular p-4 relative top-[0px]`}
           >
             Our commitment is to provide exceptional, seamless service, allowing
-            you to focus on what truly matters—whether it’s your business, your
+            you to focus on what truly matters—whether it&apos;s your business, your
             passions, or your loved ones. Because for those who demand
             excellence, time should never be a compromise.
           </p>
@@ -573,25 +531,6 @@ const Hero_ = () => {
       <section className={`min-h-screen xl:scale-[1] scale-[1]`}>
         <Pricing_ />
       </section>
-
-      {/* <section
-        ref={secondSectionRef}
-        className="main w-full flex flex-col justify-start p-4 items-center xl:mt-[90px] xl:mb-[-150px] z-[4]"
-      >
-        <div
-          className="absolute z-[0] top-0 left-0 w-full h-full opacity-5"
-          style={{
-            backgroundImage: "url(/assets/images/main_logo.png)",
-            backgroundSize: "100px",
-            backgroundRepeat: "repeat",
-            transform: "rotate(0deg)",
-            pointerEvents: "none",
-          }}
-        />
-
-        {generateRows()}
-        <VerticalGallery />
-      </section> */}
 
       <section className="footer text-[14px] text-white relative flex flex-col xl:justify-end justify-center items-center pb-8 xl:mt-[150px]">
         <div className={`pointer-events-none`}>
@@ -636,32 +575,62 @@ const Hero_ = () => {
           <div
             className={`min-w-2 min-h-2 flex flex-row justify-center items-center xl:mb-0 mb-4`}
           >
-            <FontAwesomeIcon
-              icon={faFacebook}
-              className={`text-[18px] mx-4 cursor-pointer xl:mr-0 mr-4`}
-            />
-            <FontAwesomeIcon
-              icon={faLinkedinIn}
-              className={`text-[18px] mx-4 cursor-pointer xl:mr-0 mr-4`}
-            />
-            <FontAwesomeIcon
-              icon={faInstagram}
-              className={`text-[18px] mx-4 cursor-pointer xl:mr-0 mr-4`}
-            />
-            <FontAwesomeIcon
-              icon={faTiktok}
-              className={`text-[18px] mx-4 cursor-pointer`}
-            />
+            <a
+              href={"https://www.facebook.com/needtofuel"}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FontAwesomeIcon
+                icon={faFacebook}
+                className={`text-[18px] mx-4 cursor-pointer xl:mr-0 mr-4`}
+              />
+            </a>
+            <a
+              href={"https://www.linkedin.com/needtofuel"}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FontAwesomeIcon
+                icon={faLinkedinIn}
+                className={`text-[18px] mx-4 cursor-pointer xl:mr-0 mr-4`}
+              />
+            </a>
+            <a
+              href={"https://www.instagram.com/needtofuel_"}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FontAwesomeIcon
+                icon={faInstagram}
+                className={`text-[18px] mx-4 cursor-pointer xl:mr-0 mr-4`}
+              />
+            </a>
+            <a
+              href={"https://www.tiktok.com/@needtofuel"}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FontAwesomeIcon
+                icon={faTiktok}
+                className={`text-[18px] mx-4 cursor-pointer`}
+              />
+            </a>
           </div>
           <div
             className={`min-w-2 min-h-2 flex flex-row justify-center items-center`}
           >
-            <p onClick={() => {
-              setIsOpen(true)
-            }} className={`mx-2 cursor-pointer`}>Terms & Conditions</p>
-            <p onClick={() => {
-              setIsOpen(true)
-            }} className={`mx-2 cursor-pointer`}>Privacy Ploicy</p>
+            <p
+              onClick={handleTermsClick}
+              className={`mx-2 cursor-pointer`}
+            >
+              Terms & Conditions
+            </p>
+            <p
+              onClick={handlePrivacyClick}
+              className={`mx-2 cursor-pointer`}
+            >
+              Privacy Policy
+            </p>
           </div>
         </div>
       </section>

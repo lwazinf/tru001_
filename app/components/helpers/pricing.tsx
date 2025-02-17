@@ -13,7 +13,9 @@ const Pricing_ = () => {
       <div
         className={`w-full min-h-2 flex flex-col mt-[30px] mb-[60px] justify-center items-center`}
       >
-        <p className={`text-white text-[50px] tinos-regular-italic text-center font-black`}>
+        <p
+          className={`text-white text-[50px] tinos-regular-italic text-center font-black`}
+        >
           Exclusive Offers
         </p>
       </div>
@@ -74,7 +76,7 @@ const Pricing_ = () => {
                       status: true,
                     },
                     {
-                      feature: "4 Royal Valet washes (R1,800 value/month)",
+                      feature: "4 Royal Valet washes",
                       status: true,
                     },
                     {
@@ -82,14 +84,13 @@ const Pricing_ = () => {
                       status: true,
                     },
                     {
-                      feature: "24/7 fuel delivery at station prices",
-                      status: true,
-                    },
-                    {
                       feature: "Interior steam clean & detailing",
                       status: true,
                     },
-                    { feature: "Full exterior high pressure foam wash", status: true },
+                    {
+                      feature: "Full exterior high pressure foam wash",
+                      status: true,
+                    },
                   ].map((obj_, idx_) => {
                     return (
                       <div
@@ -194,7 +195,7 @@ const Pricing_ = () => {
                       status: true,
                     },
                     {
-                      feature: "8 Royal Valet washes (R3,600 value/month)",
+                      feature: "8 Royal Valet washes",
                       status: true,
                     },
                     {
@@ -202,14 +203,13 @@ const Pricing_ = () => {
                       status: true,
                     },
                     {
-                      feature: "24/7 fuel delivery at station prices",
-                      status: true,
-                    },
-                    {
                       feature: "Interior steam clean & detailing",
                       status: true,
                     },
-                    { feature: "Full exterior high pressure foam wash", status: true },
+                    {
+                      feature: "Full exterior high pressure foam wash",
+                      status: true,
+                    },
                   ].map((obj_, idx_) => {
                     return (
                       <div
@@ -317,14 +317,13 @@ const Pricing_ = () => {
                       status: true,
                     },
                     {
-                      feature: "24/7 fuel delivery at station prices",
-                      status: true,
-                    },
-                    {
                       feature: "Interior steam clean & detailing",
                       status: true,
                     },
-                    { feature: "Full exterior high pressure foam wash", status: true },
+                    {
+                      feature: "Full exterior high pressure foam wash",
+                      status: true,
+                    },
                   ].map((obj_, idx_) => {
                     return (
                       <div
@@ -385,28 +384,46 @@ const Pricing_ = () => {
         </motion.div>
       </motion.div>
 
-      <motion.div
-        className={`flex flex-col justify-center items-center w-full min-h-2 mt-[40px] p-4 text-center`}
-        style={{ y: yRange }}
-      >
-        <p className={`text-[25px] font-black text-orange-500 tinos-regular-italic`}>Experience Our Service with Total Piece Of Mind</p>
-        <p
-          className={`text-center text-[13px] text-white/80 font-medium tinos-regular xl:scale-[1] p-4 xl:hidden flex`}
-        >
-          If you don&apos;t have more free time, feel safer and more in control
-          when it comes to your vehicle needs after the first month of joining,
-          we will give you a full refund.
-        </p>
-        <p
-            className={`text-center text-white/60 w-[600px] font-medium opacity-80 tinos-regular xl:scale-[1] xl:flex hidden relative top-[0px]`}
-          >
-            If you don&apos;t have more free time, feel safer and more in control
-          when it comes to your vehicle needs after the first month of joining,
-          we will give you a full refund.
-          </p>
-      </motion.div>
+      <ElegantTicketGuarantee />
     </div>
   );
 };
 
 export default Pricing_;
+
+// // // // // // //
+// // // // // // //
+
+const ElegantTicketGuarantee = () => {
+  return (
+    <div className="scale-[0.6]">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.6 }}
+        className="mt-16 w-full max-w-4xl px-4"
+      >
+        <div className="bg-gradient-to-b from-[#c0976a] via-[#deb887] to-[#c0976a] p-px rounded-lg">
+          <div className="bg-[#1c1814] rounded-lg p-8 md:p-12 relative">
+            <div className="text-center space-y-6">
+              <h2>
+                <span className="block text-4xl md:text-5xl font-serif italic bg-gradient-to-r from-[#deb887] to-[#c0976a] bg-clip-text text-transparent">
+                  Experience Our Service
+                </span>
+                <span className="block mt-2 text-xl md:text-2xl text-[#deb887]/80 font-serif italic">
+                  with Total Peace of Mind
+                </span>
+              </h2>
+              <p className="text-[#e8e6e3]/70 text-lg leading-relaxed max-w-2xl mx-auto scale-[1.1]">
+                If you don't have more free time, feel safer and more in control when it comes to your vehicle needs after the first month of joining,{" "}
+                <span className="text-[#deb887]/80 block mt-4 font-serif italic scale-[1.5]">
+                  we will give you a full package refund.
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
