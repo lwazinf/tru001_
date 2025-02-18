@@ -1,10 +1,9 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { useAtom } from 'jotai';
 import { PolicyState } from '../atoms/atoms';
-import { useSearchParams } from 'next/navigation';
 
 const policyText = `privacy policy
 Cookies Policy, Privacy Policy and POPIA disclaimer
@@ -200,29 +199,15 @@ The Fuel Sale Agreement and all of the documents referred to in it, in the agree
 
 const TermsModal = () => {
     const [isOpen, setIsOpen] = useAtom(PolicyState);
-    const searchParams = useSearchParams();
     const [showTerms, setShowTerms] = useState(true);
     const [isAnimating, setIsAnimating] = useState(false);
-
-    useEffect(() => {
-        const path = searchParams.get('path');
-        
-        switch (path) {
-          case 'privacy':
-            setShowTerms(false);
-            break;
-          case 'terms':
-            setShowTerms(true);
-            break;
-        }
-      }, [searchParams]);
   
     const handleClose = () => {
-      setIsOpen({ isOpen: false, section: 'privacy' });
+      setIsOpen(false);
     };
   
     const handleAccept = () => {
-      setIsOpen({ isOpen: false, section: 'privacy' });
+      setIsOpen(false);
       // Add any additional logic for accepting terms
     };
   
