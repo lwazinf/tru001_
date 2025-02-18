@@ -5,11 +5,17 @@ type CatchAllPageProps = {
 };
 
 export default function CatchAllPage({ params }: CatchAllPageProps) {
-  const path = params?.slug?.join("/") || "";
+  if (!params?.slug) {
+    redirect("/"); // Redirect if no slug is provided
+  }
+
+  const path = params.slug.join("/");
 
   if (path === "privacy" || path === "terms") {
     redirect(`/?path=${path}`);
+  } else {
+    redirect("/");
   }
 
-  redirect("/");
+  return null; // Ensures function has a valid return type
 }
