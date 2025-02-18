@@ -1,10 +1,8 @@
 import { redirect } from "next/navigation";
 
-interface CatchAllPageProps {
-  params: {
-    slug?: string[];
-  };
-}
+type CatchAllPageProps = {
+  params: { slug?: string[] };
+};
 
 export default function CatchAllPage({ params }: CatchAllPageProps) {
   const path = params?.slug?.join("/") || "";
