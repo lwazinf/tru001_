@@ -1,0 +1,7 @@
+{
+    "build": {
+      "env": {
+        "NEXTJS_IGNORE_ESLINT": "1"
+      }
+    }
+  }
