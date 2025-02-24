@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Tinos:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Domine:wght@400..700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -214,6 +215,13 @@ section{
 .gabarito {
   font-family: "Gabarito", serif;
   font-optical-sizing: auto;
+  font-style: normal;
+} 
+
+.domine {
+  font-family: "Domine", serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
   font-style: normal;
 }
 

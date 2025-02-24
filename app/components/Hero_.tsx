@@ -361,68 +361,84 @@ const Hero_ = () => {
         ref={thirdSectionRef}
         className="w-full h-screen relative xl:hidden overflow-hidden flex flex-col justify-center items-center"
       >
-        <div
-          className={`flex flex-col justify-center items-center w-full min-h-2 text-white text-center`}
-        >
-          <img
-            src="/assets/mockups/profile.png"
-            alt=""
-            className={`${
-              isVisible
-                ? "opacity-0 duration-[1000ms]"
-                : "opacity-100 duration-[200ms]"
-            } xl:opacity-100 floating-image animate-float transition-all h-[450px] object-contain scale-[0.5]`}
-          />
-          <img
-            src="/assets/mockups/orders.png"
-            alt=""
-            className={`${
-              !isVisible
-                ? "opacity-0 duration-[1000ms]"
-                : "opacity-100 duration-[200ms]"
-            } xl:opacity-100 floating-image animate-float transition-all h-[450px] object-contain scale-[0.5] absolute top-4`}
-          />
-          {/* <div className={`relative min-w-2 flex bg-white w-full h-[300px]`}>
-            <div className="flex-col justify-start items-center w-full scale-[0.5] top-0">
-              
-            </div>
-            <div className="flex-col justify-start items-center w-full scale-[0.5] absolute top-0">
-              <img
-                src="/assets/mockups/orders.png"
-                alt=""
-                className={`${
-                  !isVisible
-                    ? "opacity-0 duration-[1000ms]"
-                    : "opacity-100 duration-[200ms]"
-                } xl:opacity-100 floating-image animate-float transition-all w-full h-full object-cover`}
-              />
-            </div>
-          </div> */}
-          <div
-            className={`flex flex-col justify-center items-center w-full min-h-2 text-white text-center`}
-          >
-            <div className={`tinos-regular text-white/80 text-[13px] p-8`}>
-              At Need To Fuel, we understand that time is your most valuable
-              asset. That’s why we’ve crafted a suite of bespoke services—mobile
-              refueling, vehicle valet, tyre inspections, and roadside
-              assistance—designed to offer you unparalleled convenience and
-              peace of mind, all at the touch of a button.
-            </div>
-            <img
-              onClick={() => {
-                window.open(
-                  "https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-release.apk?alt=media&token=c4885d23-b5c4-4ff7-b438-eca7cff59a30"
-                );
-              }}
-              className={`my-1 scale-[0.7]`}
-              src={`/assets/icons/PlayStore.png`}
-            />
-            <img
-              className={`my-1 scale-[0.7] opacity-20`}
-              src={`/assets/icons/AppStore.png`}
-            />
-          </div>
-        </div>
+        <div className="flex flex-col justify-center items-center w-full min-h-2 text-white text-center px-4">
+  {/* Images Container */}
+  <div className="relative w-full flex justify-center items-center min-h-[600px]">
+    <img
+      src="/assets/mockups/profile.png"
+      alt=""
+      className={`
+        absolute
+        floating-image
+        ${isVisible ? 'visible' : ''}
+        animate-float
+        w-[280px]
+        sm:w-[320px]
+        md:w-[360px]
+        object-contain
+        sm:bottom-[240px]
+        xl:left-auto
+        xl:translate-x-0
+        xl:ml-[900px]
+      `}
+      style={{
+        transitionProperty: 'all',
+        transitionDuration: '1000ms'
+      }}
+    />
+    <img
+      src="/assets/mockups/orders.png"
+      alt=""
+      className={`
+        absolute
+        floating-image
+        ${!isVisible ? 'visible' : ''}
+        animate-float
+        w-[280px]
+        sm:w-[320px]
+        md:w-[360px]
+        object-contain
+        sm:bottom-[240px]
+        xl:left-auto
+        xl:translate-x-0
+        xl:ml-[900px]
+      `}
+      style={{
+        transitionProperty: 'all',
+        transitionDuration: '1000ms'
+      }}
+    />
+  </div>
+
+  {/* Text and Buttons Container */}
+  <div className="flex flex-col justify-center items-center w-full max-w-2xl">
+    <div className="tinos-regular text-white/80 text-sm sm:text-[13px] px-4 sm:p-8 leading-relaxed">
+      At Need To Fuel, we understand that time is your most valuable
+      asset. That&apos;s why we&apos;ve crafted a suite of bespoke services—mobile
+      refueling, vehicle valet, tyre inspections, and roadside
+      assistance—designed to offer you unparalleled convenience and
+      peace of mind, all at the touch of a button.
+    </div>
+
+    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
+      <img
+        onClick={() => {
+          window.open(
+            "https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-release.apk?alt=media&token=c4885d23-b5c4-4ff7-b438-eca7cff59a30"
+          );
+        }}
+        src="/assets/icons/PlayStore.png"
+        alt="Get it on Google Play"
+        className="w-36 sm:w-48 hover:scale-105 transition-transform cursor-pointer"
+      />
+      <img
+        src="/assets/icons/AppStore.png"
+        alt="Download on App Store"
+        className="w-36 sm:w-48 opacity-20"
+      />
+    </div>
+  </div>
+</div>
       </section>
 
       <section
@@ -641,20 +657,20 @@ const Hero_ = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-            <FontAwesomeIcon
-              icon={faFacebook}
-              className={`text-[18px] mx-4 cursor-pointer xl:mr-0 mr-4`}
-            />
+              <FontAwesomeIcon
+                icon={faFacebook}
+                className={`text-[18px] mx-4 cursor-pointer xl:mr-0 mr-4`}
+              />
             </a>
             <a
               href={"https://www.tiktok.com/needtofuel"}
               target="_blank"
               rel="noopener noreferrer"
             >
-            <FontAwesomeIcon
-              icon={faLinkedinIn}
-              className={`text-[18px] mx-4 cursor-pointer xl:mr-0 mr-4`}
-            />
+              <FontAwesomeIcon
+                icon={faLinkedinIn}
+                className={`text-[18px] mx-4 cursor-pointer xl:mr-0 mr-4`}
+              />
             </a>
             <a
               href={"https://www.instagram.com/needtofuel_"}
@@ -671,10 +687,10 @@ const Hero_ = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-            <FontAwesomeIcon
-              icon={faTiktok}
-              className={`text-[18px] mx-4 cursor-pointer`}
-            />
+              <FontAwesomeIcon
+                icon={faTiktok}
+                className={`text-[18px] mx-4 cursor-pointer`}
+              />
             </a>
           </div>
           <div
