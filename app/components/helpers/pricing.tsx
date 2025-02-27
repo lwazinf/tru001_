@@ -2,6 +2,9 @@ import {
   faArrowRight,
   faCheckCircle,
   faStar,
+  faGem,
+  faShieldAlt,
+  faCrown,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion, useMotionValue, useTransform } from "framer-motion";
@@ -12,462 +15,243 @@ const Pricing_ = () => {
 
   return (
     <div
-      className={`w-full xl:h-[90vh] min-h-screen flex flex-col justify-center items-center top_fade`}
+      className={`w-full xl:h-[90vh] min-h-screen flex flex-col justify-center items-center top_fade py-20`}
     >
       <div
         className={`w-full min-h-2 flex flex-col mt-[30px] mb-[60px] justify-center items-center`}
       >
-        <p
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className={`text-amber-400 text-[16px] uppercase tracking-widest font-bold mb-2`}
+        >
+          Choose Your Experience
+        </motion.p>
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
           className={`text-white text-[50px] tinos-regular-italic text-center font-black`}
         >
-          Exclusive Offers
-        </p>
+          Exclusive Memberships
+        </motion.h2>
       </div>
       <motion.div
-        className={`flex xl:flex-row flex-col justify-center items-center w-full min-h-2 mb-2`}
+        className={`flex xl:flex-row flex-col justify-center items-center w-full min-h-2 mb-2 gap-8`}
         style={{ y: yRange }}
-        // onMouseMove={(e) => y.set(e.clientY / window.innerHeight)}
       >
+        {/* Gold Tier */}
         <motion.div
-          className={`h-[475px] w-[350px] m-2 rounded-[5px] flex flex-col justify-center items-center bg-gradient-to-br from-yellow-200 via-yellow-500 to-yellow-200 relative overflow-hidden border-[1px] border-black/5`}
-          style={{ y: yRange }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          whileHover={{ y: -10, transition: { duration: 0.2 } }}
+          className={`h-[500px] w-[350px] m-2 rounded-2xl flex flex-col justify-start items-center relative overflow-hidden border border-amber-500/20 backdrop-blur-sm bg-gradient-to-b from-amber-500/10 to-black/40`}
+          style={{ 
+            boxShadow: "0 10px 40px -10px rgba(245, 158, 11, 0.3), 0 0 20px 0px rgba(245, 158, 11, 0.1) inset"
+          }}
         >
-          <div className={`h-[10px]`}></div>
-          <div
-            className={`flex flex-row justify-between px-2 items-center w-full`}
-          >
-            <div
-              className={`min-h-2 w-full p-4 flex flex-row items-center relative justify-center bg-white/40 backdrop-blur-sm rounded-md`}
-            >
-              <div
-                className={`w-full domine flex flex-col justify-center items-start px-4 text-black text-[20px] font-bold`}
-              >
-                Gold
-              </div>
-              <div
-                className={`text-black/80 px-4 text-[13px] domine font-bold text-right min-w-[250px] relative`}
-              >
-                R2,999.99{" "}
-                <span className={`text-black/80 font-medium`}>/month</span>
-              </div>
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500/0 via-amber-500 to-amber-500/0"></div>
+          
+          {/* Gold header */}
+          <div className="w-full pt-8 pb-4 px-6 relative">
+            <div className="absolute top-4 right-4">
+              <FontAwesomeIcon
+                icon={faGem}
+                className="text-amber-500 h-6 w-6"
+              />
             </div>
+            <span className="bg-amber-500/10 text-amber-500 text-xs font-bold px-3 py-1 rounded-full">GOLD TIER</span>
+            <h3 className="text-white text-3xl font-bold mt-2">Premium</h3>
+            <div className="flex items-baseline mt-1">
+              <span className="text-white text-4xl font-bold">R2,999</span>
+              <span className="text-white/60 ml-1">/month</span>
+            </div>
+            <p className="text-white/60 text-sm mt-2">For businesses that need quality service and dedicated support</p>
           </div>
-          <div className={`h-[300px] w-full`}>
-            {/* <div className={`h-[1px] w-[90%] bg-black/20 mx-auto`} /> */}
-            <div
-              className={`w-full h-full flex flex-col justify-center items-center relative`}
-            >
-              <motion.div
-                initial={{ y: 0 }}
-                animate={{ y: [0, -2, 0] }}
-                transition={{
-                  duration: 8,
-                  repeat: Infinity,
-                  repeatType: "loop",
-                  ease: "easeInOut", // Ensure this is a valid easing function or use `easeInOut` from Framer Motion's predefined easings
-                }}
-                className={`flex flex-col justify-center items-center p-4 opacity-[0.5]`}
-                onMouseEnter={() => {}}
-                onMouseLeave={() => {}}
-                onClick={() => {}}
-              >
-                <img
-                  src={`/assets/images/main_logo.png`}
-                  className={`w-[300px] object-cover relative`}
-                />
-              </motion.div>
-              <div className={`w-full h-full absolute p-1`}>
-                <div
-                  className={`h-full w-full flex flex-col items-start justify-start pl-4 pt-8`}
+          
+          {/* Divider */}
+          <div className="w-full h-px bg-gradient-to-r from-amber-500/0 via-amber-500/30 to-amber-500/0"></div>
+          
+          {/* Features */}
+          <div className="w-full px-6 py-6 flex-1">
+            <ul className="space-y-3">
+              {[
+                "2 vehicles allocated for fuel delivery",
+                "On-demand & scheduled fuel delivery",
+                "Purchase fuel at fuel station prices",
+              ].map((feature, idx) => (
+                <motion.li 
+                  key={idx}
+                  initial={{ opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: idx * 0.1 }}
+                  className="flex items-start"
                 >
-                  {[
-                    {
-                      feature: "2 vehicles allocated for fuel delivery.",
-                      status: true,
-                    },
-                    {
-                      feature: "On-demand & scheduled fuel delivery.",
-                      status: true,
-                    },
-                    {
-                      feature: "Purchase fuel at fuel station prices.",
-                      status: true,
-                    },
-                  ].map((obj_, idx_) => {
-                    return (
-                      <div
-                        className={`flex flex-row justify-start items-center w-full min-h-2 mb-1 tinos-regular`}
-                        key={idx_}
-                      >
-                        <FontAwesomeIcon
-                          icon={faCheckCircle}
-                          className={`mx-1 mr-2 text-[12px]`}
-                        />
-                        <p className={`text-[13px]`}>{obj_.feature}</p>
-                      </div>
-                    );
-                  })}
-
-                  <div
-                    className={`min-h-2 w-full p-4 mt-6 flex flex-col items-start relative right-2 justify-start bg-white/40 backdrop-blur-[2px] rounded-md`}
-                  >
-                    <div
-                      className={`w-full min-h-2 flex flex-col justify-center domine items-center mb-4 mt-2 font-black text-[20px]`}
-                    >
-                      FREE PACKAGE BONUS
-                    </div>
-
-                    {[
-                      {
-                        feature: "4 Royal Valet washes (Valued at R2,600)",
-                        status: true,
-                      },
-                      {
-                        feature: "Save 50% on all additional washes",
-                        status: true,
-                      },
-                    ].map((obj_, idx_) => {
-                      return (
-                        <div
-                          className={`flex flex-row justify-start text-black/80 items-center w-full min-h-2 mb-1 tinos-regular`}
-                          key={idx_}
-                        >
-                          <FontAwesomeIcon
-                            icon={faStar}
-                            className={`mx-1 mr-2 text-[12px]`}
-                          />
-                          <p className={`text-[14px] font-bold gabarito`}>
-                            {obj_.feature}
-                          </p>
-                        </div>
-                      );
-                    })}
-
-                    <div className={`h-[75px] mt-[40px] w-full`}>
-                      <div
-                        className={`h-[1px] w-[90%] bg-black/20 mx-auto mb-2`}
-                      />
-                      <div
-                        className={`w-full h-full flex flex-row justify-between items-center`}
-                      >
-                        <div
-                          className={`text-black/80 px-4 text-[13px] font-bold tinos-regular-italic`}
-                        >
-                          Limited to 50 members
-                        </div>
-                        <div
-                          className={`min-w-[100px] h-[30px] mr-4 bg-black rounded-[15px] flex flex-row justify-center items-center cursor-pointer`}
-                        >
-                          <div
-                            className={`min-w-[100px] h-[30px] scale-[0.3] opacity-50 absolute hover:animate-ping bg-whit rounded-[15px] flex flex-row justify-center items-center cursor-pointer z-[0]`}
-                          />
-                          <p
-                            className={`text-white/80 font-medium text-[12px] pointer-events-none z-[1] gabarito`}
-                          >
-                            Start Now
-                          </p>
-                          <FontAwesomeIcon
-                            icon={faArrowRight}
-                            className={`text-white/80 ml-2 text-[12px] pointer-events-none z-[1]`}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="w-full h-full overflow-y-auto absolute">
-                <div className="p-8">
-                  <div className="max-w-3xl space-y-8"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-        <motion.div
-          className={`h-[475px] w-[360px] m-2 rounded-[5px] flex flex-col justify-center items-center bg-[#131313] relative overflow-hidden`}
-          style={{ y: yRange }}
-        >
-          <div className={`h-[10px]`}></div>
-          <div
-            className={`flex flex-row justify-between px-2 items-center w-full`}
-          >
-            <div
-              className={`min-h-2 w-full p-4 flex flex-row items-center relative justify-center bg-white/40 backdrop-blur-sm rounded-md`}
-            >
-              <div
-                className={`w-full domine flex flex-col justify-center items-start px-4 text-black text-[20px] font-bold`}
-              >
-                Black
-              </div>
-              <div
-                className={`text-black/80 px-4 text-[13px] domine font-bold text-right min-w-[250px] relative`}
-              >
-                R4,999.99{" "}
-                <span className={`text-black/80 font-medium`}>/month</span>
-              </div>
-            </div>
-          </div>
-          <div className={`h-[300px] w-full`}>
-            {/* <div className={`h-[1px] w-[90%] bg-black/20 mx-auto`} /> */}
-            <div
-              className={`w-full h-full flex flex-col justify-center items-center relative`}
-            >
-              <motion.div
-                initial={{ y: 0 }}
-                animate={{ y: [0, -2, 0] }}
-                transition={{
-                  duration: 8,
-                  repeat: Infinity,
-                  repeatType: "loop",
-                  ease: "easeInOut", // Ensure this is a valid easing function or use `easeInOut` from Framer Motion's predefined easings
-                }}
-                className={`flex flex-col justify-center items-center p-4 opacity-[0.5]`}
-                onMouseEnter={() => {}}
-                onMouseLeave={() => {}}
-                onClick={() => {}}
-              >
-                <img
-                  src={`/assets/images/main_logo.png`}
-                  className={`w-[300px] object-cover relative`}
-                />
-              </motion.div>
-              <div className={`w-full h-full absolute p-1`}>
-                <div
-                  className={`h-full w-full flex flex-col items-start justify-start pl-4 pt-8`}
-                >
-                  {[
-                    {
-                      feature: "4 vehicles allocated for fuel delivery.",
-                      status: true,
-                    },
-                    {
-                      feature: "On-demand & scheduled fuel delivery.",
-                      status: true,
-                    },
-                    {
-                      feature: "Purchase fuel at fuel station prices.",
-                      status: true,
-                    },
-                  ].map((obj_, idx_) => {
-                    return (
-                      <div
-                        className={`flex flex-row justify-start items-center w-full min-h-2 mb-1 text-white tinos-regular`}
-                        key={idx_}
-                      >
-                        <FontAwesomeIcon
-                          icon={faCheckCircle}
-                          className={`mx-1 mr-2 text-[12px]`}
-                        />
-                        <p className={`text-[13px]`}>{obj_.feature}</p>
-                      </div>
-                    );
-                  })}
-
-                  <div
-                    className={`min-h-2 w-full p-4 mt-6 flex flex-col items-start relative right-2 justify-start bg-white/40 backdrop-blur-[2px] rounded-md`}
-                  >
-                    <div
-                      className={`w-full min-h-2 flex flex-col justify-center domine items-center mb-4 mt-2 font-black text-[20px] text-black`}
-                    >
-                      FREE PACKAGE BONUS
-                    </div>
-
-                    {[
-                      {
-                        feature: "8 Royal Valet washes (Valued at R5,200)",
-                        status: true,
-                      },
-                      {
-                        feature: "Save 50% on all additional washes",
-                        status: true,
-                      },
-                    ].map((obj_, idx_) => {
-                      return (
-                        <div
-                          className={`flex flex-row justify-start text-black/80 items-center w-full min-h-2 mb-1 tinos-regular`}
-                          key={idx_}
-                        >
-                          <FontAwesomeIcon
-                            icon={faStar}
-                            className={`mx-1 mr-2 text-[12px]`}
-                          />
-                          <p className={`text-[14px] font-bold gabarito`}>
-                            {obj_.feature}
-                          </p>
-                        </div>
-                      );
-                    })}
-
-                    <div className={`h-[75px] mt-[40px] w-full`}>
-                      <div
-                        className={`h-[1px] w-[90%] bg-black/20 mx-auto mb-2`}
-                      />
-                      <div
-                        className={`w-full h-full flex flex-row justify-between items-center`}
-                      >
-                        <div
-                          className={`text-black/80 px-4 text-[13px] font-bold tinos-regular-italic`}
-                        >
-                          Limited to 50 members
-                        </div>
-                        <div
-                          className={`min-w-[100px] h-[30px] mr-4 bg-black rounded-[15px] flex flex-row justify-center items-center cursor-pointer`}
-                        >
-                          <div
-                            className={`min-w-[100px] h-[30px] scale-[0.3] opacity-50 absolute hover:animate-ping bg-black rounded-[15px] flex flex-row justify-center items-center cursor-pointer z-[0]`}
-                          />
-                          <p
-                            className={`text-white/80 font-medium text-[12px] pointer-events-none z-[1] gabarito`}
-                          >
-                            Start Now
-                          </p>
-                          <FontAwesomeIcon
-                            icon={faArrowRight}
-                            className={`text-white/80 ml-2 text-[12px] pointer-events-none z-[1]`}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="w-full h-full overflow-y-auto absolute">
-                <div className="p-8">
-                  <div className="max-w-3xl space-y-8"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-        <motion.div
-          className={`h-[475px] w-[360px] m-2 rounded-[5px] flex flex-col justify-start items-center bg-[#7C0A01] relative overflow-hidden`}
-          style={{ y: yRange }}
-        >
-          <div className={`h-[10px]`}></div>
-          <div className={`flex flex-row justify-between items-center w-full`}>
-            <div
-              className={`h-[100px] w-full mb-[-20px] flex tinos-regular-italic flex-col justify-center items-start px-6 text-white/50 text-[20px] font-bold`}
-            >
-              CEO
-            </div>
-            <div
-              className={`text-white/50 px-6 tinos-regular-italic text-[13px] font-bold w-[250px] relative top-[13px]`}
-            >
-              R4,999.99{" "}
-              <span className={`text-white/20 font-medium`}>/month</span>
-            </div>
-          </div>
-          <div className={`h-[300px] w-full`}>
-            <div className={`h-[1px] w-[90%] bg-white/20 mx-auto`} />
-            <div
-              className={`w-full h-full flex flex-col justify-center items-center relative`}
-            >
-              <motion.div
-                initial={{ y: 0 }}
-                animate={{ y: [0, -1, 0] }}
-                transition={{
-                  duration: 8,
-                  repeat: Infinity,
-                  repeatType: "loop",
-                  ease: "easeInOut", // Ensure this is a valid easing function or use `easeInOut` from Framer Motion's predefined easings
-                }}
-                className={`flex flex-col justify-center items-center p-4 opacity-[0.1]`}
-                onMouseEnter={() => {}}
-                onMouseLeave={() => {}}
-                onClick={() => {}}
-              >
-                <img
-                  src={`/assets/images/main_logo.png`}
-                  className={`w-[200px] object-cover relative`}
-                />
-              </motion.div>
-              <div className={`w-full h-full absolute p-1`}>
-                <div
-                  className={`h-full w-full flex flex-col items-start justify-start pl-4 pt-8`}
-                >
-                  {[
-                    {
-                      feature: "4 vehicles registered",
-                      status: true,
-                    },
-                    {
-                      feature: "8 Royal Valet washes (R3,600 value/month)",
-                      status: true,
-                    },
-                    {
-                      feature: "On-demand & scheduled fuel delivery",
-                      status: true,
-                    },
-                    {
-                      feature: "Interior steam clean & detailing",
-                      status: true,
-                    },
-                    {
-                      feature: "Full exterior high pressure foam wash",
-                      status: true,
-                    },
-                  ].map((obj_, idx_) => {
-                    return (
-                      <div
-                        className={`flex flex-row justify-start tinos-regular items-center w-full min-h-2 mb-1 text-white`}
-                        key={idx_}
-                      >
-                        <FontAwesomeIcon
-                          icon={faCheckCircle}
-                          className={`mx-1 mr-2 text-[12px]`}
-                        />
-                        <p className={`text-[13px]`}>{obj_.feature}</p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className={`h-[75px] w-full`}>
-            <div className={`h-[1px] w-[90%] bg-white/20 mx-auto`} />
-            <div
-              className={`w-full h-full flex flex-row justify-between items-center`}
-            >
-              <div
-                className={`text-white/50 px-6 tinos-regular-italic text-[13px] font-bold`}
-              >
-                Limited to 50 members
-              </div>
-              <div
-                className={`min-w-[100px] h-[30px] mr-6 bg-white rounded-[15px] flex flex-row justify-center items-center cursor-pointer`}
-              >
-                <div
-                  className={`min-w-[100px] h-[30px] scale-[0.3] opacity-50 absolute hover:animate-ping bg-white rounded-[15px] flex flex-row justify-center items-center cursor-pointer z-[0]`}
-                />
-                <p
-                  className={`text-black/80 font-medium text-[12px] tinos-regular-italic z-[1] pointer-events-none`}
-                >
-                  Start Now
-                </p>
+                  <FontAwesomeIcon
+                    icon={faCheckCircle}
+                    className="text-amber-500 h-4 w-4 mt-0.5 mr-3 flex-shrink-0"
+                  />
+                  <span className="text-white/80 text-sm">{feature}</span>
+                </motion.li>
+              ))}
+            </ul>
+            
+            {/* Bonus section */}
+            <div className="mt-6 p-4 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-500/5 border border-amber-500/10">
+              <div className="flex items-center mb-3">
                 <FontAwesomeIcon
-                  icon={faArrowRight}
-                  className={`text-black/80 ml-2 text-[12px] z-[1] pointer-events-none`}
+                  icon={faShieldAlt}
+                  className="text-amber-500 h-4 w-4 mr-2"
                 />
+                <h4 className="text-amber-400 font-bold text-sm">FREE PACKAGE BONUS</h4>
               </div>
+              <ul className="space-y-2">
+                {[
+                  "4 Royal Valet washes (Valued at R2,600)",
+                  "Save 50% on all additional washes",
+                ].map((bonus, idx) => (
+                  <li key={idx} className="flex items-start">
+                    <FontAwesomeIcon
+                      icon={faStar}
+                      className="text-amber-500 h-3 w-3 mt-1 mr-2 flex-shrink-0"
+                    />
+                    <span className="text-amber-100/80 text-xs">{bonus}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
-          <div
-            className={`w-full h-full flex flex-col justify-center items-center bg-white/10 backdrop-blur-sm tinos-regular absolute top-0 z-[1]`}
-          >
-            <p className={`text-[50px] text-white/80 z-[1] font-bold`}>
-              CEO Offer
-            </p>
-
-            <p className={`text-[50px] text-white/80 z-[1] font-bold`}>
-              Coming Soon
-            </p>
+          
+          {/* CTA */}
+          <div className="w-full px-6 pb-8">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-amber-500/80 text-xs italic">Limited to 50 members</span>
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold text-sm flex items-center justify-center group"
+            >
+              Get Started
+              <FontAwesomeIcon
+                icon={faArrowRight}
+                className="ml-2 h-3 w-3 group-hover:translate-x-1 transition-transform"
+              />
+            </motion.button>
+          </div>
+        </motion.div>
+        
+        {/* Black Tier */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          whileHover={{ y: -10, transition: { duration: 0.2 } }}
+          className={`h-[520px] w-[350px] m-2 rounded-2xl flex flex-col justify-start items-center relative overflow-hidden border border-white/10 backdrop-blur-sm bg-gradient-to-b from-white/10 to-black/60 z-10`}
+          style={{ 
+            boxShadow: "0 10px 50px -10px rgba(0, 0, 0, 0.8), 0 0 30px 0px rgba(255, 255, 255, 0.05) inset"
+          }}
+        >
+          {/* Popular badge */}
+          <div className="absolute -right-12 top-8 bg-white text-black text-xs font-bold py-1 px-10 transform rotate-45 z-20">
+            MOST POPULAR
+          </div>
+          
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-white/0 via-white/80 to-white/0"></div>
+          
+          {/* Black header */}
+          <div className="w-full pt-8 pb-4 px-6 relative">
+            <div className="absolute top-4 right-4">
+              <FontAwesomeIcon
+                icon={faCrown}
+                className="text-white h-6 w-6"
+              />
+            </div>
+            <span className="bg-white/10 text-white text-xs font-bold px-3 py-1 rounded-full">BLACK TIER</span>
+            <h3 className="text-white text-3xl font-bold mt-2">Executive</h3>
+            <div className="flex items-baseline mt-1">
+              <span className="text-white text-4xl font-bold">R4,999</span>
+              <span className="text-white/60 ml-1">/month</span>
+            </div>
+            <p className="text-white/60 text-sm mt-2">For demanding executives who need premium service and priority</p>
+          </div>
+          
+          {/* Divider */}
+          <div className="w-full h-px bg-gradient-to-r from-white/0 via-white/30 to-white/0"></div>
+          
+          {/* Features */}
+          <div className="w-full px-6 py-6 flex-1">
+            <ul className="space-y-3">
+              {[
+                "4 vehicles allocated for fuel delivery",
+                "On-demand & scheduled fuel delivery",
+                "Purchase fuel at fuel station prices",
+                "Priority servicing & dedicated support"
+              ].map((feature, idx) => (
+                <motion.li 
+                  key={idx}
+                  initial={{ opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: idx * 0.1 }}
+                  className="flex items-start"
+                >
+                  <FontAwesomeIcon
+                    icon={faCheckCircle}
+                    className="text-white h-4 w-4 mt-0.5 mr-3 flex-shrink-0"
+                  />
+                  <span className="text-white/80 text-sm">{feature}</span>
+                </motion.li>
+              ))}
+            </ul>
+            
+            {/* Bonus section */}
+            <div className="mt-6 p-4 rounded-xl bg-gradient-to-br from-white/20 to-white/5 border border-white/10">
+              <div className="flex items-center mb-3">
+                <FontAwesomeIcon
+                  icon={faShieldAlt}
+                  className="text-white h-4 w-4 mr-2"
+                />
+                <h4 className="text-white font-bold text-sm">FREE PACKAGE BONUS</h4>
+              </div>
+              <ul className="space-y-2">
+                {[
+                  "8 Royal Valet washes (Valued at R5,200)",
+                  "Save 50% on all additional washes",
+                  "Exclusive event invitations"
+                ].map((bonus, idx) => (
+                  <li key={idx} className="flex items-start">
+                    <FontAwesomeIcon
+                      icon={faStar}
+                      className="text-white h-3 w-3 mt-1 mr-2 flex-shrink-0"
+                    />
+                    <span className="text-white/80 text-xs">{bonus}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          
+          {/* CTA */}
+          <div className="w-full px-6 pb-8">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-white/80 text-xs italic">Limited to 25 members</span>
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full py-3 rounded-xl bg-white text-black font-bold text-sm flex items-center justify-center group"
+            >
+              Get Started
+              <FontAwesomeIcon
+                icon={faArrowRight}
+                className="ml-2 h-3 w-3 group-hover:translate-x-1 transition-transform"
+              />
+            </motion.button>
           </div>
         </motion.div>
       </motion.div>
-
-      <ElegantTicketGuarantee />
     </div>
   );
 };
@@ -476,35 +260,18 @@ export default Pricing_;
 
 // // // // // // //
 // // // // // // //
+// ElegantTicketGuarantee Component (for future implementation)
 
-const ElegantTicketGuarantee = () => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.6 }}
-      className="w-full max-w-4xl px-4 mt-16 scale-90 md:scale-[0.6]"
-    >
-      <div className="bg-gradient-to-b from-[#c0976a] via-[#deb887] to-[#c0976a] p-px rounded-lg">
-        <div className="bg-[#1c1814] rounded-lg p-8 md:p-12">
-          <div className="text-center space-y-6">
-            <h2>
-              <span className="block text-3xl md:text-5xl font-serif italic bg-gradient-to-r from-[#deb887] to-[#c0976a] bg-clip-text text-transparent">
-                Experience Our Service
-              </span>
-              <span className="block mt-2 text-lg md:text-2xl text-[#deb887]/80 font-serif italic">
-                with Total Peace of Mind
-              </span>
-            </h2>
-            <p className="text-[#e8e6e3]/70 text-base md:text-lg leading-relaxed max-w-2xl mx-auto">
-              If you don&apos;t have more free time, feel safer and more in control when it comes to your vehicle needs after the first month of joining,{" "}
-              <span className="block mt-4 text-xl md:text-2xl text-[#deb887]/80 font-serif italic">
-                we will give you a full package refund.
-              </span>
-            </p>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
+// const ElegantTicketGuarantee = () => {
+//   return (
+//     <div className="max-w-md mx-auto rounded-xl overflow-hidden shadow-lg bg-gradient-to-r from-amber-500/10 to-amber-600/10 p-6 border border-amber-500/20">
+//       <div className="flex items-center mb-4">
+//         <FontAwesomeIcon icon={faShieldAlt} className="text-amber-500 h-5 w-5 mr-3" />
+//         <h3 className="text-xl font-bold text-white">Our Guarantee</h3>
+//       </div>
+//       <p className="text-white/70 mb-4 text-sm">
+//         We stand behind our service with a 100% satisfaction guarantee. If you're not completely satisfied, we'll make it right.
+//       </p>
+//     </div>
+//   );
+// };

@@ -1,135 +1,237 @@
 'use client'
 
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { User } from 'firebase/auth';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   faFacebook,
   faInstagram,
   faTwitter,
 } from "@fortawesome/free-brands-svg-icons";
-import { faBars } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faXmark, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const Nav_ = ({}) => {
+interface NavProps {
+  user: User | null;
+}
+
+const Nav_ = ({ user }: NavProps) => {
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Check if we've scrolled
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 20;
+      if (isScrolled !== scrolled) {
+        setScrolled(isScrolled);
+      }
+    };
+
+    document.addEventListener('scroll', handleScroll);
+    return () => {
+      document.removeEventListener('scroll', handleScroll);
+    };
+  }, [scrolled]);
+
   return (
-    <div
-      className={`w-full h-[70px] fixed top-0 flex flex-row xl:justify-center justify-between items-center z-[5]`}
-    >
-      <div
-        className={`w-[200px] min-h-2 hover:h-[120%] flex flex-row justify-center items-center transition-all duration-200`}
+    <>
+      {/* Main navigation */}
+      <motion.div
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.5 }}
+        className={`w-full h-[70px] fixed top-0 left-0 flex justify-between items-center z-50 px-4 md:px-8 transition-all duration-300 ${
+          scrolled ? 'bg-black/80 backdrop-blur-md shadow-md' : 'bg-transparent'
+        }`}
       >
-        <img className={`w-[80px] h-[80px]`} src="/assets/images/white_logo.png" />
-      </div>
-      <Menu_ />
-      <div
-        className={`w-[200px] h-full xl:flex hidden flex-row justify-center items-center text-[20px] text-black font-black`}
-      >
-        <div
-          className={`w-full min-h-full flex flex-row justify-center items-center xl:opacity-0 md:opacity-100 opacity-0 xl:pointer-events-none md:pointer-events-auto pointer-events-none`}
-        >
-          <FontAwesomeIcon
-            icon={faFacebook}
-            className={`h-[20px] w-[20px] text-black/60 hover:text-orange-600 transition-all duration-[400ms] cursor-pointer mx-[6px]`}
-          />
-          <FontAwesomeIcon
-            icon={faTwitter}
-            className={`h-[20px] w-[20px] text-black/60 hover:text-orange-600 transition-all duration-[400ms] cursor-pointer mx-[6px]`}
-          />
-          <FontAwesomeIcon
-            icon={faInstagram}
-            className={`h-[20px] w-[20px] text-black/60 hover:text-orange-600 transition-all duration-[400ms] cursor-pointer mx-[6px]`}
-          />
+        {/* Logo */}
+        <Link href="/">
+          <div className="flex items-center space-x-2 cursor-pointer">
+            <img 
+              className="w-[50px] h-[50px] object-contain" 
+              src="/assets/images/white_logo.png" 
+              alt="Need To Fuel Logo" 
+            />
+            <span className="text-white font-medium text-lg hidden md:block">Need To Fuel</span>
+          </div>
+        </Link>
+
+        {/* Desktop menu */}
+        <div className="hidden md:flex items-center space-x-8">
+          <a 
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="text-white/70 hover:text-amber-500 text-sm font-medium transition-all duration-300 cursor-pointer"
+          >
+            Home
+          </a>
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('services_section')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="text-white/70 hover:text-amber-500 text-sm font-medium transition-all duration-300 cursor-pointer"
+          >
+            Services
+          </a>
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('case_studies_section')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="text-white/70 hover:text-amber-500 text-sm font-medium transition-all duration-300 cursor-pointer"
+          >
+            Case Studies
+          </a>
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('pricing_section')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="text-white/70 hover:text-amber-500 text-sm font-medium transition-all duration-300 cursor-pointer"
+          >
+            Pricing
+          </a>
         </div>
-        <FontAwesomeIcon
-          icon={faBars}
-          className={`h-[100%] w-[20px] absolute top-0 text-black/60 hover:text-orange-600 transition-all duration-[400ms] cursor-pointer mx-[6px] xl:opacity-0 md:opacity-0 opacity-100 xl:pointer-events-none md:pointer-events-none pointer-events-auto`}
-        />
-      </div>
-      {["Get app"].map((obj_, idx_) => {
-        return (
-          <div
-            key={idx_}
+
+        {/* Auth and action buttons */}
+        <div className="flex items-center space-x-3">
+          {/* User status or auth button */}
+          {user ? (
+            <div className="flex items-center space-x-2 px-3 py-1.5 bg-amber-500/10 rounded-full">
+              <FontAwesomeIcon icon={faUser} className="text-amber-500 h-4 w-4" />
+              <span className="text-white text-sm font-medium truncate max-w-[100px]">
+                {user.displayName || user.email?.split('@')[0] || 'User'}
+              </span>
+            </div>
+          ) : (
+            <Link href="/auth">
+              <span className="text-white bg-amber-500/20 hover:bg-amber-500/30 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300">
+                Sign in
+              </span>
+            </Link>
+          )}
+
+          {/* Get app button */}
+          <button
             onClick={() => {
               window.open("https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-release.apk?alt=media&token=c4885d23-b5c4-4ff7-b438-eca7cff59a30")
             }}
-            className={`cursor-pointer ml-2 mr-12 min-w-8 h-8 px-4 text-[12px] text-black bg-white font-semibold flex xl:hidden flex-col justify-center items-center border-white border-[1px] rounded-[20px]`}
+            className="hidden sm:flex items-center space-x-1 bg-amber-500 hover:bg-amber-600 px-4 py-1.5 rounded-full text-sm font-medium text-black transition-all duration-300"
           >
-            {obj_}
-          </div>
-        );
-      })}
-    </div>
+            Get app
+          </button>
+
+          {/* Mobile menu toggle */}
+          <button 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300"
+          >
+            <FontAwesomeIcon 
+              icon={mobileMenuOpen ? faXmark : faBars} 
+              className="text-white h-5 w-5" 
+            />
+          </button>
+        </div>
+      </motion.div>
+
+      {/* Mobile menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed top-[70px] left-0 w-full bg-black/95 backdrop-blur-md z-40 overflow-hidden"
+          >
+            <div className="flex flex-col p-6 space-y-6">
+              <a 
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  setMobileMenuOpen(false);
+                }}
+                className="text-white/80 hover:text-amber-500 text-lg font-medium transition-all duration-300 block"
+              >
+                Home
+              </a>
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('services_section')?.scrollIntoView({ behavior: 'smooth' });
+                  setMobileMenuOpen(false);
+                }}
+                className="text-white/80 hover:text-amber-500 text-lg font-medium transition-all duration-300 block"
+              >
+                Services
+              </a>
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('case_studies_section')?.scrollIntoView({ behavior: 'smooth' });
+                  setMobileMenuOpen(false);
+                }}
+                className="text-white/80 hover:text-amber-500 text-lg font-medium transition-all duration-300 block"
+              >
+                Case Studies
+              </a>
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('pricing_section')?.scrollIntoView({ behavior: 'smooth' });
+                  setMobileMenuOpen(false);
+                }}
+                className="text-white/80 hover:text-amber-500 text-lg font-medium transition-all duration-300 block"
+              >
+                Pricing
+              </a>
+              
+              <div className="pt-4 border-t border-white/10">
+                <button
+                  onClick={() => {
+                    window.open("https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-release.apk?alt=media&token=c4885d23-b5c4-4ff7-b438-eca7cff59a30");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center justify-center bg-amber-500 hover:bg-amber-600 px-4 py-3 rounded-xl text-base font-medium text-black transition-all duration-300"
+                >
+                  Get app
+                </button>
+              </div>
+              
+              {/* Social links */}
+              <div className="flex justify-center space-x-6 pt-2">
+                <FontAwesomeIcon
+                  icon={faFacebook}
+                  className="h-5 w-5 text-white/60 hover:text-amber-500 transition-all duration-300 cursor-pointer"
+                />
+                <FontAwesomeIcon
+                  icon={faTwitter}
+                  className="h-5 w-5 text-white/60 hover:text-amber-500 transition-all duration-300 cursor-pointer"
+                />
+                <FontAwesomeIcon
+                  icon={faInstagram}
+                  className="h-5 w-5 text-white/60 hover:text-amber-500 transition-all duration-300 cursor-pointer"
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 
 export default Nav_;
-
-// ===================================== Menu_
-
-const Menu_ = ({}) => {
-  return (
-    <div
-      className={`w-full h-full xl:flex hidden flex-row justify-start items-center md:opacity-100 opacity-0 md:pointer-events-auto pointer-events-none`}
-    >
-      {/* <Link
-              activeClass="active"
-              // className="hero"
-              to="services"
-              spy={true}
-              smooth={true}
-              offset={-150}
-              duration={500}
-            > */}
-      <a href={`#hero`}>
-        <p
-          className={` opacity-0 text-[14px] text-white/60 mx-4 hover:text-orange-600 hover:font-medium transition-all duration-200 cursor-pointer`}
-        >
-          Home
-        </p>
-      </a>
-      {/* </Link> */}
-      <a href={`#services`}>
-        <p
-          className={` opacity-0 text-[14px] text-white/60 mx-4 hover:text-orange-600 hover:font-medium transition-all duration-200 cursor-pointer`}
-        >
-          Services
-        </p>
-      </a>
-      <a href={`#study`}>
-        <p
-          className={` opacity-0 text-[14px] text-white/60 mx-4 hover:text-orange-600 hover:font-medium transition-all duration-200 cursor-pointer`}
-        >
-          Case Studies
-        </p>
-      </a>
-      <a href={`#cta`}>
-        <p
-          className={` opacity-0 text-[14px] text-white/60 mx-4 hover:text-orange-600 hover:font-medium transition-all duration-200 cursor-pointer`}
-        >
-          Pricing
-        </p>
-      </a>
-      {["Sign up"].map((obj_, idx_) => {
-        return (
-          <div
-            key={idx_}
-            className={`opacity-0 ml-auto min-w-8 h-8 px-4 text-[12px] text-black bg-white font-semibold flex flex-col justify-center items-center border-white border-[1px] rounded-[20px]`}
-          >
-            {obj_}
-          </div>
-        );
-      })}
-      {["Get app"].map((obj_, idx_) => {
-        return (
-          <div
-            key={idx_}
-            onClick={() => {
-              window.open("https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-release.apk?alt=media&token=c4885d23-b5c4-4ff7-b438-eca7cff59a30")
-            }}
-            className={`cursor-pointer ml-2 min-w-8 h-8 px-4 text-[12px] bg-orange-500 text-white font-semibold flex flex-col justify-center items-center rounded-[20px]`}
-          >
-            {obj_}
-          </div>
-        );
-      })}
-    </div>
-  );
-};

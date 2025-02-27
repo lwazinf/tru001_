@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect } from "react";
 import { Eye, EyeOff, CheckCircle2, Mail } from "lucide-react";
@@ -7,8 +7,37 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/lib/firebase/AuthContext";
+import { useRouter } from "next/navigation";
 
 const AuthForm = () => {
+  const router = useRouter();
+  
+  // Safely access auth context with error handling
+  const [authContextLoaded, setAuthContextLoaded] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  
+  let authContext;
+  try {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    authContext = useAuth();
+    if (!authContextLoaded) setAuthContextLoaded(true);
+  } catch (error) {
+    if (!authError) {
+      console.error("Auth context error:", error);
+      setAuthError("Authentication system is initializing");
+    }
+  }
+  
+  const { signup, login, currentUser } = authContext || { 
+    signup: async () => { throw new Error("Auth not initialized"); },
+    login: async () => { throw new Error("Auth not initialized"); },
+    currentUser: null
+  };
+
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
   // State for form type (signup or login)
   const [isLoginForm, setIsLoginForm] = useState(false);
 
@@ -33,6 +62,13 @@ const AuthForm = () => {
     "https://images.pexels.com/photos/9796/car-refill-transportation-transport.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
   ];
 
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (currentUser) {
+      router.push('/');
+    }
+  }, [currentUser, router]);
+
   // Set up image rotation interval
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -55,15 +91,32 @@ const AuthForm = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
-    if (isLoginForm) {
-      console.log("Login submitted with data:", {
-        email: formData.email,
-        password: formData.password,
-      });
-    } else {
-      console.log("Signup submitted with data:", formData);
+    
+    if (authError) {
+      setError(authError);
+      return;
+    }
+    
+    setError('');
+    setLoading(true);
+
+    try {
+      if (isLoginForm) {
+        // Login with Firebase
+        await login(formData.email, formData.password);
+        router.push('/');
+      } else {
+        // Signup with Firebase
+        await signup(formData.firstName, formData.lastName, formData.email, formData.password);
+        router.push('/');
+      }
+    } catch (err: any) {
+      console.error("Authentication error:", err);
+      setError(err.message || 'Failed to authenticate');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -83,6 +136,7 @@ const AuthForm = () => {
       password: "",
     });
     setShowPassword(false);
+    setError('');
   };
 
   // Animation variants
@@ -108,6 +162,11 @@ const AuthForm = () => {
     hidden: { opacity: 0, y: 10 },
     visible: { opacity: 1, y: 0 }
   };
+
+  // Display auth context error for debugging if needed
+  if (authError) {
+    console.log("Auth context error detected in render:", authError);
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black md:p-4">
@@ -153,6 +212,13 @@ const AuthForm = () => {
             <span className="text-white font-medium">Need To Fuel</span>
           </motion.div>
 
+          {/* Debug info for empty page troubleshooting */}
+          {authError && (
+            <div className="mb-4 p-2 bg-yellow-500/10 border border-yellow-500/30 rounded text-yellow-500 text-xs">
+              Auth status: {authError}
+            </div>
+          )}
+
           <AnimatePresence mode="wait">
             <motion.form 
               key={isLoginForm ? "login" : "signup"}
@@ -191,6 +257,20 @@ const AuthForm = () => {
                   {isLoginForm ? "Sign Up" : "Log In"}
                 </motion.span>
               </motion.p>
+
+              {/* Display error if any */}
+              <AnimatePresence>
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-md text-red-500 text-sm"
+                  >
+                    {error}
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               <motion.div 
                 variants={itemVariants}
@@ -366,6 +446,14 @@ const AuthForm = () => {
                         className="text-amber-500 text-sm cursor-pointer hover:underline"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
+                        onClick={() => {
+                          if (formData.email) {
+                            // Implement password reset
+                            alert("Password reset functionality will be implemented!");
+                          } else {
+                            setError("Please enter your email address first");
+                          }
+                        }}
                       >
                         Forgot password?
                       </motion.span>
@@ -378,9 +466,12 @@ const AuthForm = () => {
                   <Button
                     type="submit"
                     className="w-full bg-amber-500 hover:bg-amber-600 text-black font-medium py-6 md:rounded-md rounded-lg shadow-md transition-all duration-300 ease-in-out"
-                    
+                    disabled={loading}
                   >
-                    {isLoginForm ? "Log in" : "Create account"}
+                    {loading ? 
+                      "Loading..." : 
+                      isLoginForm ? "Log in" : "Create account"
+                    }
                   </Button>
                 </motion.div>
                 
@@ -543,7 +634,7 @@ const AuthForm = () => {
             transition={{ duration: 0.5, delay: 0.3 }}
           >
             <div className="w-[50px] h-[50px] overflow-visible flex relative items-center justify-center">
-              <img src="/assets/images/white_logo.png" alt="Logo" className="w-[200px] absolute" />
+              <img src="/assets/images/white_logo.png" alt="Logo" className="w-[200px] absolute"/>
             </div>
           </motion.div>
         </div>

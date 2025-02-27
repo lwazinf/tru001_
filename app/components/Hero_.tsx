@@ -7,8 +7,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faFacebook,
   faInstagram,
-  faLinkedinIn,
   faTiktok,
+  faWhatsapp,
 } from "@fortawesome/free-brands-svg-icons";
 import Pricing_ from "./helpers/pricing";
 import Marquee from "./Marquee";
@@ -17,6 +17,7 @@ import { faAngleDoubleDown } from "@fortawesome/free-solid-svg-icons";
 import TermsModal from "./helpers/termsModal";
 import { PolicyState } from "./atoms/atoms";
 import { useAtom } from "jotai";
+import { useRouter } from "next/navigation";
 // import VerticalGallery from "./helpers/sideSwipe";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -29,6 +30,7 @@ const Hero_ = () => {
   const firstSectionRef = useRef(null);
   // const secondSectionRef = useRef(null);
   const [, setIsOpen] = useAtom(PolicyState);
+  const router = useRouter();
   const thirdSectionRef = useRef(null);
   const mainImgRef = useRef(null);
   const heroImgRef = useRef(null);
@@ -205,6 +207,7 @@ const Hero_ = () => {
     <ReactLenis root>
       <section
         ref={firstSectionRef}
+        id="hero_section"
         className="w-full h-screen relative para overflow-hidden"
       >
         <img
@@ -290,7 +293,8 @@ const Hero_ = () => {
                   return (
                     <div
                       key={idx_}
-                      className={`min-w-8 h-8 px-4 text-[12px] text-white bg-orange-600 font-semibold flex flex-col justify-center items-center rounded-[20px]`}
+                      className={`min-w-8 h-8 px-4 text-[12px] text-white bg-orange-600 font-semibold flex flex-col justify-center items-center rounded-[20px] cursor-pointer`}
+                      onClick={() => router.push('/auth')}
                     >
                       {obj_}
                     </div>
@@ -362,102 +366,116 @@ const Hero_ = () => {
         className="w-full h-screen relative xl:hidden overflow-hidden flex flex-col justify-center items-center"
       >
         <div className="flex flex-col justify-center items-center w-full min-h-2 text-white text-center px-4">
-  {/* Images Container */}
-  <div className="relative w-full flex justify-center items-center min-h-[600px]">
-    <img
-      src="/assets/mockups/profile.png"
-      alt=""
-      className={`
-        absolute
-        floating-image
-        ${isVisible ? 'visible' : ''}
-        animate-float
-        w-[280px]
-        sm:w-[320px]
-        md:w-[360px]
-        object-contain
-        sm:bottom-[240px]
-        xl:left-auto
-        xl:translate-x-0
-        xl:ml-[900px]
-      `}
-      style={{
-        transitionProperty: 'all',
-        transitionDuration: '1000ms'
-      }}
-    />
-    <img
-      src="/assets/mockups/orders.png"
-      alt=""
-      className={`
-        absolute
-        floating-image
-        ${!isVisible ? 'visible' : ''}
-        animate-float
-        w-[280px]
-        sm:w-[320px]
-        md:w-[360px]
-        object-contain
-        sm:bottom-[240px]
-        xl:left-auto
-        xl:translate-x-0
-        xl:ml-[900px]
-      `}
-      style={{
-        transitionProperty: 'all',
-        transitionDuration: '1000ms'
-      }}
-    />
-  </div>
+          {/* Images Container */}
+          <div className="relative w-full flex justify-center items-center min-h-[400px] sm:min-h-[500px] md:min-h-[600px]">
+            <img
+              src="/assets/mockups/profile.png"
+              alt="Need To Fuel mobile app profile screen"
+              className={`
+                absolute
+                floating-image
+                ${isVisible ? 'visible' : ''}
+                animate-float
+                w-[250px]
+                sm:w-[300px]
+                md:w-[340px]
+                object-contain
+                z-10
+              `}
+              style={{
+                transitionProperty: 'all',
+                transitionDuration: '1000ms'
+              }}
+            />
+            <img
+              src="/assets/mockups/orders.png"
+              alt="Need To Fuel mobile app orders screen"
+              className={`
+                absolute
+                floating-image
+                ${!isVisible ? 'visible' : ''}
+                animate-float
+                w-[250px]
+                sm:w-[300px]
+                md:w-[340px]
+                object-contain
+                z-10
+              `}
+              style={{
+                transitionProperty: 'all',
+                transitionDuration: '1000ms'
+              }}
+            />
+          </div>
 
-  {/* Text and Buttons Container */}
-  <div className="flex flex-col justify-center items-center w-full max-w-2xl">
-    <div className="tinos-regular text-white/80 text-sm sm:text-[13px] px-4 sm:p-8 leading-relaxed">
-      At Need To Fuel, we understand that time is your most valuable
-      asset. That&apos;s why we&apos;ve crafted a suite of bespoke services—mobile
-      refueling, vehicle valet, tyre inspections, and roadside
-      assistance—designed to offer you unparalleled convenience and
-      peace of mind, all at the touch of a button.
-    </div>
+          {/* Text and Buttons Container */}
+          <div className="flex flex-col justify-center items-center w-full max-w-2xl px-4 sm:px-6">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-white">
+              Mobile App Features
+            </h2>
+            <div className="tinos-regular text-white/80 text-sm sm:text-base px-2 sm:px-8 leading-relaxed mb-6">
+              At Need To Fuel, we understand that time is your most valuable
+              asset. That&apos;s why we&apos;ve crafted a suite of bespoke services—mobile
+              refueling, vehicle valet, tyre inspections, and roadside
+              assistance—designed to offer you unparalleled convenience and
+              peace of mind, all at the touch of a button.
+            </div>
 
-    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
-      <img
-        onClick={() => {
-          window.open(
-            "https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-release.apk?alt=media&token=c4885d23-b5c4-4ff7-b438-eca7cff59a30"
-          );
-        }}
-        src="/assets/icons/PlayStore.png"
-        alt="Get it on Google Play"
-        className="w-36 sm:w-48 hover:scale-105 transition-transform cursor-pointer"
-      />
-      <img
-        src="/assets/icons/AppStore.png"
-        alt="Download on App Store"
-        className="w-36 sm:w-48 opacity-20"
-      />
-    </div>
-  </div>
-</div>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-5 mt-6 mb-8">
+              <a 
+                href="https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-release.apk?alt=media&token=c4885d23-b5c4-4ff7-b438-eca7cff59a30"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-40 sm:w-48 hover:scale-105 transition-transform shadow-lg rounded-lg overflow-hidden"
+                aria-label="Download Android App"
+              >
+                <img
+                  src="/assets/icons/PlayStore.png"
+                  alt="Get it on Google Play"
+                  className="w-full h-auto"
+                />
+              </a>
+              <a 
+                href="#"
+                className="w-40 sm:w-48 hover:scale-105 transition-transform shadow-lg rounded-lg overflow-hidden relative"
+                aria-label="Download iOS App - Coming Soon"
+                onClick={(e) => {
+                  e.preventDefault();
+                  alert('iOS app coming soon!');
+                }}
+              >
+                <img
+                  src="/assets/icons/AppStore.png"
+                  alt="Download on App Store"
+                  className="w-full h-auto opacity-20"
+                />
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded-full whitespace-nowrap">
+                  Coming Soon
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section
         ref={thirdSectionRef}
-        className="w-full h-screen relative overflow-hidden"
+        id="services_section"
+        className="w-full h-screen min-h-screen relative para overflow-hidden bg-white"
       >
         <img
           ref={heroImgRef}
           src="/assets/images/hero.jpg"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover absolute inset-0"
         />
         <div className="topFade absolute top-0 w-full h-full" />
         <div className="rotate-180 topFade absolute top-0 w-full h-full" />
-        <div className="absolute top-0 w-full h-full flex flex-col justify-end items-start text-white">
-          <div className="w-full h-full flex flex-col justify-center items-center absolute">
+        <div className="absolute inset-0 w-full h-full flex flex-col justify-center items-center text-white">
+          <div className="w-full h-full flex flex-col justify-center items-center">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="max-w-4xl mx-auto p-12 relative bottom-[150px]"
+              className="max-w-4xl mx-auto p-4 sm:p-6 md:p-12"
             >
               <div className="relative px-8">
                 {/* Top quotes */}
@@ -470,7 +488,7 @@ const Hero_ = () => {
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.2 }}
-                  className="text-center text-4xl md:text-5xl lg:text-6xl font-light tracking-wide leading-tight text-white lobster mb-8"
+                  className="text-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light tracking-wide leading-tight text-white lobster mb-8"
                 >
                   I can buy anything I want, basically, but I can&apos;t buy
                   time
@@ -544,7 +562,10 @@ const Hero_ = () => {
         </div>
       </section>
 
-      <section className={`xl:hidden flex`}>
+      <section 
+        id="services_section"
+        className="xl:hidden flex"
+      >
         <div
           className={`flex flex-col justify-center items-center w-full h-full`}
         >
@@ -579,14 +600,17 @@ const Hero_ = () => {
             className={`text-center text-white/80 text-[13px] font-medium tinos-regular p-4 relative top-[0px]`}
           >
             Our commitment is to provide exceptional, seamless service, allowing
-            you to focus on what truly matters—whether it’s your business, your
+            you to focus on what truly matters—whether it&apos;s your business, your
             passions, or your loved ones. Because for those who demand
             excellence, time should never be a compromise.
           </p>
         </div>
       </section>
 
-      <section className={`min-h-screen xl:scale-[1] scale-[1]`}>
+      <section
+        id="pricing_section"
+        className="third-section w-full min-h-screen flex flex-col justify-center items-center bg-black relative overflow-hidden"
+      >
         <Pricing_ />
       </section>
 
@@ -609,113 +633,210 @@ const Hero_ = () => {
         <VerticalGallery />
       </section> */}
 
-      <section className="footer text-[14px] text-white relative flex flex-col xl:justify-end justify-center items-center pb-8 xl:mt-[150px]">
-        <div className={`pointer-events-none`}>
+      <section 
+        id="contact_section"
+        className="footer-section relative bg-black pt-24 pb-12"
+      >
+        {/* Subtle top border with gradient */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-amber-500/0 via-amber-500/50 to-amber-500/0"></div>
+        
+        {/* Background logo watermark */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden opacity-[0.03]">
           <img
-            className={`absolute xl:bottom-[-200px] w-[600px] opacity-5`}
             src="/assets/images/white_logo.png"
+            alt=""
+            className="w-[900px] max-w-none"
           />
         </div>
-        <div
-          className={`flex flex-row xl:justify-evenly justify-center items-center mb-8 w-full min-h-2`}
-        >
-          <div className={`flec flex-col relative right-[55px]`}>
-            <p className={``}>97 Sun valley place</p>
-            <p className={``}>Oakdene, Johannesburg</p>
-            <p className={`mb-4`}>2190 - South Africa</p>
-
-            <p className={``}>support@needtofuel.com</p>
-            <p className={`mb-4`}>+27 71 220 4794</p>
-
-            <p className={``}>
-              Monday - Friday <span className={`ml-[8px]`}>08:00 - 23:00</span>
-            </p>
-            <p className={``}>
-              Saturday <span className={`ml-[53px]`}>08:00 - 17:00</span>
-            </p>
-            <p className={`mb-4`}>
-              Sunday <span className={`ml-[60px]`}>Closed</span>
-            </p>
+        
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          {/* Main footer content */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 mb-16">
+            {/* Company info - 4 columns on desktop, full width on mobile */}
+            <div className="md:col-span-4">
+              <div className="mb-8 flex flex-col items-center md:items-start">
+                {/* Logo section with both image logo and text logo */}
+                <div className="flex items-center mb-6">
+                  <div className="relative w-16 h-16 mr-4 overflow-hidden rounded-full bg-gradient-to-br from-amber-500 to-amber-700 p-0.5 shadow-lg">
+                    <img 
+                      src="/assets/images/main_logo.png" 
+                      alt="Need To Fuel" 
+                      className="w-full h-full object-cover rounded-full bg-black p-1"
+                    />
+                  </div>
+                  <img 
+                    src="/assets/images/logoText.png" 
+                    alt="Need To Fuel" 
+                    className="h-10"
+                  />
+                </div>
+                
+                <div className="w-16 h-0.5 bg-amber-500 mb-6 hidden md:block"></div>
+                <p className="text-white/70 text-sm leading-relaxed text-center md:text-left max-w-xs mx-auto md:mx-0 mb-6">
+                  Premium fuel delivery service for executives and businesses who value time and convenience. Experience the luxury of time saved.
+                </p>
+              </div>
+              
+              {/* Social media icons - centered on mobile, left aligned on desktop */}
+              <div className="flex space-x-4 justify-center md:justify-start mt-4 mb-8 md:mb-0">
+                <a 
+                  href="https://www.facebook.com/needtofuel" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full flex items-center justify-center border border-white/10 bg-white/5 hover:bg-amber-500/10 hover:border-amber-500/30 transition-all transform hover:-translate-y-1"
+                >
+                  <FontAwesomeIcon icon={faFacebook} className="text-white/70 hover:text-amber-500" />
+                </a>
+                <a 
+                  href="https://www.instagram.com/needtofuel_" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full flex items-center justify-center border border-white/10 bg-white/5 hover:bg-amber-500/10 hover:border-amber-500/30 transition-all transform hover:-translate-y-1"
+                >
+                  <FontAwesomeIcon icon={faInstagram} className="text-white/70 hover:text-amber-500" />
+                </a>
+                <a 
+                  href="https://www.tiktok.com/@needtofuel" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full flex items-center justify-center border border-white/10 bg-white/5 hover:bg-amber-500/10 hover:border-amber-500/30 transition-all transform hover:-translate-y-1"
+                >
+                  <FontAwesomeIcon icon={faTiktok} className="text-white/70 hover:text-amber-500" />
+                </a>
+              </div>
+            </div>
+            
+            {/* Contact info - 3 columns on desktop, stack on mobile */}
+            <div className="md:col-span-3 text-center md:text-left">
+              <h3 className="text-lg font-bold text-white mb-6 relative inline-block after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:mx-auto md:after:mx-0 after:w-16 after:h-0.5 after:bg-amber-500/50 pb-2">
+                Contact Us
+              </h3>
+              
+              <div className="space-y-4">
+                <div className="flex gap-x-3 items-start justify-center md:justify-start">
+                  <div className="flex-shrink-0 w-5 h-5 mt-1 flex items-start justify-center text-amber-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                      <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-white/80 text-sm">97 Sun valley place<br />Oakdene, Johannesburg<br />2190 - South Africa</p>
+                  </div>
+                </div>
+                
+                <div className="flex gap-x-3 items-center justify-center md:justify-start">
+                  <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-amber-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <a href="tel:+27712204794" className="text-white/80 text-sm hover:text-amber-400 transition-colors">+27 71 220 4794</a>
+                  </div>
+                </div>
+                
+                <div className="flex gap-x-3 items-center justify-center md:justify-start">
+                  <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-amber-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                      <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                  </div>
+                  <div>
+                    <a href="mailto:support@needtofuel.com" className="text-white/80 text-sm hover:text-amber-400 transition-colors">support@needtofuel.com</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Hours */}
+            <div className="md:col-span-3 text-center md:text-left">
+              <h3 className="text-lg font-bold text-white mb-6 relative inline-block after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:mx-auto md:after:mx-0 after:w-16 after:h-0.5 after:bg-amber-500/50 pb-2">
+                Business Hours
+              </h3>
+              
+              <div className="space-y-4 max-w-[200px] mx-auto md:mx-0">
+                <div className="flex justify-between">
+                  <span>Monday - Friday:</span>
+                  <span className="text-white">08:00 - 23:00</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Saturday:</span>
+                  <span className="text-white">08:00 - 17:00</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Sunday:</span>
+                  <span className="text-white">Closed</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Quick links - 2 columns on desktop, centered on mobile */}
+            <div className="md:col-span-2 text-center md:text-left">
+              <h3 className="text-lg font-bold text-white mb-6 relative inline-block after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:mx-auto md:after:mx-0 after:w-16 after:h-0.5 after:bg-amber-500/50 pb-2">
+                Quick Links
+              </h3>
+              
+              <ul className="space-y-3">
+                <li>
+                  <a href="#" className="text-white/80 hover:text-amber-400 text-sm transition-colors">Home</a>
+                </li>
+                <li>
+                  <a href="#" className="text-white/80 hover:text-amber-400 text-sm transition-colors">Services</a>
+                </li>
+                <li>
+                  <a href="#" className="text-white/80 hover:text-amber-400 text-sm transition-colors">Pricing</a>
+                </li>
+                <li>
+                  <a href="#" className="text-white/80 hover:text-amber-400 text-sm transition-colors">About Us</a>
+                </li>
+                <li>
+                  <a href="#" className="text-white/80 hover:text-amber-400 text-sm transition-colors">Contact</a>
+                </li>
+              </ul>
+            </div>
           </div>
-          <div
-            className={`min-w-2 min-h-2 xl:flex hidden flex-row justify-center items-center`}
-          ></div>
-          <div
-            className={`min-w-2 min-h-2 xl:flex hidden flex-row justify-center items-center`}
-          ></div>
-        </div>
-        <div className={`w-[80%] h-[1px] bg-white/20 mb-4`} />
-        <div
-          className={`flex xl:flex-row flex-col justify-evenly items-center w-full min-h-2`}
-        >
-          <p className={`xl:mb-0 mb-4`}>© 2025 - Need To Fuel</p>
-          <div
-            className={`min-w-2 min-h-2 flex flex-row justify-center items-center xl:mb-0 mb-4`}
-          >
-            <a
-              href={"https://www.facebook.com/needtofuel"}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FontAwesomeIcon
-                icon={faFacebook}
-                className={`text-[18px] mx-4 cursor-pointer xl:mr-0 mr-4`}
-              />
-            </a>
-            <a
-              href={"https://www.tiktok.com/needtofuel"}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FontAwesomeIcon
-                icon={faLinkedinIn}
-                className={`text-[18px] mx-4 cursor-pointer xl:mr-0 mr-4`}
-              />
-            </a>
-            <a
-              href={"https://www.instagram.com/needtofuel_"}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FontAwesomeIcon
-                icon={faInstagram}
-                className={`text-[18px] mx-4 cursor-pointer xl:mr-0 mr-4`}
-              />
-            </a>
-            <a
-              href={"https://www.tiktok.com/@needtofuel"}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FontAwesomeIcon
-                icon={faTiktok}
-                className={`text-[18px] mx-4 cursor-pointer`}
-              />
-            </a>
-          </div>
-          <div
-            className={`min-w-2 min-h-2 flex flex-row justify-center items-center`}
-          >
-            <p
-              onClick={() => {
-                setIsOpen(true);
-              }}
-              className={`mx-2 cursor-pointer`}
-            >
-              Terms & Conditions
-            </p>
-            <p
-              onClick={() => {
-                setIsOpen(true);
-              }}
-              className={`mx-2 cursor-pointer`}
-            >
-              Privacy Ploicy
-            </p>
+          
+          {/* Footer bottom - Full responsive handling */}
+          <div className="pt-8 border-t border-white/10">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <p className="text-white/60 text-sm mb-6 md:mb-0">&#169; 2025 Need To Fuel. All rights reserved.</p>
+              
+              <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 text-center">
+                <p 
+                  onClick={() => setIsOpen(true)} 
+                  className="text-white/60 text-sm hover:text-amber-400 cursor-pointer transition-colors"
+                >
+                  Terms & Conditions
+                </p>
+                <p 
+                  onClick={() => setIsOpen(true)} 
+                  className="text-white/60 text-sm hover:text-amber-400 cursor-pointer transition-colors"
+                >
+                  Privacy Policy
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
-      <TermsModal />
+      <TermsModal/>
+      
+      {/* WhatsApp Support Bubble */}
+      <a 
+        href="https://wa.me/27712204794" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 bg-green-500 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg hover:bg-green-600 transition-all duration-300 z-50 hover:scale-110"
+        aria-label="Contact support via WhatsApp"
+      >
+        <FontAwesomeIcon icon={faWhatsapp} className="text-2xl" />
+        <span className="absolute top-0 right-0 flex h-3 w-3">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+        </span>
+      </a>
     </ReactLenis>
   );
 };
