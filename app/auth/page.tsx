@@ -1,7 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Eye } from "lucide-react";
+import { Eye, EyeOff, CheckCircle2, Mail } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const AuthForm = () => {
   // State for form type (signup or login)
@@ -41,7 +46,7 @@ const AuthForm = () => {
   }, []);
 
   // Handle input changes
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: any) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -50,7 +55,7 @@ const AuthForm = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: any) => {
     e.preventDefault();
     if (isLoginForm) {
       console.log("Login submitted with data:", {
@@ -80,191 +85,380 @@ const AuthForm = () => {
     setShowPassword(false);
   };
 
+  // Animation variants
+  const formVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { 
+        duration: 0.5, 
+        staggerChildren: 0.1,
+        delayChildren: 0.2
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      y: -20, 
+      transition: { duration: 0.3 } 
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0 }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black p-4">
-      <div className="w-full max-w-4xl rounded-3xl overflow-hidden bg-gray-900 shadow-2xl flex flex-col md:flex-row">
+    <div className="min-h-screen flex items-center justify-center bg-black md:p-4">
+      <Card className="w-full h-full md:h-auto md:max-w-4xl rounded-none md:rounded-3xl overflow-hidden bg-gray-900 shadow-2xl flex flex-col md:flex-row border-0">
         {/* Left section with form - full width on mobile, half width on desktop */}
-        <div className="w-full md:w-1/2 p-6 md:p-12">
-          <div className="flex items-center mb-6 md:mb-6 relative right-[50px] mt-[-50px]">
+        <motion.div 
+          className="w-full md:w-1/2 p-6 pt-8 md:pt-6 md:p-12 relative"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          {/* Header for mobile */}
+          <motion.div 
+            className="md:hidden flex items-center justify-between mb-6 px-1"
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="flex items-center">
+              <div className="w-[40px] h-[40px] overflow-visible flex relative items-center justify-center mr-2">
+                <img src="/assets/images/main_logo.png" alt="Logo" className="w-[170px] absolute" />
+              </div>
+              <span className="text-white font-medium">Need To Fuel</span>
+            </div>
+            <Button 
+              variant="ghost" 
+              className="text-white bg-black/20 hover:bg-black/40 rounded-full px-4 py-2 text-sm"
+            >
+              Get app
+            </Button>
+          </motion.div>
+          
+          {/* Header for desktop */}
+          <motion.div 
+            className="hidden md:flex items-center mb-6 md:mb-6 relative right-[50px] mt-[-50px]"
+            initial={{ x: -50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
             <div className="w-[150px] h-[150px] overflow-visible flex relative items-center justify-center mr-[-20px]">
               <img src="/assets/images/main_logo.png" alt="Logo" className="w-[650px] absolute" />
             </div>
             <span className="text-white font-medium">Need To Fuel</span>
-          </div>
+          </motion.div>
 
-          <form onSubmit={handleSubmit}>
-            <p className="text-gray-400 text-sm tracking-wide mb-2">
-              {isLoginForm ? "WELCOME BACK" : "START FOR FREE"}
-            </p>
-            <h1 className="text-white text-3xl md:text-4xl font-bold mb-2">
-              {isLoginForm ? "Log in to account" : "Create new account"}
-              <span className="text-amber-500">.</span>
-            </h1>
-            <p className="text-gray-400 text-sm mb-6 md:mb-8">
-              {isLoginForm ? "Don't have an account? " : "Already A Member? "}
-              <span
-                className="text-amber-500 cursor-pointer hover:underline"
-                onClick={toggleFormType}
+          <AnimatePresence mode="wait">
+            <motion.form 
+              key={isLoginForm ? "login" : "signup"}
+              variants={formVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              onSubmit={handleSubmit}
+            >
+              <motion.p 
+                variants={itemVariants}
+                className="text-gray-400 text-sm tracking-wide mb-2"
               >
-                {isLoginForm ? "Sign Up" : "Log In"}
-              </span>
-            </p>
+                {isLoginForm ? "WELCOME BACK" : "START FOR FREE"}
+              </motion.p>
+              
+              <motion.h1 
+                variants={itemVariants}
+                className="text-white text-3xl md:text-4xl font-bold mb-2"
+              >
+                {isLoginForm ? "Log in to account" : "Create new account"}
+                <span className="text-amber-500">.</span>
+              </motion.h1>
+              
+              <motion.p 
+                variants={itemVariants}
+                className="text-gray-400 text-sm mb-6 md:mb-8"
+              >
+                {isLoginForm ? "Don't have an account? " : "Already A Member? "}
+                <motion.span
+                  className="text-amber-500 cursor-pointer hover:underline"
+                  onClick={toggleFormType}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {isLoginForm ? "Sign Up" : "Log In"}
+                </motion.span>
+              </motion.p>
 
-            <div className="space-y-4">
-              {/* Signup-only fields */}
-              {!isLoginForm && (
-                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <div className="relative w-full sm:w-1/2">
-                    <p className="text-xs text-gray-400 absolute top-2 left-3">
-                      First name
-                    </p>
-                    <input
-                      type="text"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      className="w-full bg-black rounded-md py-3 pl-3 pt-6 pb-2 text-white focus:outline-none focus:ring-1 focus:ring-amber-500"
-                      required
-                    />
-                    {formData.firstName && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="amber"
-                          strokeWidth="2"
-                        >
-                          <path d="M20 6L9 17l-5-5"></path>
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                  <div className="relative w-full sm:w-1/2">
-                    <p className="text-xs text-gray-400 absolute top-2 left-3">
-                      Last name
-                    </p>
-                    <input
-                      type="text"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      className="w-full bg-black rounded-md py-3 pl-3 pt-6 pb-2 text-white focus:outline-none focus:ring-1 focus:ring-amber-500"
-                      required
-                    />
-                    {formData.lastName && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="amber"
-                          strokeWidth="2"
-                        >
-                          <path d="M20 6L9 17l-5-5"></path>
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Email field for both forms */}
-              <div className="relative">
-                <p className="text-xs text-gray-400 absolute top-2 left-3">
-                  Email
-                </p>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full bg-black rounded-md py-3 pl-3 pt-6 pb-2 text-white focus:outline-none focus:ring-1 focus:ring-amber-500"
-                  required
-                />
-                {formData.email && (
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="amber"
-                      strokeWidth="2"
+              <motion.div 
+                variants={itemVariants}
+                className="space-y-4"
+              >
+                {/* Signup-only fields */}
+                <AnimatePresence>
+                  {!isLoginForm && (
+                    <motion.div 
+                      className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
                     >
-                      <path d="M22 6C22 4.9 21.1 4 20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6ZM20 6L12 11L4 6H20ZM20 18H4V8L12 13L20 8V18Z"></path>
-                    </svg>
-                  </div>
-                )}
-              </div>
+                      <div className="relative w-full sm:w-1/2">
+                        <Label className="text-xs text-gray-400 absolute top-2 left-3 z-10">
+                          First name
+                        </Label>
+                        <div className="relative group">
+                          <Input
+                            type="text"
+                            name="firstName"
+                            value={formData.firstName}
+                            onChange={handleInputChange}
+                            className="w-full bg-black rounded-md py-3 pl-3 pt-6 pb-2 text-white border-gray-800 transition-all duration-300
+                            focus:border-amber-500 focus:ring-amber-500 group-hover:border-gray-600"
+                            required
+                          />
+                          <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 transition-all duration-300 group-hover:w-full"></div>
+                          {formData.firstName && (
+                            <motion.div 
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              transition={{ type: "spring", stiffness: 500 }}
+                              className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                            >
+                              <CheckCircle2 size={16} className="text-amber-500" />
+                            </motion.div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="relative w-full sm:w-1/2">
+                        <Label className="text-xs text-gray-400 absolute top-2 left-3 z-10">
+                          Last name
+                        </Label>
+                        <div className="relative group">
+                          <Input
+                            type="text"
+                            name="lastName"
+                            value={formData.lastName}
+                            onChange={handleInputChange}
+                            className="w-full bg-black rounded-md py-3 pl-3 pt-6 pb-2 text-white border-gray-800 transition-all duration-300
+                            focus:border-amber-500 focus:ring-amber-500 group-hover:border-gray-600"
+                            required
+                          />
+                          <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 transition-all duration-300 group-hover:w-full"></div>
+                          {formData.lastName && (
+                            <motion.div 
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              transition={{ type: "spring", stiffness: 500 }}
+                              className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                            >
+                              <CheckCircle2 size={16} className="text-amber-500" />
+                            </motion.div>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
-              {/* Password field for both forms */}
-              <div className="relative">
-                <p className="text-xs text-gray-400 absolute top-2 left-3">
-                  Password
-                </p>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className="w-full bg-black rounded-md py-3 pl-3 pt-6 pb-2 text-white border border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
-                  required
-                />
-                {formData.password && (
-                  <div
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
-                    onClick={togglePasswordVisibility}
+                {/* Email field for both forms */}
+                <motion.div variants={itemVariants} className="relative">
+                  <Label className="text-xs text-gray-400 absolute top-2 left-3 z-10">
+                    Email
+                  </Label>
+                  <div className="relative group">
+                    <Input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="w-full bg-black rounded-md py-3 pl-3 pt-6 pb-2 text-white border-gray-800 transition-all duration-300 
+                      focus:border-amber-500 focus:ring-amber-500 group-hover:border-gray-600"
+                      required
+                    />
+                    <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 transition-all duration-300 group-hover:w-full"></div>
+                    {formData.email && (
+                      <motion.div 
+                        initial={{ scale: 0, rotate: -10 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                      >
+                        <Mail size={16} className="text-amber-500" />
+                      </motion.div>
+                    )}
+                  </div>
+                  {formData.email && (
+                    <motion.p 
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-xs text-amber-500/70 mt-1 ml-1"
+                    >
+                      We&apos;ll never share your email
+                    </motion.p>
+                  )}
+                </motion.div>
+
+                {/* Password field for both forms */}
+                <motion.div variants={itemVariants} className="relative">
+                  <Label className="text-xs text-gray-400 absolute top-2 left-3 z-10">
+                    Password
+                  </Label>
+                  <div className="relative group">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      className="w-full bg-black rounded-md py-3 pl-3 pt-6 pb-2 text-white border border-amber-500 transition-all duration-300
+                      focus:border-amber-500 focus:ring-amber-500 group-hover:border-amber-400"
+                      required
+                    />
+                    {formData.password && (
+                      <motion.div
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+                        onClick={togglePasswordVisibility}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        {showPassword ? (
+                          <EyeOff size={16} className="text-amber-500" />
+                        ) : (
+                          <Eye size={16} className="text-amber-500" />
+                        )}
+                      </motion.div>
+                    )}
+                  </div>
+                  {formData.password && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      transition={{ duration: 0.3 }}
+                      className="mt-1 overflow-hidden"
+                    >
+                      <div className="flex gap-1 ml-1">
+                        <div className={`h-1 w-full rounded-full ${formData.password.length > 3 ? 'bg-amber-500' : 'bg-gray-600'}`}></div>
+                        <div className={`h-1 w-full rounded-full ${formData.password.length > 5 ? 'bg-amber-500' : 'bg-gray-600'}`}></div>
+                        <div className={`h-1 w-full rounded-full ${formData.password.length > 7 ? 'bg-amber-500' : 'bg-gray-600'}`}></div>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1 ml-1">
+                        {formData.password.length < 4 ? 'Weak password' : 
+                         formData.password.length < 6 ? 'Fair password' : 
+                         formData.password.length < 8 ? 'Good password' : 'Strong password'}
+                      </p>
+                    </motion.div>
+                  )}
+                </motion.div>
+
+                {/* Forgot password link (login only) */}
+                <AnimatePresence>
+                  {isLoginForm && (
+                    <motion.div 
+                      className="text-right"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                    >
+                      <motion.span 
+                        className="text-amber-500 text-sm cursor-pointer hover:underline"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        Forgot password?
+                      </motion.span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Submit button */}
+                <motion.div variants={itemVariants}>
+                  <Button
+                    type="submit"
+                    className="w-full bg-amber-500 hover:bg-amber-600 text-black font-medium py-6 md:rounded-md rounded-lg shadow-md transition-all duration-300 ease-in-out"
+                    
                   >
-                    <Eye size={16} color="#F59E0B" />
-                  </div>
-                )}
-              </div>
-
-              {/* Forgot password link (login only) */}
-              {isLoginForm && (
-                <div className="text-right">
-                  <span className="text-amber-500 text-sm cursor-pointer hover:underline">
-                    Forgot password?
-                  </span>
-                </div>
-              )}
-
-              {/* Submit button */}
-              <button
-                type="submit"
-                className="w-full bg-amber-500 text-black font-medium py-3 rounded-md hover:bg-amber-600 active:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-gray-900 shadow-sm cursor-pointer transition-colors"
-              >
-                {isLoginForm ? "Log in" : "Create account"}
-              </button>
-            </div>
-          </form>
-        </div>
+                    {isLoginForm ? "Log in" : "Create account"}
+                  </Button>
+                </motion.div>
+                
+                {/* Mobile-only fixed button at bottom */}
+                <AnimatePresence>
+                  {!isLoginForm && (
+                    <motion.div 
+                      className="fixed bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black to-transparent z-30 md:hidden"
+                      initial={{ y: 100, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: 100, opacity: 0 }}
+                      transition={{ delay: 0.5 }}
+                    >
+                      <motion.div
+                        className="relative h-1 w-32 bg-amber-500/20 mx-auto mb-3 rounded-full overflow-hidden"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.8 }}
+                      >
+                        <motion.div 
+                          className="absolute top-0 left-0 h-full bg-amber-500 rounded-full"
+                          initial={{ width: "0%" }}
+                          animate={{ width: "100%" }}
+                          transition={{ delay: 1, duration: 1.5 }}
+                        />
+                      </motion.div>
+                      <motion.div
+                        className="flex items-center justify-between"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.7 }}
+                      >
+                        <div className="flex items-center text-xs text-white/60">
+                          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                          2 min setup
+                        </div>
+                        <a href="#" className="text-amber-500 text-xs font-medium">Need help?</a>
+                      </motion.div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </motion.form>
+          </AnimatePresence>
+        </motion.div>
 
         {/* Right section with rotating images - hidden on mobile, shown on medium screens and up */}
         <div className="hidden md:block w-full md:w-1/2 relative">
-          {backgroundImages.map((image, index) => (
-            <div
-              key={index}
-              className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out ${
-                index === currentImageIndex ? "opacity-100" : "opacity-0"
-              }`}
-              style={{
-                backgroundImage: `url('${image}')`,
-              }}
-            />
-          ))}
+          <AnimatePresence mode="wait">
+            {backgroundImages.map((image, index) => (
+              index === currentImageIndex && (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 1 }}
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url('${image}')`,
+                  }}
+                />
+              )
+            ))}
+          </AnimatePresence>
 
           {/* Image indicators */}
           <div className="absolute top-6 right-6 z-20 flex space-x-2">
             {backgroundImages.map((_, index) => (
-              <div
+              <motion.div
                 key={index}
                 className={`w-2 h-2 rounded-full ${
                   index === currentImageIndex ? "bg-amber-500" : "bg-gray-500"
                 }`}
+                animate={{
+                  scale: index === currentImageIndex ? 1.2 : 1,
+                }}
+                transition={{ duration: 0.3 }}
               />
             ))}
           </div>
@@ -290,63 +484,70 @@ const AuthForm = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-gray-900 via-black/80 to-transparent z-10"></div>
 
           {/* Logo in the bottom right */}
-          <div className="absolute bottom-6 right-6 z-20">
+          <motion.div 
+            className="absolute bottom-6 right-6 z-20"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+          >
             <div className="w-[150px] h-[150px] overflow-visible flex relative items-center justify-center mr-[-20px]">
               <img src="/assets/images/white_logo.png" alt="Logo" className="w-[650px] absolute" />
             </div>
-          </div>
+          </motion.div>
         </div>
 
-        {/* Mobile background image - only visible on small screens */}
-        <div className="relative h-48 md:hidden">
-          {backgroundImages.map((image, index) => (
-            <div
-              key={index}
-              className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out ${
-                index === currentImageIndex ? "opacity-100" : "opacity-0"
-              }`}
-              style={{
-                backgroundImage: `url('${image}')`,
-              }}
-            />
-          ))}
+        {/* Mobile background image - only visible on small screens, now at bottom of page */}
+        <div className="relative h-48 md:hidden mt-auto">
+          <AnimatePresence mode="wait">
+            {backgroundImages.map((image, index) => (
+              index === currentImageIndex && (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 1 }}
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url('${image}')`,
+                  }}
+                />
+              )
+            ))}
+          </AnimatePresence>
 
           {/* Image indicators for mobile */}
-          <div className="absolute top-4 right-4 z-20 flex space-x-2">
+          <div className="absolute bottom-4 right-4 z-20 flex space-x-2">
             {backgroundImages.map((_, index) => (
-              <div
+              <motion.div
                 key={index}
                 className={`w-2 h-2 rounded-full ${
                   index === currentImageIndex ? "bg-amber-500" : "bg-gray-500"
                 }`}
+                animate={{
+                  scale: index === currentImageIndex ? 1.2 : 1,
+                }}
+                transition={{ duration: 0.3 }}
               />
             ))}
           </div>
 
           {/* Dark gradient overlay for mobile */}
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent z-10"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-900 to-transparent z-10"></div>
 
           {/* Logo in the bottom right for mobile */}
-          <div className="absolute bottom-4 right-4 z-20">
-            <svg
-              className="text-amber-500"
-              width="30"
-              height="22"
-              viewBox="0 0 40 30"
-            >
-              <g fill="#F59E0B">
-                <path
-                  d="M2 0L14 28L26 0"
-                  stroke="#F59E0B"
-                  strokeWidth="4"
-                  fill="none"
-                />
-                <circle cx="32" cy="6" r="4" />
-              </g>
-            </svg>
-          </div>
+          <motion.div 
+            className="absolute bottom-4 left-4 z-20"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <div className="w-[50px] h-[50px] overflow-visible flex relative items-center justify-center">
+              <img src="/assets/images/white_logo.png" alt="Logo" className="w-[200px] absolute" />
+            </div>
+          </motion.div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
