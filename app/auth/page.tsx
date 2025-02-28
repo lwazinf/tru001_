@@ -6,12 +6,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/firebase/AuthContext";
 import { useRouter } from "next/navigation";
+import { processPayment } from '../utils/payment';
 
 const AuthForm = () => {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedTier, setSelectedTier] = useState<string | null>(null);
   
   // Safely access auth context with error handling
   const [authContextLoaded, setAuthContextLoaded] = useState(false);
@@ -62,12 +64,14 @@ const AuthForm = () => {
     "https://images.pexels.com/photos/9796/car-refill-transportation-transport.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
   ];
 
-  // Redirect if user is already logged in
+  // Show thank you message when user is logged in
+  const [showThankYou, setShowThankYou] = useState(false);
+  
   useEffect(() => {
     if (currentUser) {
-      router.push('/');
+      setShowThankYou(true);
     }
-  }, [currentUser, router]);
+  }, [currentUser]);
 
   // Set up image rotation interval
   useEffect(() => {
@@ -91,9 +95,7 @@ const AuthForm = () => {
   };
 
   // Handle form submission
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    
+  const handleSubmit = async () => {
     if (authError) {
       setError(authError);
       return;
@@ -110,7 +112,7 @@ const AuthForm = () => {
       } else {
         // Signup with Firebase
         await signup(formData.firstName, formData.lastName, formData.email, formData.password);
-        router.push('/');
+        // router.push('/');
       }
     } catch (err: any) {
       console.error("Authentication error:", err);
@@ -170,7 +172,199 @@ const AuthForm = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black md:p-4">
-      <Card className="w-full h-full md:h-auto md:max-w-4xl rounded-none md:rounded-3xl overflow-hidden bg-gray-900 shadow-2xl flex flex-col md:flex-row border-0">
+      <Card className="w-full h-full md:h-auto md:max-w-4xl rounded-none md:rounded-3xl overflow-hidden bg-gray-900 shadow-2xl flex flex-col md:flex-row border-0 relative">
+          {/* Thank you message */}
+          <AnimatePresence>
+            {showThankYou && (
+              <motion.div 
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -50 }}
+                transition={{ duration: 0.5 }}
+                className="absolute left-0 top-0 bottom-0 w-full md:w-1/2 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-8 z-10"
+              >
+                <div className="text-center">
+                  <motion.div 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.3, type: "spring" }}
+                    className="w-24 h-24 mx-auto mb-8 bg-amber-500 rounded-full p-4 shadow-lg shadow-amber-500/20"
+                  >
+                    <img src="/assets/images/main_logo.png" alt="NTF Logo" className="w-full h-full object-contain" />
+                  </motion.div>
+                  <motion.h2 
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                    className="text-3xl font-bold text-amber-500 mb-4"
+                  >
+                    Thanks for choosing NTF
+                  </motion.h2>
+                  <motion.p 
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.7 }}
+                    className="text-gray-300 text-lg leading-relaxed mb-10"
+                  >
+                    We&apos;re excited to have you on board!
+                  </motion.p>
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.9 }}
+                    className="text-amber-500 text-sm font-medium mb-4 tracking-wide"
+                  >
+                    SELECT YOUR MEMBERSHIP
+                  </motion.p>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1 }}
+                    className="flex justify-center space-x-6 w-full max-w-xs mx-auto"
+                  >                    
+                    {/* Gold Tier Option */}
+                    <motion.div
+                      initial={{ scale: 1 }}
+                      whileHover={{ 
+                        scale: 0.97,
+                        boxShadow: "0 0 30px 8px rgba(245, 158, 11, 0.4)"
+                      }}
+                      transition={{
+                        boxShadow: {
+                          duration: 0.8,
+                          repeat: Infinity,
+                          repeatType: "reverse" 
+                        }
+                      }}
+                      whileTap={{ scale: 0.92 }}
+                      onClick={() => {
+                        // Handle Gold tier selection
+                        console.log("Gold tier selected");
+                        setSelectedTier("gold");
+                        setIsLoading(true);
+                        // Process payment before navigating
+                        processPayment({ 
+                          amount: "2999.00",
+                          transactionReference: `${formData.email || 'guest'}-Gold-${Date.now()}`.substring(0, 50),
+                          bankReference: "NTF Gold Membership"
+                        })
+                          .then((paymentResponse) => {
+                            console.log("Payment processed:", paymentResponse);
+                            // Here you would save the user's preference and navigate
+                            setTimeout(() => {
+                              // router.push('/dashboard');
+                            }, 1000); // Give time for user to see success state
+                          })
+                          .catch((error) => {
+                            console.error("Payment failed:", error);
+                            // Handle payment error - reset loading state
+                            setIsLoading(false);
+                            setSelectedTier(null);
+                          });
+                      }}
+                      className="bg-gradient-to-b from-amber-500/30 to-amber-600/20 border border-amber-500/40 rounded-xl p-4 cursor-pointer flex-1 min-w-[120px] flex flex-col items-center shadow-lg transition-all duration-500 relative"
+                    >
+                      <motion.div 
+                        className="absolute inset-0 rounded-xl bg-amber-500/0"
+                        animate={{
+                          boxShadow: ["0 0 0px 0px rgba(245, 158, 11, 0)", "0 0 15px 2px rgba(245, 158, 11, 0.3)", "0 0 0px 0px rgba(245, 158, 11, 0)"]
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          repeatType: "loop"
+                        }}
+                      />
+                      <div className="bg-amber-500 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-3 shadow-amber-500/40 shadow-inner">
+                        {selectedTier === "gold" && isLoading ? (
+                          <motion.span 
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            className="w-5 h-5 border-2 border-black border-t-transparent rounded-full"
+                          />
+                        ) : (
+                          <span className="text-black font-bold text-base sm:text-lg">G</span>
+                        )}
+                      </div>
+                      <span className="text-amber-500 font-semibold text-base sm:text-lg">Gold</span>
+                      <span className="text-gray-400 text-xs mt-1">R2,999/mo</span>
+                    </motion.div>
+                    
+                    {/* Black Tier Option */}
+                    <motion.div
+                      initial={{ scale: 1 }}
+                      whileHover={{ 
+                        scale: 0.97,
+                        boxShadow: "0 0 30px 8px rgba(255, 255, 255, 0.15)"
+                      }}
+                      transition={{
+                        boxShadow: {
+                          duration: 0.8,
+                          repeat: Infinity,
+                          repeatType: "reverse"
+                        }
+                      }}
+                      whileTap={{ scale: 0.92 }}
+                      onClick={() => {
+                        // Handle Black tier selection
+                        console.log("Black tier selected");
+                        setSelectedTier("black");
+                        setIsLoading(true);
+                        // Process payment before navigating
+                        processPayment({ 
+                          amount: "4999.00",
+                          transactionReference: `${formData.email || 'guest'}-Black-${Date.now()}`.substring(0, 50),
+                          bankReference: "NTF Black Membership"
+                        })
+                          .then((paymentResponse) => {
+                            console.log("Payment processed:", paymentResponse);
+                            // Here you would save the user's preference and navigate
+                            setTimeout(() => {
+                              // router.push('/dashboard');
+                            }, 1000); // Give time for user to see success state
+                          })
+                          .catch((error) => {
+                            console.error("Payment failed:", error);
+                            // Handle payment error - reset loading state
+                            setIsLoading(false);
+                            setSelectedTier(null);
+                          });
+                      }}
+                      className="bg-gradient-to-b from-gray-700/50 to-gray-900/50 border border-white/20 rounded-xl p-4 cursor-pointer flex-1 min-w-[120px] flex flex-col items-center shadow-lg transition-all duration-500 relative overflow-hidden"
+                    >
+                      <motion.div 
+                        className="absolute inset-0 rounded-xl bg-white/0"
+                        animate={{
+                          boxShadow: ["0 0 0px 0px rgba(255, 255, 255, 0)", "0 0 15px 2px rgba(255, 255, 255, 0.1)", "0 0 0px 0px rgba(255, 255, 255, 0)"]
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          repeatType: "loop"
+                        }}
+                      />
+                      <div className="absolute top-0 right-0 bg-white text-[9px] sm:text-[10px] text-black font-bold py-0.5 px-2 rotate-[45deg] translate-x-[8px] translate-y-[-2px] shadow-sm">
+                        POPULAR
+                      </div>
+                      <div className="bg-black border border-white/40 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-3 shadow-white/20 shadow-inner">
+                        {selectedTier === "black" && isLoading ? (
+                          <motion.span 
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                          />
+                        ) : (
+                          <span className="text-white font-bold text-base sm:text-lg">B</span>
+                        )}
+                      </div>
+                      <span className="text-white font-semibold text-base sm:text-lg">Black</span>
+                      <span className="text-gray-400 text-xs mt-1">R4,999/mo</span>
+                    </motion.div>
+                  </motion.div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         {/* Left section with form - full width on mobile, half width on desktop */}
         <motion.div 
           className="w-full md:w-1/2 p-6 pt-8 md:pt-6 md:p-12 relative"
@@ -193,7 +387,7 @@ const AuthForm = () => {
             </div>
             <Button 
               variant="ghost" 
-              className="text-white bg-black/20 hover:bg-black/40 rounded-full px-4 py-2 text-sm"
+              className="text-amber-500 hover:text-amber-400 bg-black/20 hover:bg-black/40 rounded-full px-4 py-2 text-sm font-medium"
             >
               Get app
             </Button>
@@ -207,7 +401,7 @@ const AuthForm = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <div className="w-[150px] h-[150px] overflow-visible flex relative items-center justify-center mr-[-20px]">
-              <img src="/assets/images/main_logo.png" alt="Logo" className="w-[650px] absolute" />
+              <img src="/assets/images/white_logo.png" alt="Logo" className="w-[650px] absolute" />
             </div>
             <span className="text-white font-medium">Need To Fuel</span>
           </motion.div>
@@ -226,11 +420,11 @@ const AuthForm = () => {
               initial="hidden"
               animate="visible"
               exit="exit"
-              onSubmit={handleSubmit}
+              onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}
             >
               <motion.p 
                 variants={itemVariants}
-                className="text-gray-400 text-sm tracking-wide mb-2"
+                className="text-amber-500 text-sm tracking-wider font-medium mb-2"
               >
                 {isLoginForm ? "WELCOME BACK" : "START FOR FREE"}
               </motion.p>
@@ -245,7 +439,7 @@ const AuthForm = () => {
               
               <motion.p 
                 variants={itemVariants}
-                className="text-gray-400 text-sm mb-6 md:mb-8"
+                className="text-gray-300 text-sm mb-6 md:mb-8"
               >
                 {isLoginForm ? "Don't have an account? " : "Already A Member? "}
                 <motion.span
@@ -286,21 +480,19 @@ const AuthForm = () => {
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <div className="relative w-full sm:w-1/2">
-                        <Label className="text-xs text-gray-400 absolute top-2 left-3 z-10">
-                          First name
-                        </Label>
-                        <div className="relative group">
+                      <div className="relative w-full sm:w-1/2 mb-4 sm:mb-0">
+                        <div className="relative group h-16">
                           <Input
                             type="text"
                             name="firstName"
                             value={formData.firstName}
                             onChange={handleInputChange}
-                            className="w-full bg-black rounded-md py-3 pl-3 pt-6 pb-2 text-white border-gray-800 transition-all duration-300
-                            focus:border-amber-500 focus:ring-amber-500 group-hover:border-gray-600"
+                            placeholder="First name"
+                            className="w-full h-full bg-black/60 backdrop-blur-sm rounded-md px-4 text-white border-0 ring-1 ring-gray-700 transition-all duration-300
+                            focus:ring-2 focus:ring-amber-500 group-hover:ring-gray-600 text-base"
                             required
                           />
-                          <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 transition-all duration-300 group-hover:w-full"></div>
+                          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-500/10 to-amber-500/80 opacity-0 transition-all duration-300 group-hover:opacity-100"></div>
                           {formData.firstName && (
                             <motion.div 
                               initial={{ scale: 0, opacity: 0 }}
@@ -308,26 +500,24 @@ const AuthForm = () => {
                               transition={{ type: "spring", stiffness: 500 }}
                               className="absolute right-3 top-1/2 transform -translate-y-1/2"
                             >
-                              <CheckCircle2 size={16} className="text-amber-500" />
+                              <CheckCircle2 size={18} className="text-amber-500" />
                             </motion.div>
                           )}
                         </div>
                       </div>
                       <div className="relative w-full sm:w-1/2">
-                        <Label className="text-xs text-gray-400 absolute top-2 left-3 z-10">
-                          Last name
-                        </Label>
-                        <div className="relative group">
+                        <div className="relative group h-16">
                           <Input
                             type="text"
                             name="lastName"
                             value={formData.lastName}
                             onChange={handleInputChange}
-                            className="w-full bg-black rounded-md py-3 pl-3 pt-6 pb-2 text-white border-gray-800 transition-all duration-300
-                            focus:border-amber-500 focus:ring-amber-500 group-hover:border-gray-600"
+                            placeholder="Last name"
+                            className="w-full h-full bg-black/60 backdrop-blur-sm rounded-md px-4 text-white border-0 ring-1 ring-gray-700 transition-all duration-300
+                            focus:ring-2 focus:ring-amber-500 group-hover:ring-gray-600 text-base"
                             required
                           />
-                          <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 transition-all duration-300 group-hover:w-full"></div>
+                          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-500/10 to-amber-500/80 opacity-0 transition-all duration-300 group-hover:opacity-100"></div>
                           {formData.lastName && (
                             <motion.div 
                               initial={{ scale: 0, opacity: 0 }}
@@ -335,7 +525,7 @@ const AuthForm = () => {
                               transition={{ type: "spring", stiffness: 500 }}
                               className="absolute right-3 top-1/2 transform -translate-y-1/2"
                             >
-                              <CheckCircle2 size={16} className="text-amber-500" />
+                              <CheckCircle2 size={18} className="text-amber-500" />
                             </motion.div>
                           )}
                         </div>
@@ -346,20 +536,18 @@ const AuthForm = () => {
 
                 {/* Email field for both forms */}
                 <motion.div variants={itemVariants} className="relative">
-                  <Label className="text-xs text-gray-400 absolute top-2 left-3 z-10">
-                    Email
-                  </Label>
-                  <div className="relative group">
+                  <div className="relative group h-16 mb-4">
                     <Input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full bg-black rounded-md py-3 pl-3 pt-6 pb-2 text-white border-gray-800 transition-all duration-300 
-                      focus:border-amber-500 focus:ring-amber-500 group-hover:border-gray-600"
+                      placeholder="Email address"
+                      className="w-full h-full bg-black/60 backdrop-blur-sm rounded-md px-4 text-white border-0 ring-1 ring-gray-700 transition-all duration-300
+                      focus:ring-2 focus:ring-amber-500 group-hover:ring-gray-600 text-base"
                       required
                     />
-                    <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 transition-all duration-300 group-hover:w-full"></div>
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-500/10 to-amber-500/80 opacity-0 transition-all duration-300 group-hover:opacity-100"></div>
                     {formData.email && (
                       <motion.div 
                         initial={{ scale: 0, rotate: -10 }}
@@ -367,7 +555,7 @@ const AuthForm = () => {
                         transition={{ type: "spring", stiffness: 400, damping: 10 }}
                         className="absolute right-3 top-1/2 transform -translate-y-1/2"
                       >
-                        <Mail size={16} className="text-amber-500" />
+                        <Mail size={18} className="text-amber-500" />
                       </motion.div>
                     )}
                   </div>
@@ -375,7 +563,7 @@ const AuthForm = () => {
                     <motion.p 
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="text-xs text-amber-500/70 mt-1 ml-1"
+                      className="text-xs text-amber-500/70 -mt-2 mb-4 ml-1"
                     >
                       We&apos;ll never share your email
                     </motion.p>
@@ -384,19 +572,18 @@ const AuthForm = () => {
 
                 {/* Password field for both forms */}
                 <motion.div variants={itemVariants} className="relative">
-                  <Label className="text-xs text-gray-400 absolute top-2 left-3 z-10">
-                    Password
-                  </Label>
-                  <div className="relative group">
+                  <div className="relative group h-16">
                     <Input
                       type={showPassword ? "text" : "password"}
                       name="password"
                       value={formData.password}
                       onChange={handleInputChange}
-                      className="w-full bg-black rounded-md py-3 pl-3 pt-6 pb-2 text-white border border-amber-500 transition-all duration-300
-                      focus:border-amber-500 focus:ring-amber-500 group-hover:border-amber-400"
+                      placeholder="Password"
+                      className="w-full h-full bg-black/60 backdrop-blur-sm rounded-md px-4 text-white border-0 ring-1 ring-amber-500/60 transition-all duration-300
+                      focus:ring-2 focus:ring-amber-500 group-hover:ring-amber-400 text-base"
                       required
                     />
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-500/10 to-amber-500/80 opacity-0 transition-all duration-300 group-hover:opacity-100"></div>
                     {formData.password && (
                       <motion.div
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
@@ -405,14 +592,14 @@ const AuthForm = () => {
                         whileTap={{ scale: 0.9 }}
                       >
                         {showPassword ? (
-                          <EyeOff size={16} className="text-amber-500" />
+                          <EyeOff size={18} className="text-amber-500" />
                         ) : (
-                          <Eye size={16} className="text-amber-500" />
+                          <Eye size={18} className="text-amber-500" />
                         )}
                       </motion.div>
                     )}
                   </div>
-                  {formData.password && (
+                  {!isLoginForm && formData.password && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
@@ -462,18 +649,23 @@ const AuthForm = () => {
                 </AnimatePresence>
 
                 {/* Submit button */}
-                <motion.div variants={itemVariants}>
-                  <Button
-                    type="submit"
-                    className="w-full bg-amber-500 hover:bg-amber-600 text-black font-medium py-6 md:rounded-md rounded-lg shadow-md transition-all duration-300 ease-in-out"
-                    disabled={loading}
-                  >
-                    {loading ? 
-                      "Loading..." : 
-                      isLoginForm ? "Log in" : "Create account"
-                    }
-                  </Button>
-                </motion.div>
+                <AnimatePresence>
+                  {!showThankYou && (
+                    <motion.div
+                      initial={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      onClick={() => !loading && handleSubmit()}
+                      className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-6 md:rounded-md rounded-lg shadow-md transition-all duration-300 ease-in-out cursor-pointer select-none text-center text-lg tracking-wide relative z-20"
+                      style={{ opacity: loading ? 0.7 : 1 }}
+                    >
+                  
+                  {loading ? 
+                    "Loading..." : 
+                    isLoginForm ? "Log in" : "Create account"
+                  }
+                    </motion.div>
+                  )}
+                </AnimatePresence>
                 
                 {/* Mobile-only fixed button at bottom */}
                 <AnimatePresence>

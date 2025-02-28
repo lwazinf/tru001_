@@ -3,13 +3,30 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { motion } from 'framer-motion';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faShieldAlt, faUserLock, faFileContract, faCookieBite } from '@fortawesome/free-solid-svg-icons';
 
 const PrivacyPage = () => {
   const mainRef = useRef(null);
+  const heroRef = useRef(null);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
     
+    // Hero section parallax effect
+    gsap.to(heroRef.current, {
+      backgroundPosition: '50% 100%',
+      ease: 'none',
+      scrollTrigger: {
+        trigger: heroRef.current,
+        start: 'top top',
+        end: 'bottom top',
+        scrub: true
+      }
+    });
+
+    // Sections reveal animation
     const sections = gsap.utils.toArray('.reveal-section');
     sections.forEach((section:any) => {
       gsap.from(section, {
@@ -24,38 +41,101 @@ const PrivacyPage = () => {
         },
       });
     });
+
+    // Cards stagger animation
+    gsap.from('.privacy-card', {
+      opacity: 0,
+      y: 30,
+      duration: 0.8,
+      stagger: 0.2,
+      scrollTrigger: {
+        trigger: '.privacy-cards-container',
+        start: 'top 70%',
+      }
+    });
   }, []);
 
   return (
     <div className="min-h-screen bg-black" ref={mainRef}>
       {/* Hero Section */}
-      <div className="bg-zinc-900">
-        <div className="max-w-7xl mx-auto px-6 py-12">
+      <div 
+        ref={heroRef}
+        className="relative min-h-[60vh] bg-cover bg-center flex items-center"
+        style={{
+          backgroundImage: 'linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url(/assets/images/hero-bg.jpg)'
+        }}
+      >
+        <div className="absolute top-0 left-0 w-full p-6">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <motion.img 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              src="/assets/images/main_logo.png" 
+              alt="Logo" 
+              className="w-[250px]" 
+            />
+            <motion.button 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="bg-amber-500 hover:bg-amber-600 text-white px-6 py-2 rounded-lg transition-all duration-300"
+            >
+              Get app
+            </motion.button>
+          </div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-6 w-full">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="max-w-3xl"
+          >
           <div className="flex items-center justify-between">
             <img src="/assets/images/main_logo.png" alt="Logo" className="w-[250px]" />
             <button className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded">
               Get app
             </button>
           </div>
+          </motion.div>
+
           <div className="mt-16 max-w-3xl reveal-section">
-            <h1 className="text-5xl font-bold text-white">
+            <h1 className="text-6xl font-bold text-white mb-6">
               Privacy Policy
             </h1>
-            <p className="mt-4 text-lg text-zinc-400">
-              Your privacy is important to us. Learn how we collect, use, and protect your information.
+            <p className="text-xl text-zinc-300 max-w-2xl leading-relaxed">
+              Your privacy is our priority. We're committed to protecting your personal information with the highest standards of security and transparency.
             </p>
+            
+            <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 privacy-cards-container">
+              {[
+                { icon: faShieldAlt, title: 'Secure', text: 'Enterprise-grade security' },
+                { icon: faUserLock, title: 'Private', text: 'Your data belongs to you' },
+                { icon: faFileContract, title: 'Compliant', text: 'POPIA compliant' },
+                { icon: faCookieBite, title: 'Transparent', text: 'Clear cookie policy' },
+              ].map((card, index) => (
+                <div key={index} className="privacy-card bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 p-6 rounded-xl">
+                  <FontAwesomeIcon icon={card.icon} className="text-amber-500 text-3xl mb-4" />
+                  <h3 className="text-white font-semibold text-lg mb-2">{card.title}</h3>
+                  <p className="text-zinc-400">{card.text}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-12">
-        <div className="bg-zinc-900 rounded-lg border border-zinc-800">
+      <main className="max-w-7xl mx-auto px-6 py-24">
+        <div className="bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-zinc-800/50 shadow-2xl">
+          <div className="absolute inset-0 bg-gradient-to-b from-amber-500/5 to-transparent rounded-2xl"></div>
           <div className="p-8 space-y-12">
             {/* Cookie Policy Section */}
             <div className="reveal-section">
               <h2 className="text-2xl font-bold text-orange-500 mb-8">Cookies Policy, Privacy Policy and POPIA disclaimer</h2>
-              <div className="bg-zinc-800 rounded-lg p-6 border-l-4 border-orange-600">
+              <div className="bg-zinc-800/50 backdrop-blur-sm rounded-xl p-6 border-l-4 border-amber-500 shadow-lg transition-all duration-300 hover:transform hover:scale-[1.02] hover:border-amber-400">
                 <h3 className="text-xl font-semibold text-white">Cookie policy</h3>
                 <p className="mt-3 text-zinc-300">
                   We use cookies to make your experience with us better. By continuing to use our website without changing the settings, you are agreeing to our use of cookies.
@@ -84,7 +164,7 @@ const PrivacyPage = () => {
                   When used in this Privacy Policy, the term &quot;personal information&quot; has the meaning given to it in the POPIA. Generally speaking, personal information is any information relating to an identifiable, living natural person or an existing juristic person.
                 </p>
                 
-                <div className="bg-zinc-800 rounded-lg p-6 border-l-4 border-orange-600">
+                <div className="bg-zinc-800/50 backdrop-blur-sm rounded-xl p-6 border-l-4 border-amber-500 shadow-lg transition-all duration-300 hover:transform hover:scale-[1.02] hover:border-amber-400">
                   <p className="text-white mb-4">We will collect your personal information in a number of ways, including:</p>
                   <ul className="list-disc pl-6 space-y-2">
                     <li>directly from you (where it is practicable to do so);</li>
@@ -93,7 +173,7 @@ const PrivacyPage = () => {
                   </ul>
                 </div>
 
-                <div className="bg-zinc-800 rounded-lg p-6">
+                <div className="bg-zinc-800/50 backdrop-blur-sm rounded-xl p-6 shadow-lg transition-all duration-300 hover:transform hover:scale-[1.02]">
                   <p className="text-white mb-4">Personal information we collect may include:</p>
                   <ul className="list-disc pl-6 space-y-2">
                     <li>contact details and personal information;</li>
@@ -109,7 +189,7 @@ const PrivacyPage = () => {
             {/* Use of Information Section */}
             <div className="reveal-section">
               <h3 className="text-xl font-semibold text-orange-500 mb-4">Our Use of Personal Information</h3>
-              <div className="grid gap-4">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="bg-zinc-800 p-6 rounded-lg border-l-4 border-orange-600">
                   <h4 className="text-white font-medium mb-2">Business Engagements</h4>
                   <p className="text-zinc-300">We use personal information for proposed and actual transactions, supporting our procurement and on-boarding processes.</p>
@@ -128,7 +208,7 @@ const PrivacyPage = () => {
             {/* Security Section */}
             <div className="reveal-section">
               <h3 className="text-xl font-semibold text-orange-500 mb-4">Security</h3>
-              <div className="bg-zinc-800 rounded-lg p-6 border-l-4 border-orange-600">
+              <div className="bg-zinc-800/50 backdrop-blur-sm rounded-xl p-6 border-l-4 border-amber-500 shadow-lg transition-all duration-300 hover:transform hover:scale-[1.02] hover:border-amber-400">
                 <p className="text-zinc-300">
                   NtF is committed to protecting the security of personal information. We use various security technologies and procedures to help protect your personal information from unauthorized access, use, or disclosure.
                 </p>
@@ -140,7 +220,7 @@ const PrivacyPage = () => {
               <h3 className="text-xl font-semibold text-orange-500 mb-4">Questions?</h3>
               <p className="text-zinc-300">
                 Contact us at{' '}
-                <a href="mailto:support@needtofuel.com" className="text-orange-500 hover:text-orange-400">
+                <a href="mailto:support@needtofuel.com" className="text-amber-500 hover:text-amber-400 transition-colors duration-300">
                   support@needtofuel.com
                 </a>
               </p>
