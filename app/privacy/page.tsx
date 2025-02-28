@@ -106,7 +106,7 @@ const PrivacyPage = () => {
               Privacy Policy
             </h1>
             <p className="text-xl text-zinc-300 max-w-2xl leading-relaxed">
-              Your privacy is our priority. We're committed to protecting your personal information with the highest standards of security and transparency.
+              Your privacy is our priority. We&apos;re committed to protecting your personal information with the highest standards of security and transparency.
             </p>
             
             <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 privacy-cards-container">

@@ -5,7 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faDatabase, faHistory, faExclamationTriangle, faUserShield, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faDatabase, faHistory, faExclamationTriangle, faLock } from '@fortawesome/free-solid-svg-icons';
 
 const CONFIRMATION_TEXT = 'Delete my NTF account';
 
@@ -47,6 +47,7 @@ const DeleteDataPage = () => {
 
       // Redirect to confirmation page after successful deletion
       window.location.href = '/account-deleted';
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setError('Failed to delete account. Please check your password and try again.');
     } finally {
@@ -171,7 +172,7 @@ const DeleteDataPage = () => {
               Delete Your Account
             </h1>
             <p className="text-xl text-zinc-300 max-w-2xl leading-relaxed">
-              We're sorry to see you go. Before proceeding with account deletion, please review the important information below about what data will be removed and what will be retained.
+              We&apos;re sorry to see you go. Before proceeding with account deletion, please review the important information below about what data will be removed and what will be retained.
             </p>
             
             <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 privacy-cards-container">
@@ -328,7 +329,7 @@ const DeleteDataPage = () => {
               <h3 className="text-xl font-semibold text-orange-500 mb-4">Need More Help?</h3>
               <div className="bg-zinc-800/50 backdrop-blur-sm rounded-xl p-6 border-l-4 border-amber-500 shadow-lg transition-all duration-300 hover:transform hover:scale-[1.02] hover:border-amber-400">
                 <p className="text-zinc-300">
-                  If you're experiencing any issues or have questions about the account deletion process, our support team is here to help. Contact us at{' '}
+                  If you&apos;re experiencing any issues or have questions about the account deletion process, our support team is here to help. Contact us at{' '}
                   <a href="mailto:support@needtofuel.com" className="text-amber-500 hover:text-amber-400 transition-colors duration-300">
                     support@needtofuel.com
                   </a>
@@ -342,7 +343,7 @@ const DeleteDataPage = () => {
               <div className="bg-zinc-800 rounded-lg p-6 border-orange-600 border">
                 <h4 className="text-white font-medium mb-4">Before You Go</h4>
                 <p className="text-zinc-300 mb-4">
-                  Consider these alternatives if you're having specific issues:
+                  Consider these alternatives if you&apos;re having specific issues:
                 </p>
                 <ul className="list-disc pl-6 space-y-2 text-zinc-300">
                   <li>Contact support for account-related issues</li>
