@@ -250,10 +250,18 @@ const AuthForm = () => {
                         })
                           .then((paymentResponse) => {
                             console.log("Payment processed:", paymentResponse);
-                            // Here you would save the user's preference and navigate
-                            setTimeout(() => {
-                              // router.push('/dashboard');
-                            }, 1000); // Give time for user to see success state
+                            // Redirect to the payment URL if available
+                            if (paymentResponse && paymentResponse.url) {
+                              // Set timeout to allow user to see the loading state briefly
+                              setTimeout(() => {
+                                // Open the payment URL in a new tab/window
+                                window.open(paymentResponse.url, '_blank');
+                                setIsLoading(false);
+                              }, 500);
+                            } else {
+                              setIsLoading(false);
+                              alert("Payment processing failed: No payment URL received.");
+                            }
                           })
                           .catch((error) => {
                             console.error("Payment failed:", error);
@@ -318,10 +326,18 @@ const AuthForm = () => {
                         })
                           .then((paymentResponse) => {
                             console.log("Payment processed:", paymentResponse);
-                            // Here you would save the user's preference and navigate
-                            setTimeout(() => {
-                              // router.push('/dashboard');
-                            }, 1000); // Give time for user to see success state
+                            // Redirect to the payment URL if available
+                            if (paymentResponse && paymentResponse.url) {
+                              // Set timeout to allow user to see the loading state briefly
+                              setTimeout(() => {
+                                // Open the payment URL in a new tab/window
+                                window.open(paymentResponse.url, '_blank');
+                                setIsLoading(false);
+                              }, 500);
+                            } else {
+                              setIsLoading(false);
+                              alert("Payment processing failed: No payment URL received.");
+                            }
                           })
                           .catch((error) => {
                             console.error("Payment failed:", error);
