@@ -18,6 +18,9 @@ interface DeviceInfoState {
   orientation: string | null;
   touchScreen: boolean | null;
   pixelScale: number | null;
+  isScaleAdjusted: boolean;
+  originalScale: number | null;
+  adjustedScale: number | null;
 }
 
 type OrientationType = 'Portrait' | 'Landscape' | 'Unknown';
@@ -39,7 +42,13 @@ export default function DeviceInfo(): JSX.Element {
     orientation: null,
     touchScreen: null,
     pixelScale: null,
+    isScaleAdjusted: false,
+    originalScale: null,
+    adjustedScale: null,
   });
+  
+  // State to track if we've applied scaling
+  const [scaleAdjusted, setScaleAdjusted] = useState<boolean>(false);
 
   useEffect(() => {
     // Function to update device info
@@ -86,6 +95,11 @@ export default function DeviceInfo(): JSX.Element {
       // Calculate physical pixel scale (how many physical pixels per CSS pixel)
       const pixelScale: number = Math.round((screenWidth * devicePixelRatio) / screenWidth * 100) / 100;
       
+      // Scale adjustment info
+      const isScaleAdjusted = devicePixelRatio !== 1 && scaleAdjusted;
+      const originalScale = devicePixelRatio;
+      const adjustedScale = isScaleAdjusted ? 1 : devicePixelRatio;
+      
       setDeviceInfo({
         os,
         browser,
@@ -100,6 +114,9 @@ export default function DeviceInfo(): JSX.Element {
         orientation,
         touchScreen,
         pixelScale,
+        isScaleAdjusted,
+        originalScale,
+        adjustedScale,
       });
     };
 
@@ -111,7 +128,38 @@ export default function DeviceInfo(): JSX.Element {
     
     // Cleanup
     return () => window.removeEventListener('resize', updateDeviceInfo);
-  }, []);
+  }, [scaleAdjusted]);
+  
+  // Effect to handle scale adjustment
+  useEffect(() => {
+    if (!deviceInfo.devicePixelRatio) return;
+    
+    // Check if the scale needs adjustment (not 1x)
+    if (deviceInfo.devicePixelRatio !== 1 && !scaleAdjusted) {
+      // Apply scale adjustment
+      const metaViewport = document.querySelector('meta[name=viewport]');
+      if (metaViewport) {
+        // Update existing viewport meta tag
+        metaViewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+      } else {
+        // Create new viewport meta tag if it doesn't exist
+        const meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+        document.head.appendChild(meta);
+      }
+      
+      // Apply scale transform to the entire page
+      if (document.body) {
+        document.body.style.transform = `scale(${1 / deviceInfo.devicePixelRatio})`;
+        document.body.style.transformOrigin = 'top left';
+        document.body.style.width = `${100 * deviceInfo.devicePixelRatio}%`;
+        document.body.style.height = `${100 * deviceInfo.devicePixelRatio}%`;
+      }
+      
+      setScaleAdjusted(true);
+    }
+  }, [deviceInfo.devicePixelRatio, scaleAdjusted]);
 
   // Define animation variants
   const fadeIn = {
@@ -213,6 +261,21 @@ export default function DeviceInfo(): JSX.Element {
                 <span className="text-gray-400">Physical Pixel Scale:</span>
                 <span className="font-medium">{deviceInfo.pixelScale}x</span>
               </li>
+              <li className="flex justify-between">
+                <span className="text-gray-400">Adjusted Viewing Scale:</span>
+                <span className="font-medium">
+                  {deviceInfo.isScaleAdjusted ? 
+                    `${deviceInfo.originalScale}x → 1x` : 
+                    `${deviceInfo.devicePixelRatio}x (No Adjustment)`}
+                </span>
+              </li>
+              {deviceInfo.isScaleAdjusted && (
+                <li className="mt-2">
+                  <div className="text-xs text-amber-400 p-2 bg-amber-500/10 border border-amber-500/20 rounded">
+                    Scale has been adjusted for optimal viewing
+                  </div>
+                </li>
+              )}
             </ul>
           </div>
           
