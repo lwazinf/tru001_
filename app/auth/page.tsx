@@ -196,7 +196,7 @@ const AuthForm = () => {
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="text-3xl font-bold text-amber-500 mb-4"
+                    className="text-3xl font-bold text-amber-500 mt-12 text-center"
                   >
                     Thanks for choosing NTF
                   </motion.h2>
@@ -204,30 +204,30 @@ const AuthForm = () => {
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.7 }}
-                    className="text-gray-300 text-lg leading-relaxed mb-10"
+                    className="text-gray-300 mb-8 text-center"
                   >
                     We&apos;re excited to have you on board!
                   </motion.p>
-                  <motion.p
+                  <motion.h3
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.9 }}
-                    className="text-amber-500 text-sm font-medium mb-4 tracking-wide"
+                    className="text-2xl font-semibold text-amber-500 mb-6 text-center"
                   >
                     SELECT YOUR MEMBERSHIP
-                  </motion.p>
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
+                  </motion.h3>
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
                     transition={{ delay: 1 }}
-                    className="flex justify-center space-x-6 w-full max-w-xs mx-auto"
+                    className="flex flex-col sm:flex-row gap-6 mx-auto max-w-2xl px-4 mb-12"
                   >                    
                     {/* Gold Tier Option */}
                     <motion.div
                       initial={{ scale: 1 }}
                       whileHover={{ 
-                        scale: 0.97,
-                        boxShadow: "0 0 30px 8px rgba(245, 158, 11, 0.4)"
+                        scale: 1.05,
+                        boxShadow: "0 0 25px 5px rgba(245, 158, 11, 0.3)"
                       }}
                       transition={{
                         boxShadow: {
@@ -270,7 +270,7 @@ const AuthForm = () => {
                             setSelectedTier(null);
                           });
                       }}
-                      className="bg-gradient-to-b from-amber-500/30 to-amber-600/20 border border-amber-500/40 rounded-xl p-4 cursor-pointer flex-1 min-w-[120px] flex flex-col items-center shadow-lg transition-all duration-500 relative"
+                      className="bg-gradient-to-b from-amber-500/30 to-amber-600/20 border border-amber-500/40 rounded-xl p-6 cursor-pointer flex-1 min-w-[120px] flex flex-col items-center shadow-lg transition-all duration-500 relative h-full"
                     >
                       <motion.div 
                         className="absolute inset-0 rounded-xl bg-amber-500/0"
@@ -294,8 +294,8 @@ const AuthForm = () => {
                           <span className="text-black font-bold text-base sm:text-lg">G</span>
                         )}
                       </div>
-                      <span className="text-amber-500 font-semibold text-base sm:text-lg">Gold</span>
-                      <span className="text-gray-400 text-xs mt-1">R2,999/mo</span>
+                      <span className="text-amber-500 font-semibold text-xl mt-2 mb-1">Gold</span>
+                      <span className="text-gray-400 text-sm mb-4">R2,999/mo</span>
                     </motion.div>
                     
                     {/* Black Tier Option */}
@@ -303,13 +303,13 @@ const AuthForm = () => {
                       initial={{ scale: 1 }}
                       whileHover={{ 
                         scale: 0.97,
-                        boxShadow: "0 0 30px 8px rgba(255, 255, 255, 0.15)"
+                        boxShadow: "0 0 30px 8px rgba(245, 158, 11, 0.4)"
                       }}
                       transition={{
                         boxShadow: {
                           duration: 0.8,
                           repeat: Infinity,
-                          repeatType: "reverse"
+                          repeatType: "reverse" 
                         }
                       }}
                       whileTap={{ scale: 0.92 }}
@@ -346,7 +346,7 @@ const AuthForm = () => {
                             setSelectedTier(null);
                           });
                       }}
-                      className="bg-gradient-to-b from-gray-700/50 to-gray-900/50 border border-white/20 rounded-xl p-4 cursor-pointer flex-1 min-w-[120px] flex flex-col items-center shadow-lg transition-all duration-500 relative overflow-hidden"
+                      className="bg-gradient-to-b from-gray-700/50 to-gray-900/50 border border-white/20 rounded-xl p-6 cursor-pointer flex-1 min-w-[120px] flex flex-col items-center shadow-lg transition-all duration-500 relative overflow-hidden h-full"
                     >
                       <motion.div 
                         className="absolute inset-0 rounded-xl bg-white/0"
@@ -373,8 +373,8 @@ const AuthForm = () => {
                           <span className="text-white font-bold text-base sm:text-lg">B</span>
                         )}
                       </div>
-                      <span className="text-white font-semibold text-base sm:text-lg">Black</span>
-                      <span className="text-gray-400 text-xs mt-1">R4,999/mo</span>
+                      <span className="text-white font-semibold text-xl mt-2 mb-1">Black</span>
+                      <span className="text-gray-400 text-sm mb-4">R4,999/mo</span>
                     </motion.div>
                   </motion.div>
                 </div>
@@ -551,7 +551,10 @@ const AuthForm = () => {
                 </AnimatePresence>
 
                 {/* Email field for both forms */}
-                <motion.div variants={itemVariants} className="relative">
+                <motion.div 
+                  variants={itemVariants}
+                  className="relative"
+                >
                   <div className="relative group h-16 mb-4">
                     <Input
                       type="email"
@@ -587,7 +590,10 @@ const AuthForm = () => {
                 </motion.div>
 
                 {/* Password field for both forms */}
-                <motion.div variants={itemVariants} className="relative">
+                <motion.div 
+                  variants={itemVariants}
+                  className="relative"
+                >
                   <div className="relative group h-16">
                     <Input
                       type={showPassword ? "text" : "password"}
