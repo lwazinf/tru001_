@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
-import { Eye, EyeOff, CheckCircle2, Mail } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { Eye, EyeOff, CheckCircle2, Mail, AlertCircle, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -44,6 +44,15 @@ const AuthForm = () => {
   // State for form type (signup or login)
   const [isLoginForm, setIsLoginForm] = useState(false);
 
+  // State for field-specific validation errors
+  const [fieldErrors, setFieldErrors] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    title: "",
+  });
+
   // State for form fields
   const [formData, setFormData] = useState({
     firstName: "",
@@ -68,6 +77,7 @@ const AuthForm = () => {
 
   // Show thank you message when user is logged in
   const [showThankYou, setShowThankYou] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
   
   useEffect(() => {
     if (currentUser) {
@@ -90,6 +100,15 @@ const AuthForm = () => {
   // Handle input changes
   const handleInputChange = (e: any) => {
     const { name, value } = e.target;
+    
+    // Clear field-specific error when user types
+    if (fieldErrors[name as keyof typeof fieldErrors]) {
+      setFieldErrors({
+        ...fieldErrors,
+        [name]: ""
+      });
+    }
+    
     setFormData({
       ...formData,
       [name]: value,
@@ -116,6 +135,91 @@ const AuthForm = () => {
     }
   };
 
+  // Validate form fields
+  const validateForm = () => {
+    let isValid = true;
+    const errors = {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      title: "",
+    };
+
+    // Only validate firstName, lastName, and title for signup
+    if (!isLoginForm) {
+      if (!formData.firstName.trim()) {
+        errors.firstName = "First name is required";
+        isValid = false;
+      }
+
+      if (!formData.lastName.trim()) {
+        errors.lastName = "Last name is required";
+        isValid = false;
+      }
+      
+      if (!formData.title) {
+        errors.title = "Title is required";
+        isValid = false;
+      }
+    }
+
+    // Email validation
+    if (!formData.email.trim()) {
+      errors.email = "Email address is required";
+      isValid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = "Please enter a valid email address";
+      isValid = false;
+    }
+
+    // Password validation
+    if (!formData.password) {
+      errors.password = "Password is required";
+      isValid = false;
+    } else if (!isLoginForm && formData.password.length < 6) {
+      errors.password = "Password must be at least 6 characters";
+      isValid = false;
+    }
+
+    setFieldErrors(errors);
+    return isValid;
+  };
+
+  // Format Firebase error messages to be more user-friendly
+  const getReadableErrorMessage = (error: any) => {
+    const errorCode = error.code || '';
+    const errorMessage = error.message || '';
+    
+    // Common Firebase Auth error codes
+    switch (errorCode) {
+      case 'auth/email-already-in-use':
+        return "This email is already registered. Please log in instead.";
+      case 'auth/user-not-found':
+        return "No account found with this email. Please check your email or sign up.";
+      case 'auth/wrong-password':
+        return "Incorrect password. Please try again or reset your password.";
+      case 'auth/invalid-email':
+        return "Please enter a valid email address.";
+      case 'auth/weak-password':
+        return "Your password is too weak. Please use at least 6 characters.";
+      case 'auth/too-many-requests':
+        return "Too many failed attempts. Please try again later or reset your password.";
+      case 'auth/network-request-failed':
+        return "Network error. Please check your internet connection and try again.";
+      case 'auth/invalid-credential':
+        return "Incorrect email or password. Please try again.";
+      default:
+        // Extract useful info from the default error message if possible
+        if (errorMessage.includes("password") && errorMessage.includes("weak")) {
+          return "Your password is too weak. Please use a stronger password.";
+        } else if (errorMessage.includes("email") && errorMessage.includes("already")) {
+          return "This email is already registered. Please log in instead.";
+        }
+        return "Authentication failed. Please try again.";
+    }
+  };
+
   // Handle form submission
   const handleSubmit = async () => {
     if (authError) {
@@ -123,7 +227,16 @@ const AuthForm = () => {
       return;
     }
     
+    // Reset errors
     setError('');
+    
+    // Validate form before submitting
+    if (!validateForm()) {
+      return;
+    }
+    
+    // Set form as submitted to hide title button
+    setFormSubmitted(true);
     setLoading(true);
 
     try {
@@ -138,7 +251,9 @@ const AuthForm = () => {
       }
     } catch (err: any) {
       console.error("Authentication error:", err);
-      setError(err.message || 'Failed to authenticate');
+      setError(getReadableErrorMessage(err));
+      // If there's an error, allow showing the title button again
+      setFormSubmitted(false);
     } finally {
       setLoading(false);
     }
@@ -160,8 +275,17 @@ const AuthForm = () => {
       password: "",
       title: "",
     });
+    // Reset errors and states
     setShowPassword(false);
     setError('');
+    setFormSubmitted(false);
+    setFieldErrors({
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      title: "",
+    });
   };
 
   // Animation variants
@@ -178,23 +302,82 @@ const AuthForm = () => {
     },
     exit: { 
       opacity: 0, 
-      y: -20, 
-      transition: { duration: 0.3 } 
+      y: -20,
+      transition: { duration: 0.3 }
     }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0 }
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.3 }
+    }
   };
-
-  // Display auth context error for debugging if needed
-  if (authError) {
-    console.log("Auth context error detected in render:", authError);
-  }
+  
+  // Custom CSS for animations
+  useEffect(() => {
+    const styleElement = document.createElement('style');
+    styleElement.innerHTML = `
+      @keyframes pulse-slow {
+        0%, 100% {
+          background-color: rgb(245, 158, 11);
+        }
+        50% {
+          background-color: rgb(239, 68, 68);
+        }
+      }
+      .animate-pulse-slow {
+        animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+      
+      @keyframes glow-pulse {
+        0%, 100% {
+          box-shadow: 0 0 10px rgba(239, 68, 68, 0.7);
+        }
+        50% {
+          box-shadow: 0 0 20px rgba(239, 68, 68, 0.9);
+        }
+      }
+      
+      .red-glow {
+        animation: glow-pulse 2s ease-in-out infinite;
+      }
+    `;
+    document.head.appendChild(styleElement);
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
 
   // Title dropdown menu
   const [titleDropdownOpen, setTitleDropdownOpen] = useState(false);
+  const dropdownTimerRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Clean up dropdown timer on unmount
+  useEffect(() => {
+    return () => {
+      if (dropdownTimerRef.current) {
+        clearTimeout(dropdownTimerRef.current);
+      }
+    };
+  }, []);
+  
+  const handleDropdownMouseLeave = () => {
+    // Start timer to close dropdown after 3 seconds
+    dropdownTimerRef.current = setTimeout(() => {
+      setTitleDropdownOpen(false);
+    }, 3000);
+  };
+  
+  const handleDropdownMouseEnter = () => {
+    // Clear the timer if mouse enters dropdown again
+    if (dropdownTimerRef.current) {
+      clearTimeout(dropdownTimerRef.current);
+      dropdownTimerRef.current = null;
+    }
+  };
   
   const selectTitle = (title: string) => {
     // Update form data directly without using selectedTitle
@@ -202,6 +385,15 @@ const AuthForm = () => {
       ...formData,
       title: title,
     });
+    
+    // Clear title error if it exists
+    if (fieldErrors.title) {
+      setFieldErrors({
+        ...fieldErrors,
+        title: ""
+      });
+    }
+    
     setTitleDropdownOpen(false);
   };
 
@@ -521,9 +713,13 @@ const AuthForm = () => {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
-                    className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-md text-red-500 text-sm"
+                    className="mb-6 p-4 bg-red-500/10 border-l-4 border-red-500 rounded-r-md text-white shadow-md flex items-start"
                   >
-                    {error}
+                    <AlertCircle size={20} className="text-red-500 mr-3 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-medium text-sm text-red-500 mb-1">Authentication Error</h4>
+                      <p className="text-sm text-gray-200">{error}</p>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -532,44 +728,50 @@ const AuthForm = () => {
                 variants={itemVariants}
                 className="space-y-4"
               >
-              {!isLoginForm && (
+              {!isLoginForm && !formSubmitted && (
                 <div 
-                      className="bg-amber-500 text-white text-xs font-black ml-[-12px] px-3 py-1 rounded-sm absolute z-10 mt-[-8px] cursor-pointer"
-                      onClick={() => setTitleDropdownOpen(!titleDropdownOpen)}
-                    >
-                      <span>{formData.title || "Title"}</span>
+                  initial={{ opacity: 1 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className={`${fieldErrors.title ? 'bg-red-500 red-glow' : 'bg-amber-500'} text-white text-xs font-black ml-[-12px] px-3 py-1 rounded-sm absolute z-10 mt-[-8px] cursor-pointer transition-all duration-300`}
+                  onClick={() => setTitleDropdownOpen(!titleDropdownOpen)}
+                >
+                  <span>{formData.title || "Title"}</span>
 
-                      {/* Title dropdown menu */}
-                      {titleDropdownOpen && (
-                        <motion.div 
-                          initial={{ opacity: 0, y: 5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0 }}
-                          className="absolute z-10 overflow-hidden shadow-lg bg-amber-500/95 rounded-sm  mt-2 ml-[-12px] border border-amber-600/40"
-                          style={{ width: 'fit-content', minWidth: '45px' }}
-                        >
-                          <div className="py-0.5">
-                            {[
-                              "Mr.", 
-                              "Mrs.", 
-                              "Ms.", 
-                              "Dr.", 
-                              "Prof.", 
-                              "Adv."
-                            ].map((title, index) => (
-                              <div
-                                key={title}
-                                onClick={() => selectTitle(title)}
-                                className={`px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-600 cursor-pointer transition-colors ${
-                                  index !== 0 ? 'border-t border-amber-400/20' : ''
-                                }`}
-                              >
-                                {title}
-                              </div>
-                            ))}
+                  {/* Title dropdown menu */}
+                  {titleDropdownOpen && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="absolute z-10 overflow-hidden shadow-lg bg-amber-500/95 rounded-sm mt-2 ml-[-12px] border border-amber-600/40"
+                      style={{ width: 'fit-content', minWidth: '45px' }}
+                      onMouseEnter={handleDropdownMouseEnter}
+                      onMouseLeave={handleDropdownMouseLeave}
+                    >
+                      <div className="py-0.5">
+                        {[
+                          "Mr.", 
+                          "Mrs.", 
+                          "Ms.", 
+                          "Dr.", 
+                          "Prof.", 
+                          "Adv."
+                        ].map((title, index) => (
+                          <div
+                            key={title}
+                            onClick={() => selectTitle(title)}
+                            className={`px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-600 cursor-pointer transition-colors ${
+                              index !== 0 ? 'border-t border-amber-400/20' : ''
+                            }`}
+                          >
+                            {title}
                           </div>
-                        </motion.div>
-                      )}
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
                 </div>
               )}
                 {/* Signup-only fields */}
@@ -583,7 +785,7 @@ const AuthForm = () => {
                       transition={{ duration: 0.3 }}
                     >
                       <div className="relative w-full sm:w-1/2 mb-4 sm:mb-0">
-                        <div className="relative group h-16">
+                        <div className={`relative group h-16 ${fieldErrors.firstName ? 'mb-8' : ''}`}>
                           <Input
                             type="text"
                             name="firstName"
@@ -591,12 +793,22 @@ const AuthForm = () => {
                             onChange={handleInputChange}
                             placeholder="First name"
                             autoComplete="new-password"
-                            className="w-full h-full bg-black/60 backdrop-blur-sm rounded-md px-4 text-white border-0 ring-1 ring-gray-700 transition-all duration-300
-                            focus:ring-2 focus:ring-amber-500 group-hover:ring-gray-600 text-base"
+                            className={`w-full h-full bg-black/60 backdrop-blur-sm rounded-md px-4 text-white border-0 ring-1 ${fieldErrors.firstName ? 'ring-red-500' : 'ring-gray-700'} transition-all duration-300
+                            focus:ring-2 focus:ring-amber-500 group-hover:ring-gray-600 text-base`}
                             required
                           />
                           <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-500/10 to-amber-500/80 opacity-0 transition-all duration-300 group-hover:opacity-100"></div>
-                          {formData.firstName && (
+                          {fieldErrors.firstName && (
+                            <motion.div 
+                              initial={{ opacity: 0, y: 3 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="absolute -bottom-6 left-0 flex items-center text-red-400 text-xs pl-1"
+                            >
+                              <AlertTriangle size={12} className="mr-1 flex-shrink-0" />
+                              <span>{fieldErrors.firstName}</span>
+                            </motion.div>
+                          )}
+                          {formData.firstName && !fieldErrors.firstName && (
                             <motion.div 
                               initial={{ scale: 0, opacity: 0 }}
                               animate={{ scale: 1, opacity: 1 }}
@@ -609,7 +821,7 @@ const AuthForm = () => {
                         </div>
                       </div>
                       <div className="relative w-full sm:w-1/2">
-                        <div className="relative group h-16">
+                        <div className={`relative group h-16 ${fieldErrors.lastName ? 'mb-8' : ''}`}>
                           <Input
                             type="text"
                             name="lastName"
@@ -617,12 +829,22 @@ const AuthForm = () => {
                             onChange={handleInputChange}
                             placeholder="Last name"
                             autoComplete="new-password"
-                            className="w-full h-full bg-black/60 backdrop-blur-sm rounded-md px-4 text-white border-0 ring-1 ring-gray-700 transition-all duration-300
-                            focus:ring-2 focus:ring-amber-500 group-hover:ring-gray-600 text-base"
+                            className={`w-full h-full bg-black/60 backdrop-blur-sm rounded-md px-4 text-white border-0 ring-1 ${fieldErrors.lastName ? 'ring-red-500' : 'ring-gray-700'} transition-all duration-300
+                            focus:ring-2 focus:ring-amber-500 group-hover:ring-gray-600 text-base`}
                             required
                           />
                           <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-500/10 to-amber-500/80 opacity-0 transition-all duration-300 group-hover:opacity-100"></div>
-                          {formData.lastName && (
+                          {fieldErrors.lastName && (
+                            <motion.div 
+                              initial={{ opacity: 0, y: 3 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="absolute -bottom-6 left-0 flex items-center text-red-400 text-xs pl-1"
+                            >
+                              <AlertTriangle size={12} className="mr-1 flex-shrink-0" />
+                              <span>{fieldErrors.lastName}</span>
+                            </motion.div>
+                          )}
+                          {formData.lastName && !fieldErrors.lastName && (
                             <motion.div 
                               initial={{ scale: 0, opacity: 0 }}
                               animate={{ scale: 1, opacity: 1 }}
@@ -643,7 +865,7 @@ const AuthForm = () => {
                   variants={itemVariants}
                   className="relative"
                 >
-                  <div className="relative group h-16 mb-4">
+                  <div className={`relative group h-16 ${fieldErrors.email ? 'mb-8' : 'mb-4'}`}>
                     <Input
                       type="email"
                       name="email"
@@ -651,12 +873,22 @@ const AuthForm = () => {
                       onChange={handleInputChange}
                       placeholder="Email address"
                       autoComplete="nope"
-                      className="w-full h-full bg-black/60 backdrop-blur-sm rounded-md px-4 text-white border-0 ring-1 ring-gray-700 transition-all duration-300
-                      focus:ring-2 focus:ring-amber-500 group-hover:ring-gray-600 text-base"
+                      className={`w-full h-full bg-black/60 backdrop-blur-sm rounded-md px-4 text-white border-0 ring-1 ${fieldErrors.email ? 'ring-red-500' : 'ring-gray-700'} transition-all duration-300
+                      focus:ring-2 focus:ring-amber-500 group-hover:ring-gray-600 text-base`}
                       required
                     />
                     <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-500/10 to-amber-500/80 opacity-0 transition-all duration-300 group-hover:opacity-100"></div>
-                    {formData.email && (
+                    {fieldErrors.email && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 3 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="absolute -bottom-6 left-0 flex items-center text-red-400 text-xs pl-1"
+                      >
+                        <AlertTriangle size={12} className="mr-1 flex-shrink-0" />
+                        <span>{fieldErrors.email}</span>
+                      </motion.div>
+                    )}
+                    {formData.email && !fieldErrors.email && (
                       <motion.div 
                         initial={{ scale: 0, rotate: -10 }}
                         animate={{ scale: 1, rotate: 0 }}
@@ -667,7 +899,7 @@ const AuthForm = () => {
                       </motion.div>
                     )}
                   </div>
-                  {formData.email && (
+                  {formData.email && !fieldErrors.email && (
                     <motion.p 
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -683,7 +915,7 @@ const AuthForm = () => {
                   variants={itemVariants}
                   className="relative"
                 >
-                  <div className="relative group h-16">
+                  <div className={`relative group h-16 ${fieldErrors.password ? 'mb-8' : ''}`}>
                     <Input
                       type={showPassword ? "text" : "password"}
                       name="password"
@@ -691,12 +923,22 @@ const AuthForm = () => {
                       onChange={handleInputChange}
                       placeholder="Password"
                       autoComplete="new-password"
-                      className="w-full h-full bg-black/60 backdrop-blur-sm rounded-md px-4 text-white border-0 ring-1 ring-amber-500/60 transition-all duration-300
-                      focus:ring-2 focus:ring-amber-500 group-hover:ring-amber-400 text-base"
+                      className={`w-full h-full bg-black/60 backdrop-blur-sm rounded-md px-4 text-white border-0 ring-1 ${fieldErrors.password ? 'ring-red-500' : 'ring-amber-500/60'} transition-all duration-300
+                      focus:ring-2 focus:ring-amber-500 group-hover:ring-amber-400 text-base`}
                       required
                     />
                     <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-500/10 to-amber-500/80 opacity-0 transition-all duration-300 group-hover:opacity-100"></div>
-                    {formData.password && (
+                    {fieldErrors.password && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 3 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="absolute -bottom-6 left-0 flex items-center text-red-400 text-xs pl-1"
+                      >
+                        <AlertTriangle size={12} className="mr-1 flex-shrink-0" />
+                        <span>{fieldErrors.password}</span>
+                      </motion.div>
+                    )}
+                    {formData.password && !fieldErrors.password && (
                       <motion.div
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
                         onClick={togglePasswordVisibility}
