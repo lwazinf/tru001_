@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/lib/firebase/AuthContext";
 import { useRouter } from "next/navigation";
 import { processPayment } from '../utils/payment';
+import { doc, setDoc, getFirestore } from "firebase/firestore";
 
 const AuthForm = () => {
   const router = useRouter();
@@ -92,6 +93,26 @@ const AuthForm = () => {
       ...formData,
       [name]: value,
     });
+  };
+
+  // Function to save payment response to Firestore
+  const savePaymentToFirestore = async (paymentResponse: any, transactionRef: string) => {
+    try {
+      const db = getFirestore();
+      const now = new Date();
+      
+      // Create the payment document
+      await setDoc(doc(db, "Payments", paymentResponse.paymentRequestId), {
+        paymentRequestId: paymentResponse.paymentRequestId,
+        transactionReference: transactionRef,
+        timestamp: now,
+        userId: currentUser ? currentUser.uid : null, // Add user ID if available
+      });
+      
+      console.log("Payment saved to Firestore successfully");
+    } catch (error) {
+      console.error("Error saving payment to Firestore:", error);
+    }
   };
 
   // Handle form submission
@@ -243,13 +264,18 @@ const AuthForm = () => {
                         setSelectedTier("gold");
                         setIsLoading(true);
                         // Process payment before navigating
+                        const transactionRef = `${formData.email || 'guest'}-Gold-${Date.now()}`.substring(0, 50);
                         processPayment({ 
                           amount: "2999.00",
-                          transactionReference: `${formData.email || 'guest'}-Gold-${Date.now()}`.substring(0, 50),
+                          transactionReference: transactionRef,
                           bankReference: "NTF Gold Membership"
                         })
                           .then((paymentResponse) => {
                             console.log("Payment processed:", paymentResponse);
+                            // Save payment data to Firestore
+                            if (paymentResponse) {
+                              savePaymentToFirestore(paymentResponse, transactionRef);
+                            }
                             // Redirect to the payment URL if available
                             if (paymentResponse && paymentResponse.url) {
                               // Set timeout to allow user to see the loading state briefly
@@ -319,13 +345,18 @@ const AuthForm = () => {
                         setSelectedTier("black");
                         setIsLoading(true);
                         // Process payment before navigating
+                        const transactionRef = `${formData.email || 'guest'}-Black-${Date.now()}`.substring(0, 50);
                         processPayment({ 
                           amount: "4999.00",
-                          transactionReference: `${formData.email || 'guest'}-Black-${Date.now()}`.substring(0, 50),
+                          transactionReference: transactionRef,
                           bankReference: "NTF Black Membership"
                         })
                           .then((paymentResponse) => {
                             console.log("Payment processed:", paymentResponse);
+                            // Save payment data to Firestore
+                            if (paymentResponse) {
+                              savePaymentToFirestore(paymentResponse, transactionRef);
+                            }
                             // Redirect to the payment URL if available
                             if (paymentResponse && paymentResponse.url) {
                               // Set timeout to allow user to see the loading state briefly

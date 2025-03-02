@@ -17,7 +17,8 @@ export async function POST(request: NextRequest) {
       siteCode: "NEE-NEE-003",
       countryCode: "ZA",
       currencyCode: "ZAR",
-      isTest: false,
+      notifyUrl: "https://hook.eu2.make.com/3kq4t19wngrc3ojq3hfipodwhotlz1he",
+      isTest: true,
     };
     
     // Merge request data with base data (request data takes precedence)
@@ -35,6 +36,7 @@ export async function POST(request: NextRequest) {
       mergedData.amount,
       mergedData.transactionReference,
       mergedData.bankReference,
+      mergedData.notifyUrl,
       mergedData.isTest ? "true" : "false"
     ];
     
@@ -64,6 +66,7 @@ export async function POST(request: NextRequest) {
       amount: mergedData.amount,
       transactionReference: mergedData.transactionReference,
       bankReference: mergedData.bankReference,
+      notifyUrl: mergedData.notifyUrl,
       isTest: mergedData.isTest,
       hashCheck: hashCheck
     };
