@@ -482,6 +482,7 @@ const AuthForm = () => {
               animate="visible"
               exit="exit"
               onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}
+              autoComplete="off"
             >
               <motion.p 
                 variants={itemVariants}
@@ -589,6 +590,7 @@ const AuthForm = () => {
                             value={formData.firstName}
                             onChange={handleInputChange}
                             placeholder="First name"
+                            autoComplete="new-password"
                             className="w-full h-full bg-black/60 backdrop-blur-sm rounded-md px-4 text-white border-0 ring-1 ring-gray-700 transition-all duration-300
                             focus:ring-2 focus:ring-amber-500 group-hover:ring-gray-600 text-base"
                             required
@@ -614,6 +616,7 @@ const AuthForm = () => {
                             value={formData.lastName}
                             onChange={handleInputChange}
                             placeholder="Last name"
+                            autoComplete="new-password"
                             className="w-full h-full bg-black/60 backdrop-blur-sm rounded-md px-4 text-white border-0 ring-1 ring-gray-700 transition-all duration-300
                             focus:ring-2 focus:ring-amber-500 group-hover:ring-gray-600 text-base"
                             required
@@ -647,6 +650,7 @@ const AuthForm = () => {
                       value={formData.email}
                       onChange={handleInputChange}
                       placeholder="Email address"
+                      autoComplete="nope"
                       className="w-full h-full bg-black/60 backdrop-blur-sm rounded-md px-4 text-white border-0 ring-1 ring-gray-700 transition-all duration-300
                       focus:ring-2 focus:ring-amber-500 group-hover:ring-gray-600 text-base"
                       required
@@ -686,6 +690,7 @@ const AuthForm = () => {
                       value={formData.password}
                       onChange={handleInputChange}
                       placeholder="Password"
+                      autoComplete="new-password"
                       className="w-full h-full bg-black/60 backdrop-blur-sm rounded-md px-4 text-white border-0 ring-1 ring-amber-500/60 transition-all duration-300
                       focus:ring-2 focus:ring-amber-500 group-hover:ring-amber-400 text-base"
                       required
