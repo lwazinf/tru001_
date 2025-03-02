@@ -50,6 +50,7 @@ const AuthForm = () => {
     lastName: "",
     email: "",
     password: "",
+    title: "",
   });
 
   // State for password visibility
@@ -157,6 +158,7 @@ const AuthForm = () => {
       lastName: "",
       email: "",
       password: "",
+      title: "",
     });
     setShowPassword(false);
     setError('');
@@ -190,6 +192,18 @@ const AuthForm = () => {
   if (authError) {
     console.log("Auth context error detected in render:", authError);
   }
+
+  // Title dropdown menu
+  const [titleDropdownOpen, setTitleDropdownOpen] = useState(false);
+  
+  const selectTitle = (title: string) => {
+    // Update form data directly without using selectedTitle
+    setFormData({
+      ...formData,
+      title: title,
+    });
+    setTitleDropdownOpen(false);
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black md:p-4">
@@ -519,8 +533,41 @@ const AuthForm = () => {
               >
               <div 
                     className="bg-amber-500 text-white text-xs font-black ml-[-12px] px-3 py-1 rounded-sm absolute z-10 mt-[-8px] cursor-pointer"
+                    onClick={() => setTitleDropdownOpen(!titleDropdownOpen)}
                   >
-                    <span>{"Title"}</span>
+                    <span>{formData.title || "Title"}</span>
+
+                    {/* Title dropdown menu */}
+        {titleDropdownOpen && (
+          <motion.div 
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="absolute z-10 overflow-hidden shadow-lg bg-amber-500/95 rounded-sm  mt-2 ml-[-12px] border border-amber-600/40"
+            style={{ width: 'fit-content', minWidth: '45px' }}
+          >
+            <div className="py-0.5">
+              {[
+                "Mr.", 
+                "Mrs.", 
+                "Ms.", 
+                "Dr.", 
+                "Prof.", 
+                "Adv."
+              ].map((title, index) => (
+                <div
+                  key={title}
+                  onClick={() => selectTitle(title)}
+                  className={`px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-600 cursor-pointer transition-colors ${
+                    index !== 0 ? 'border-t border-amber-400/20' : ''
+                  }`}
+                >
+                  {title}
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
                   </div>
                 {/* Signup-only fields */}
                 <AnimatePresence>
@@ -888,6 +935,8 @@ const AuthForm = () => {
             </div>
           </motion.div>
         </div>
+
+        
       </Card>
     </div>
   );
