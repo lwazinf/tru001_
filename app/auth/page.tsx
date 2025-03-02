@@ -517,6 +517,11 @@ const AuthForm = () => {
                 variants={itemVariants}
                 className="space-y-4"
               >
+              <div 
+                    className="bg-amber-500 text-white text-xs font-black ml-[-12px] px-3 py-1 rounded-sm absolute z-10 mt-[-8px] cursor-pointer"
+                  >
+                    <span>{"Title"}</span>
+                  </div>
                 {/* Signup-only fields */}
                 <AnimatePresence>
                   {!isLoginForm && (
