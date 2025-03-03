@@ -79,7 +79,7 @@ const AuthForm = () => {
   // Show thank you message when user is logged in
   const [showThankYou, setShowThankYou] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
-  const [setPaymentError] = useState(false);
+  const [, setPaymentError] = useState(false);
   
   useEffect(() => {
     if (currentUser) {
@@ -94,7 +94,6 @@ const AuthForm = () => {
       const status = url.searchParams.get('Status');
       
       if (status === 'Error') {
-        // @ts-expect-error
         setPaymentError(true);
         // Optional: Scroll to top to make error visible
         window.scrollTo(0, 0);
