@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/lib/firebase/AuthContext";
 import { useRouter } from "next/navigation";
 import { processPayment } from '../utils/payment';
-import { doc, setDoc, getFirestore } from "firebase/firestore";
+import { doc, setDoc, getFirestore, serverTimestamp, Timestamp } from "firebase/firestore";
 
 const AuthForm = () => {
   const router = useRouter();
@@ -246,7 +246,42 @@ const AuthForm = () => {
         router.push('/');
       } else {
         // Signup with Firebase
-        await signup(formData.firstName, formData.lastName, formData.email, formData.password);
+        const userCredential = await signup(formData.firstName, formData.lastName, formData.email, formData.password);
+        
+        // Create user document in Firestore
+        const db = getFirestore();
+        const userDocRef = doc(db, 'users', userCredential.user.uid);
+        
+        const userData = {
+          firstName: formData.firstName,
+          accepted_tos: false,
+          lastName: formData.lastName,
+          gender: '',
+          title: formData.title,
+          email: formData.email,
+          phone: '',
+          tier: 'new',
+          uid: userCredential.user?.uid,
+          family: [],
+          dp: '',
+          address: '',
+          vehicles: [],
+          history: {
+            orders: [],
+            reserves: []
+          },
+          documents: [],
+          tanks: {
+            diesel: 0,
+            petrol: {
+              '93': 0,
+              '95': 0
+            }
+          },
+          since: Timestamp.now()
+        };
+
+        await setDoc(userDocRef, userData);
         // router.push('/');
       }
     } catch (err: any) {
@@ -487,7 +522,7 @@ const AuthForm = () => {
                               // Set timeout to allow user to see the loading state briefly
                               setTimeout(() => {
                                 // Open the payment URL in a new tab/window
-                                window.open(paymentResponse.url, '_blank');
+                                window.location.href = paymentResponse.url;
                                 setIsLoading(false);
                               }, 500);
                             } else {

@@ -18,6 +18,8 @@ export async function POST(request: NextRequest) {
       countryCode: "ZA",
       currencyCode: "ZAR",
       cancelUrl: "https://www.youtube.com/watch?v=b1SJ3UF4AWE",
+      errorUrl: "https://www.needtofuel.com/auth",
+      successUrl: "https://www.needtofuel.com/dash",
       notifyUrl: "https://hook.eu2.make.com/3kq4t19wngrc3ojq3hfipodwhotlz1he",
       isTest: true,
     };
@@ -38,6 +40,8 @@ export async function POST(request: NextRequest) {
       mergedData.transactionReference,
       mergedData.bankReference,
       mergedData.cancelUrl,
+      mergedData.errorUrl,
+      mergedData.successUrl,
       mergedData.notifyUrl,
       mergedData.isTest ? "true" : "false"
     ];
@@ -69,6 +73,8 @@ export async function POST(request: NextRequest) {
       transactionReference: mergedData.transactionReference,
       bankReference: mergedData.bankReference,
       cancelUrl: mergedData.cancelUrl,
+      errorUrl: mergedData.errorUrl,
+      successUrl: mergedData.successUrl,
       notifyUrl: mergedData.notifyUrl,
       isTest: mergedData.isTest,
       hashCheck: hashCheck
