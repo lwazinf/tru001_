@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/lib/firebase/AuthContext";
 import { useRouter } from "next/navigation";
 import { processPayment } from '../utils/payment';
-import { doc, setDoc, getFirestore, Timestamp } from "firebase/firestore";
+import { doc, setDoc, getFirestore, Timestamp, getDoc, updateDoc } from "firebase/firestore";
 
 const AuthForm = () => {
   const router = useRouter();
@@ -83,9 +83,36 @@ const AuthForm = () => {
   
   useEffect(() => {
     if (currentUser) {
-      setShowThankYou(true);
+      // Check if user already has a tier
+      const checkUserTier = async () => {
+        try {
+          const db = getFirestore();
+          const userDocRef = doc(db, 'users', currentUser.uid);
+          const userDoc = await getDoc(userDocRef);
+          
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            // If user already has Gold or Black tier, redirect to dashboard
+            if (userData.tier === 'Gold' || userData.tier === 'Black') {
+              router.push('/dash');
+            } else {
+              // Otherwise show the thank you page with tier selection
+              setShowThankYou(true);
+            }
+          } else {
+            // If user document doesn't exist yet, show thank you page
+            setShowThankYou(true);
+          }
+        } catch (error) {
+          console.error("Error checking user tier:", error);
+          // On error, default to showing thank you page
+          setShowThankYou(true);
+        }
+      };
+      
+      checkUserTier();
     }
-  }, [currentUser]);
+  }, [currentUser, router]);
 
   // Check for payment error in URL
   useEffect(() => {
@@ -132,7 +159,7 @@ const AuthForm = () => {
   };
 
   // Function to save payment response to Firestore
-  const savePaymentToFirestore = async (paymentResponse: any, transactionRef: string) => {
+  const savePaymentToFirestore = async (paymentResponse: any, transactionRef: string, tierSelected: string) => {
     try {
       const db = getFirestore();
       const now = new Date();
@@ -143,7 +170,16 @@ const AuthForm = () => {
         transactionReference: transactionRef,
         timestamp: now,
         userId: currentUser ? currentUser.uid : null, // Add user ID if available
+        tier: tierSelected
       });
+      
+      // Update user's tier
+      if (currentUser) {
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        await updateDoc(userDocRef, {
+          tier: tierSelected
+        });
+      }
       
       console.log("Payment saved to Firestore successfully");
     } catch (error) {
@@ -259,7 +295,7 @@ const AuthForm = () => {
       if (isLoginForm) {
         // Login with Firebase
         await login(formData.email, formData.password);
-        router.push('/');
+        // Don't redirect here - let the useEffect handle it based on tier
       } else {
         // Signup with Firebase
         const userCredential = await signup(formData.firstName, formData.lastName, formData.email, formData.password);
@@ -298,7 +334,7 @@ const AuthForm = () => {
         };
 
         await setDoc(userDocRef, userData);
-        // router.push('/');
+        // Don't redirect - let the useEffect handle it
       }
     } catch (err: any) {
       console.error("Authentication error:", err);
@@ -531,7 +567,7 @@ const AuthForm = () => {
                             console.log("Payment processed:", paymentResponse);
                             // Save payment data to Firestore
                             if (paymentResponse) {
-                              savePaymentToFirestore(paymentResponse, transactionRef);
+                              savePaymentToFirestore(paymentResponse, transactionRef, "gold");
                             }
                             // Redirect to the payment URL if available
                             if (paymentResponse && paymentResponse.url) {
@@ -612,7 +648,7 @@ const AuthForm = () => {
                             console.log("Payment processed:", paymentResponse);
                             // Save payment data to Firestore
                             if (paymentResponse) {
-                              savePaymentToFirestore(paymentResponse, transactionRef);
+                              savePaymentToFirestore(paymentResponse, transactionRef, "black");
                             }
                             // Redirect to the payment URL if available
                             if (paymentResponse && paymentResponse.url) {

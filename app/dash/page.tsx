@@ -37,6 +37,7 @@ export default function DashPage() {
   const [isAddressLoading, setIsAddressLoading] = useState(false);
   const [loading, setLoading] = useState(false); // Loading state for save button
   const [isDataLoading, setIsDataLoading] = useState(true); // Loading state for initial data fetch
+  const [isAuthChecking, setIsAuthChecking] = useState(true); // State to track if we're checking auth
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const [mapPosition, setMapPosition] = useState<[number, number]>([-26.2041, 28.0473]); // Johannesburg coordinates
   const [mapZoom, setMapZoom] = useState(10);
@@ -60,6 +61,26 @@ export default function DashPage() {
     documents: [],
     history: { orders: [], reserves: [] }
   });
+
+  // Check authentication and redirect if not authenticated
+  useEffect(() => {
+    const checkAuth = async () => {
+      setIsAuthChecking(true);
+      
+      // Wait a moment to ensure auth state is properly loaded
+      setTimeout(() => {
+        if (!currentUser) {
+          // User is not authenticated, redirect to auth page
+          router.push('/auth');
+        } else {
+          // User is authenticated, allow access to dashboard
+          setIsAuthChecking(false);
+        }
+      }, 1000);
+    };
+    
+    checkAuth();
+  }, [currentUser, router]);
 
   // Fetch user data from Firestore
   useEffect(() => {
@@ -120,8 +141,11 @@ export default function DashPage() {
       }
     };
     
-    fetchUserData();
-  }, [currentUser]);
+    // Only fetch data if user is authenticated and auth check is complete
+    if (currentUser && !isAuthChecking) {
+      fetchUserData();
+    }
+  }, [currentUser, isAuthChecking]);
 
   // Update Firestore when user data changes
   const saveUserDataToFirestore = async () => {
@@ -441,6 +465,21 @@ export default function DashPage() {
       (window as any).initMap = () => {};
     };
   }, []);
+
+  // If still checking auth or loading data, show loading overlay
+  if (isAuthChecking) {
+    return (
+      <div className="flex min-h-screen bg-gradient-to-b from-gray-950 to-gray-900 text-gray-100 items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-4 border-amber-400 border-t-transparent"></div>
+        <p className="ml-4 text-lg font-medium text-amber-400">Checking authentication...</p>
+      </div>
+    );
+  }
+
+  // If user is not authenticated, don't render anything (redirect will happen)
+  if (!currentUser) {
+    return null;
+  }
 
   return (
     <>
