@@ -4,12 +4,78 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Search, X, AlertTriangle, User, Mail, Lock, MapPin, Car, CheckCircle2, Bell, Settings, Menu, ArrowRight, Shield, Clock, Fuel, FileText } from 'lucide-react';
 import Script from 'next/script';
 import zxcvbn from 'zxcvbn';
+import dynamic from 'next/dynamic';
+import type { Map as LeafletMap } from 'leaflet';
+
+// Dynamically import Leaflet components to avoid SSR issues
+const MapContainer = dynamic(
+  () => import('react-leaflet').then((mod) => mod.MapContainer),
+  { ssr: false }
+);
+
+const TileLayer = dynamic(
+  () => import('react-leaflet').then((mod) => mod.TileLayer),
+  { ssr: false }
+);
+
+const Marker = dynamic(
+  () => import('react-leaflet').then((mod) => mod.Marker),
+  { ssr: false }
+);
+
+const Popup = dynamic(
+  () => import('react-leaflet').then((mod) => mod.Popup),
+  { ssr: false }
+);
 
 // Google Maps types
 declare global {
   interface Window {
     google: typeof google;
+    initMap: () => void;
   }
+}
+
+// Create a separate Map component to handle Leaflet initialization better
+const Map = ({ position, zoom, address }: { position: [number, number]; zoom: number; address: string }) => {
+  const mapRef = useRef<LeafletMap | null>(null);
+  
+  // Use effect to fly to new position when it changes
+  useEffect(() => {
+    if (mapRef.current) {
+      // Use flyTo for a smooth animation to the new location
+      mapRef.current.flyTo(position, zoom, {
+        duration: 1.8, // Animation duration in seconds
+        easeLinearity: 0.25,
+        animate: true,
+      });
+    }
+  }, [position, zoom]);
+  
+  return (
+    <MapContainer 
+      center={position} 
+      zoom={zoom} 
+      style={{ height: '100%', width: '100%' }}
+      ref={mapRef as any} // Type casting to avoid type issues with dynamic imports
+      zoomAnimation={true}
+      fadeAnimation={true}
+      markerZoomAnimation={true}
+    >
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+      <Marker position={position} 
+        // Use autoPan to make marker move into view if needed
+        autoPan={true}
+      >
+        <Popup>
+          {address || 'Your location'}
+        </Popup>
+      </Marker>
+    </MapContainer>
+  );
 }
 
 export default function DashPage() {
@@ -26,7 +92,9 @@ export default function DashPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAddressLoading, setIsAddressLoading] = useState(false);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
-  const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
+  const [mapPosition, setMapPosition] = useState<[number, number]>([51.505, -0.09]); // Default London coordinates
+  const [mapZoom, setMapZoom] = useState(13);
+  const [isBrowser, setIsBrowser] = useState(false); // Add this to track if we're running in browser
   
   // Mock user data - replace with actual data fetching
   const [userData, setUserData] = useState({
@@ -73,11 +141,37 @@ export default function DashPage() {
         if (place.formatted_address) {
           setAddress(place.formatted_address);
           setUserData(prev => ({ ...prev, address: place.formatted_address || '' }));
+          
+          // Update map position when a place is selected
+          if (place.geometry && place.geometry.location) {
+            const lat = place.geometry.location.lat();
+            const lng = place.geometry.location.lng();
+            
+            // Trigger a noticeable animation by zooming out first if already zoomed in
+            if (mapZoom > 12) {
+              // First zoom out a bit to make the animation more dramatic
+              setMapZoom(11);
+              
+              // Then after a small delay, set the final position and zoom
+              setTimeout(() => {
+                setMapPosition([lat, lng]);
+                setMapZoom(16); // Zoom in closer to the selected location
+              }, 300);
+            } else {
+              // Direct animation if not already zoomed in
+              setMapPosition([lat, lng]);
+              setMapZoom(16);
+            }
+          }
         }
-        setIsAddressLoading(false);
+        
+        setTimeout(() => {
+          setIsAddressLoading(false);
+        }, 600); // Longer delay to match animation
       });
       
       autocompleteRef.current = autoComplete;
+      console.log('Google Places Autocomplete initialized successfully');
     } catch (error) {
       console.error('Error initializing Google Places:', error);
     }
@@ -87,7 +181,7 @@ export default function DashPage() {
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAddress(e.target.value);
     setUserData(prev => ({ ...prev, address: e.target.value }));
-    setIsAddressLoading(false);
+    // Don't geocode on every keystroke - the autocomplete will handle this when a selection is made
   };
 
   // Handle password strength
@@ -135,7 +229,6 @@ export default function DashPage() {
   useEffect(() => {
     // Initialize after Google Maps script is loaded
     if (window.google) {
-      setIsGoogleMapsLoaded(true);
       initAutocomplete();
     }
 
@@ -194,11 +287,72 @@ export default function DashPage() {
     };
   }, []);
 
+  // Load Leaflet CSS
+  useEffect(() => {
+    // Add Leaflet CSS
+    const leafletStyles = document.createElement('link');
+    leafletStyles.rel = 'stylesheet';
+    leafletStyles.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    leafletStyles.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+    leafletStyles.crossOrigin = '';
+    document.head.appendChild(leafletStyles);
+    
+    return () => {
+      document.head.removeChild(leafletStyles);
+    };
+  }, []);
+
+  // Update map when address changes from outside autocomplete
+  useEffect(() => {
+    if (!address || !window.google || !window.google.maps) return;
+    
+    // Only geocode if we have an address that isn't already positioned
+    if (address !== userData.address || (mapPosition[0] === 51.505 && mapPosition[1] === -0.09)) {
+      const geocoder = new window.google.maps.Geocoder();
+      geocoder.geocode({ address }, (results, status) => {
+        if (status === 'OK' && results && results[0] && results[0].geometry) {
+          const location = results[0].geometry.location;
+          setMapPosition([location.lat(), location.lng()]);
+          setMapZoom(15);
+        }
+      });
+    }
+  }, [address, userData.address, mapPosition]);
+
+  // Set isBrowser to true when component mounts (client-side only)
+  useEffect(() => {
+    setIsBrowser(true);
+  }, []);
+  
+  // Set up the initMap callback that Google Maps will call when loaded
+  useEffect(() => {
+    window.initMap = () => {
+      initAutocomplete();
+      console.log("Google Maps API loaded and initialized");
+    };
+    
+    return () => {
+      window.initMap = () => {};
+    };
+  }, []);
+
   return (
     <>
+      {/* Add Leaflet CSS */}
+      <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossOrigin=""
+      />
+      
+      {/* Google Maps API Script */}
       <Script
-        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
-        onLoad={initAutocomplete}
+        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&callback=initMap`}
+        strategy="lazyOnload"
+        onError={(e) => {
+          console.error("Error loading Google Maps script:", e);
+        }}
       />
       <div className="flex min-h-screen bg-gradient-to-b from-gray-950 to-gray-900 text-gray-100">
         {/* Buffer for top navigation */}
@@ -382,11 +536,13 @@ export default function DashPage() {
                               </div>
                             )}
                           </div>
-                          {!isGoogleMapsLoaded && (
-                            <p className="text-xs text-amber-400/70 mt-1">
-                              Loading Google Maps...
-                            </p>
-                          )}
+                          
+                          {/* Map */}
+                          <div className="mt-3 h-48 rounded-md overflow-hidden border border-gray-700 shadow-inner shadow-black/20">
+                            {isBrowser && (
+                              <Map position={mapPosition} zoom={mapZoom} address={address} />
+                            )}
+                          </div>
                         </div>
                       </div>
                       <div className="space-y-4">
