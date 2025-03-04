@@ -1,25 +1,24 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-import { Clock, Bell, Settings, Menu, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Clock, Menu, ArrowRight } from 'lucide-react';
 import Script from 'next/script';
 import { useAuth } from '@/lib/firebase/AuthContext';
 import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { updatePassword, sendPasswordResetEmail } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
-
-// Import components
-import { MapComponent } from '@/components/dashboard/MapComponent';
-import { ProfileSection } from '@/components/dashboard/ProfileSection';
-import { SecuritySection } from '@/components/dashboard/SecuritySection';
-import { VehicleGrid } from '@/components/dashboard/VehicleGrid';
-import { FuelTanksStatus } from '@/components/dashboard/FuelTanksStatus';
+import { AddVehicleModal } from '@/components/dashboard/AddVehicleModal';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
-import { AddVehicleModal } from '@/components/dashboard/AddVehicleModal';
 import { DeleteAccountModal } from '@/components/dashboard/DeleteAccountModal';
-import { SuccessToast } from '@/components/dashboard/SuccessToast';
+import { FuelTanksStatus } from '@/components/dashboard/FuelTanksStatus';
 import { LoadingOverlay } from '@/components/dashboard/LoadingOverlay';
+import { ProfileSection } from '@/components/dashboard/ProfileSection';
+import { SecuritySection } from '@/components/dashboard/SecuritySection';
+import { SuccessToast } from '@/components/dashboard/SuccessToast';
+import { VehicleGrid } from '@/components/dashboard/VehicleGrid';
+import { auth } from '@/lib/firebase/config';
+
 
 export default function DashPage() {
   // State variables
@@ -176,7 +175,7 @@ export default function DashPage() {
             // If the error is due to requiring recent authentication
             if (passwordError.code === 'auth/requires-recent-login') {
               // Send a password reset email instead
-              await sendPasswordResetEmail(currentUser.auth, userData.email);
+              await sendPasswordResetEmail(auth, userData.email);
               setSuccessMessage('Profile updated. A password reset link has been sent to your email.');
             } else {
               throw new Error(`Failed to update password: ${passwordError.message}`);
@@ -268,12 +267,6 @@ export default function DashPage() {
     setAddress(e.target.value);
     setUserData(prev => ({ ...prev, address: e.target.value }));
     // Explicitly NOT geocoding here - that will happen only when autocomplete selection is made
-  };
-
-  // Handle password strength
-  const checkPasswordStrength = (pass: string) => {
-    // This will be moved to the SecuritySection component
-    setPassword(pass);
   };
 
   // Handle confirm password
@@ -440,13 +433,12 @@ export default function DashPage() {
   
   // Set up the initMap callback that Google Maps will call when loaded
   useEffect(() => {
-    window.initMap = () => {
+    (window as any).initMap = () => {
       initAutocomplete();
       console.log("Google Maps API loaded and initialized");
     };
-    
     return () => {
-      window.initMap = () => {};
+      (window as any).initMap = () => {};
     };
   }, []);
 
