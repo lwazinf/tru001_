@@ -5,7 +5,7 @@ import { Clock, Menu, ArrowRight } from 'lucide-react';
 import Script from 'next/script';
 import { useAuth } from '@/lib/firebase/AuthContext';
 import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { updatePassword, sendPasswordResetEmail } from 'firebase/auth';
+import { updatePassword, sendPasswordResetEmail, deleteUser, signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { AddVehicleModal } from '@/components/dashboard/AddVehicleModal';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
@@ -313,27 +313,54 @@ export default function DashPage() {
     }
 
     try {
+      setLoading(true);
+      
       if (currentUser && currentUser.uid) {
         const db = getFirestore();
-        // Delete the user document
+        
+        // First delete the user document from Firestore
         await deleteDoc(doc(db, 'users', currentUser.uid));
         
-        // Then delete the user authentication account
-        await currentUser.delete();
+        // Log the deletion for debugging
+        console.log(`Deleting user data for UID: ${currentUser.uid}, Email: ${currentUser.email}`);
         
+        // Then delete the user authentication account
+        // This removes email, password, and all authentication data
+        await deleteUser(currentUser);
+        
+        // Log the user out
+        await signOut(auth);
+        
+        // Close the modal
         setShowDeleteModal(false);
+        
+        // Show success message
         setSuccessMessage('Account deleted successfully');
         setShowSuccessToast(true);
-        setTimeout(() => {
-          setShowSuccessToast(false);
-          router.push('/');
-        }, 3000);
+        
+        // Redirect immediately to home page
+        router.push('/');
       }
     } catch (error) {
       console.error('Failed to delete account:', error);
-      setSuccessMessage('Failed to delete account');
+      
+      // If error is due to auth session timeout, try to sign out anyway
+      if (error.code === 'auth/requires-recent-login') {
+        try {
+          // Still sign out the user even if deletion fails
+          await signOut(auth);
+          router.push('/');
+        } catch (signOutError) {
+          console.error('Error signing out:', signOutError);
+        }
+      }
+      
+      // Show error message
+      setSuccessMessage('Failed to delete account. You may need to re-authenticate first.');
       setShowSuccessToast(true);
       setTimeout(() => setShowSuccessToast(false), 3000);
+    } finally {
+      setLoading(false);
     }
   };
 
