@@ -6,6 +6,9 @@ import Script from 'next/script';
 import zxcvbn from 'zxcvbn';
 import dynamic from 'next/dynamic';
 import type { Map as LeafletMap } from 'leaflet';
+import { useAuth } from '@/lib/firebase/AuthContext';
+import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { useRouter } from 'next/navigation';
 
 // Dynamically import Leaflet components to avoid SSR issues
 const MapContainer = dynamic(
@@ -95,12 +98,14 @@ export default function DashPage() {
   const [mapPosition, setMapPosition] = useState<[number, number]>([51.505, -0.09]); // Default London coordinates
   const [mapZoom, setMapZoom] = useState(13);
   const [isBrowser, setIsBrowser] = useState(false); // Add this to track if we're running in browser
+  const { currentUser } = useAuth();
+  const router = useRouter();
   
-  // Mock user data - replace with actual data fetching
+  // User data state with proper type definition
   const [userData, setUserData] = useState({
-    firstName: 'User',
+    firstName: '',
     lastName: '',
-    email: 'user@example.com',
+    email: '',
     phone: '',
     tier: 'basic',
     address: '',
@@ -112,6 +117,87 @@ export default function DashPage() {
     documents: [],
     history: { orders: [], reserves: [] }
   });
+
+  // Fetch user data from Firestore
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (currentUser && currentUser.uid) {
+        try {
+          const db = getFirestore();
+          const userDocRef = doc(db, 'users', currentUser.uid);
+          const userDoc = await getDoc(userDocRef);
+          
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            setUserData({
+              firstName: data.firstName || '',
+              lastName: data.lastName || '',
+              email: data.email || '',
+              phone: data.phone || '',
+              tier: data.tier || 'basic',
+              address: data.address || '',
+              vehicles: data.vehicles || [],
+              tanks: data.tanks || {
+                diesel: 0,
+                petrol: { '93': 0, '95': 0 }
+              },
+              documents: data.documents || [],
+              history: data.history || { orders: [], reserves: [] }
+            });
+            
+            // Update address state to match user data
+            setAddress(data.address || '');
+            
+            // If user has address with coordinates, update map
+            if (data.address && window.google && window.google.maps) {
+              const geocoder = new window.google.maps.Geocoder();
+              geocoder.geocode({ address: data.address }, (results, status) => {
+                if (status === 'OK' && results && results[0] && results[0].geometry) {
+                  const location = results[0].geometry.location;
+                  setMapPosition([location.lat(), location.lng()]);
+                  setMapZoom(15);
+                }
+              });
+            }
+          } else {
+            console.log('No user document found!');
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      }
+    };
+    
+    fetchUserData();
+  }, [currentUser]);
+
+  // Update Firestore when user data changes
+  const saveUserDataToFirestore = async () => {
+    if (currentUser && currentUser.uid) {
+      try {
+        const db = getFirestore();
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        
+        // Update multiple fields that may have changed
+        await updateDoc(userDocRef, {
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          email: userData.email,
+          phone: userData.phone,
+          address: userData.address
+        });
+        
+        setSuccessMessage('Changes saved successfully!');
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
+      } catch (error) {
+        console.error('Error updating user data:', error);
+        setSuccessMessage('Failed to save changes');
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
+      }
+    }
+  };
 
   // Initialize Google Places Autocomplete
   const initAutocomplete = () => {
@@ -193,9 +279,7 @@ export default function DashPage() {
 
   // Handle save changes
   const handleSave = () => {
-    setSuccessMessage('Changes saved successfully!');
-    setShowSuccessToast(true);
-    setTimeout(() => setShowSuccessToast(false), 3000);
+    saveUserDataToFirestore();
   };
 
   // Handle delete account
@@ -208,22 +292,34 @@ export default function DashPage() {
     }
 
     try {
-      // Here you would typically make an API call to delete the account
-      setShowDeleteModal(false);
-      setSuccessMessage('Account deleted successfully');
-      setShowSuccessToast(true);
-      setTimeout(() => setShowSuccessToast(false), 3000);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      if (currentUser && currentUser.uid) {
+        const db = getFirestore();
+        // Delete the user document
+        await deleteDoc(doc(db, 'users', currentUser.uid));
+        
+        // Then delete the user authentication account
+        await currentUser.delete();
+        
+        setShowDeleteModal(false);
+        setSuccessMessage('Account deleted successfully');
+        setShowSuccessToast(true);
+        setTimeout(() => {
+          setShowSuccessToast(false);
+          router.push('/');
+        }, 3000);
+      }
     } catch (error) {
+      console.error('Failed to delete account:', error);
       setSuccessMessage('Failed to delete account');
       setShowSuccessToast(true);
       setTimeout(() => setShowSuccessToast(false), 3000);
     }
   };
 
-  // Add these handlers
+  // Handler for input changes
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUserData(prev => ({ ...prev, firstName: e.target.value }));
+    const { name, value } = e.target;
+    setUserData(prev => ({ ...prev, [name]: value }));
   };
 
   useEffect(() => {
@@ -496,6 +592,7 @@ export default function DashPage() {
                           </label>
                           <input
                             type="text"
+                            name="firstName"
                             className="w-full bg-gray-800/50 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-200 focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-colors"
                             placeholder="Your Name"
                             value={userData.firstName}
@@ -521,10 +618,11 @@ export default function DashPage() {
                           </label>
                           <div className="relative">
                             <input
-                              id="location-input"
                               type="text"
-                              className="w-full bg-gray-800/50 border border-gray-700 rounded-md pl-9 pr-3 py-2 text-sm text-gray-200 placeholder-gray-400 focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-colors"
-                              placeholder="Enter your delivery address"
+                              id="location-input"
+                              name="address"
+                              className="w-full pl-10 pr-4 py-2 bg-gray-800/50 border border-gray-700 rounded-md text-sm text-gray-200 focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-colors"
+                              placeholder="Your Address"
                               value={address}
                               onChange={handleAddressChange}
                               disabled={isAddressLoading}
