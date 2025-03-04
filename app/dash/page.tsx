@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-import { Search, X, AlertTriangle, User, Mail, Lock, MapPin, Car, CheckCircle2, Bell, Settings, Menu, ArrowRight, Shield, Clock, Fuel, FileText } from 'lucide-react';
+import { Search, X, AlertTriangle, User, Mail, Lock, MapPin, Car, CheckCircle2, Bell, Settings, Menu, ArrowRight, Shield, Clock, Fuel, FileText, Phone } from 'lucide-react';
 import Script from 'next/script';
 import zxcvbn from 'zxcvbn';
 import dynamic from 'next/dynamic';
@@ -74,7 +74,7 @@ const Map = ({ position, zoom, address }: { position: [number, number]; zoom: nu
         autoPan={true}
       >
         <Popup>
-          {address || 'Your location'}
+          {address || 'Johannesburg, South Africa'}
         </Popup>
       </Marker>
     </MapContainer>
@@ -94,9 +94,10 @@ export default function DashPage() {
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAddressLoading, setIsAddressLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state for save button
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
-  const [mapPosition, setMapPosition] = useState<[number, number]>([51.505, -0.09]); // Default London coordinates
-  const [mapZoom, setMapZoom] = useState(13);
+  const [mapPosition, setMapPosition] = useState<[number, number]>([-26.2041, 28.0473]); // Johannesburg coordinates
+  const [mapZoom, setMapZoom] = useState(10);
   const [isBrowser, setIsBrowser] = useState(false); // Add this to track if we're running in browser
   const { currentUser } = useAuth();
   const router = useRouter();
@@ -158,6 +159,10 @@ export default function DashPage() {
                   setMapZoom(15);
                 }
               });
+            } else {
+              // Default to Johannesburg if no address
+              setMapPosition([-26.2041, 28.0473]);
+              setMapZoom(10);
             }
           } else {
             console.log('No user document found!');
@@ -175,18 +180,31 @@ export default function DashPage() {
   const saveUserDataToFirestore = async () => {
     if (currentUser && currentUser.uid) {
       try {
+        setLoading(true);
         const db = getFirestore();
         const userDocRef = doc(db, 'users', currentUser.uid);
         
-        // Update multiple fields that may have changed
-        await updateDoc(userDocRef, {
+        // First get the current document to avoid overwriting fields we're not updating
+        const userDoc = await getDoc(userDocRef);
+        if (!userDoc.exists()) {
+          throw new Error("User document not found");
+        }
+        
+        // Create the update object with all the fields from the form
+        const updateData = {
           firstName: userData.firstName,
           lastName: userData.lastName,
-          email: userData.email,
           phone: userData.phone,
-          address: userData.address
-        });
+          address: userData.address,
+          // Preserve the existing data structure for other fields
+          tanks: userData.tanks,
+          vehicles: userData.vehicles
+        };
         
+        // Update the document
+        await updateDoc(userDocRef, updateData);
+        
+        // Show success message
         setSuccessMessage('Changes saved successfully!');
         setShowSuccessToast(true);
         setTimeout(() => setShowSuccessToast(false), 3000);
@@ -195,7 +213,13 @@ export default function DashPage() {
         setSuccessMessage('Failed to save changes');
         setShowSuccessToast(true);
         setTimeout(() => setShowSuccessToast(false), 3000);
+      } finally {
+        setLoading(false);
       }
+    } else {
+      setSuccessMessage('Please log in to save changes');
+      setShowSuccessToast(true);
+      setTimeout(() => setShowSuccessToast(false), 3000);
     }
   };
 
@@ -214,7 +238,7 @@ export default function DashPage() {
 
     try {
       const options: google.maps.places.AutocompleteOptions = {
-        componentRestrictions: { country: 'za' },
+        componentRestrictions: { country: 'za' }, // South Africa
         types: ['address'],
         fields: ['formatted_address', 'geometry']
       };
@@ -224,30 +248,24 @@ export default function DashPage() {
       autoComplete.addListener('place_changed', () => {
         setIsAddressLoading(true);
         const place = autoComplete.getPlace();
+        
         if (place.formatted_address) {
           setAddress(place.formatted_address);
           setUserData(prev => ({ ...prev, address: place.formatted_address || '' }));
           
-          // Update map position when a place is selected
+          // Update map position when a place is selected from autocomplete
           if (place.geometry && place.geometry.location) {
             const lat = place.geometry.location.lat();
             const lng = place.geometry.location.lng();
             
-            // Trigger a noticeable animation by zooming out first if already zoomed in
-            if (mapZoom > 12) {
-              // First zoom out a bit to make the animation more dramatic
-              setMapZoom(11);
-              
-              // Then after a small delay, set the final position and zoom
-              setTimeout(() => {
-                setMapPosition([lat, lng]);
-                setMapZoom(16); // Zoom in closer to the selected location
-              }, 300);
-            } else {
-              // Direct animation if not already zoomed in
+            // Animate the map transition
+            setMapZoom(11); // First zoom out a bit
+            
+            // Then after a small delay, set the final position and zoom
+            setTimeout(() => {
               setMapPosition([lat, lng]);
-              setMapZoom(16);
-            }
+              setMapZoom(16); // Zoom in closer to the selected location
+            }, 300);
           }
         }
         
@@ -263,11 +281,11 @@ export default function DashPage() {
     }
   };
 
-  // Handle address change
+  // Handle address change - don't geocode on every keystroke
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAddress(e.target.value);
     setUserData(prev => ({ ...prev, address: e.target.value }));
-    // Don't geocode on every keystroke - the autocomplete will handle this when a selection is made
+    // Explicitly NOT geocoding here - that will happen only when autocomplete selection is made
   };
 
   // Handle password strength
@@ -400,24 +418,28 @@ export default function DashPage() {
 
   // Update map when address changes from outside autocomplete
   useEffect(() => {
-    if (!address || !window.google || !window.google.maps) return;
-    
-    // Only geocode if we have an address that isn't already positioned
-    if (address !== userData.address || (mapPosition[0] === 51.505 && mapPosition[1] === -0.09)) {
-      const geocoder = new window.google.maps.Geocoder();
-      geocoder.geocode({ address }, (results, status) => {
-        if (status === 'OK' && results && results[0] && results[0].geometry) {
-          const location = results[0].geometry.location;
-          setMapPosition([location.lat(), location.lng()]);
-          setMapZoom(15);
-        }
-      });
+    if (!address || !window.google || !window.google.maps) {
+      // Default to Johannesburg if no address
+      if (!address && mapPosition[0] !== -26.2041 && mapPosition[1] !== 28.0473) {
+        setMapPosition([-26.2041, 28.0473]);
+        setMapZoom(10);
+      }
+      return;
     }
-  }, [address, userData.address, mapPosition]);
+    
+    // Only geocode if address is selected through the autocomplete
+    // This code is now handled in the autocomplete place_changed event
+  }, [address, mapPosition]);
 
   // Set isBrowser to true when component mounts (client-side only)
   useEffect(() => {
     setIsBrowser(true);
+    
+    // Default to Johannesburg if no address is set
+    if (!address) {
+      setMapPosition([-26.2041, 28.0473]); // Johannesburg coordinates
+      setMapZoom(10);
+    }
   }, []);
   
   // Set up the initMap callback that Google Maps will call when loaded
@@ -588,14 +610,29 @@ export default function DashPage() {
                         <div className="space-y-1.5">
                           <label className="text-xs text-gray-300 flex items-center gap-1">
                             <User className="h-3 w-3 text-gray-400" />
-                            Name
+                            First Name
                           </label>
                           <input
                             type="text"
                             name="firstName"
                             className="w-full bg-gray-800/50 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-200 focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-colors"
-                            placeholder="Your Name"
+                            placeholder="Your First Name"
                             value={userData.firstName}
+                            onChange={handleNameChange}
+                          />
+                        </div>
+                        
+                        <div className="space-y-1.5">
+                          <label className="text-xs text-gray-300 flex items-center gap-1">
+                            <User className="h-3 w-3 text-gray-400" />
+                            Last Name
+                          </label>
+                          <input
+                            type="text"
+                            name="lastName"
+                            className="w-full bg-gray-800/50 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-200 focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-colors"
+                            placeholder="Your Last Name"
+                            value={userData.lastName}
                             onChange={handleNameChange}
                           />
                         </div>
@@ -610,6 +647,21 @@ export default function DashPage() {
                               + Add Vehicle
                             </button>
                           </div>
+                        </div>
+                        
+                        <div className="space-y-1.5">
+                          <label className="text-xs text-gray-300 flex items-center gap-1">
+                            <Phone className="h-3 w-3 text-gray-400" />
+                            Phone Number
+                          </label>
+                          <input
+                            type="tel"
+                            name="phone"
+                            className="w-full bg-gray-800/50 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-200 focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-colors"
+                            placeholder="Your Phone Number"
+                            value={userData.phone}
+                            onChange={handleNameChange}
+                          />
                         </div>
                         <div className="space-y-1.5">
                           <label className="text-xs text-gray-300 flex items-center gap-1">
@@ -746,10 +798,11 @@ export default function DashPage() {
                           <div className="relative">
                             <input
                               type="email"
+                              name="email"
                               className="w-full bg-gray-800/30 border border-gray-700/50 rounded-md px-3 py-2 text-sm text-gray-400 cursor-not-allowed"
                               value={userData.email}
-                              readOnly
                               disabled
+                              readOnly
                             />
                             <div className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] px-1.5 py-0.5 bg-gray-800 text-gray-400 rounded-full">Verified</div>
                           </div>
@@ -923,11 +976,23 @@ export default function DashPage() {
                 Cancel
               </div>
               <div
-                onClick={handleSave}
-                className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-500 text-gray-900 rounded-md transition-colors duration-150 text-xs font-bold cursor-pointer shadow-lg shadow-amber-900/20 flex items-center gap-1.5"
+                onClick={loading ? undefined : handleSave}
+                className={`px-4 py-2 ${loading 
+                  ? 'bg-amber-600/50' 
+                  : 'bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-500'
+                } text-gray-900 rounded-md transition-colors duration-150 text-xs font-bold cursor-pointer shadow-lg shadow-amber-900/20 flex items-center gap-1.5`}
               >
-                <span>Save changes</span>
-                <ArrowRight className="h-3.5 w-3.5" />
+                {loading ? (
+                  <>
+                    <span>Saving...</span>
+                    <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-gray-900 border-t-transparent"></div>
+                  </>
+                ) : (
+                  <>
+                    <span>Save changes</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </>
+                )}
               </div>
             </div>
           </div>
