@@ -345,7 +345,7 @@ export default function DashPage() {
       console.error('Failed to delete account:', error);
       
       // If error is due to auth session timeout, try to sign out anyway
-      if (error.code === 'auth/requires-recent-login') {
+      if ((error as any).code === 'auth/requires-recent-login') {
         try {
           // Still sign out the user even if deletion fails
           await signOut(auth);
