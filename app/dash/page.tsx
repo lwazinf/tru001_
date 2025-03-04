@@ -8,6 +8,7 @@ import dynamic from 'next/dynamic';
 import type { Map as LeafletMap } from 'leaflet';
 import { useAuth } from '@/lib/firebase/AuthContext';
 import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 
 // Dynamically import Leaflet components to avoid SSR issues
@@ -85,6 +86,8 @@ export default function DashPage() {
   // State variables
   const [address, setAddress] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showAddVehicleModal, setShowAddVehicleModal] = useState(false);
+  const [newVehicle, setNewVehicle] = useState({ name: '', type: '' });
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [activeTab, setActiveTab] = useState('profile');
@@ -95,6 +98,7 @@ export default function DashPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAddressLoading, setIsAddressLoading] = useState(false);
   const [loading, setLoading] = useState(false); // Loading state for save button
+  const [isDataLoading, setIsDataLoading] = useState(true); // Loading state for initial data fetch
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const [mapPosition, setMapPosition] = useState<[number, number]>([-26.2041, 28.0473]); // Johannesburg coordinates
   const [mapZoom, setMapZoom] = useState(10);
@@ -204,13 +208,36 @@ export default function DashPage() {
         // Update the document
         await updateDoc(userDocRef, updateData);
         
+        // Handle password update if password was changed
+        if (password && password.length >= 6) {
+          if (password !== confirmPassword) {
+            throw new Error("Passwords do not match");
+          }
+          
+          // Update Firebase Auth password
+          try {
+            await updatePassword(currentUser, password);
+            console.log("Password updated successfully");
+          } catch (passwordError) {
+            console.error("Error updating password:", passwordError);
+            // This might happen if the user hasn't recently signed in
+            throw new Error("Failed to update password. You may need to sign in again.");
+          }
+        }
+        
         // Show success message
         setSuccessMessage('Changes saved successfully!');
         setShowSuccessToast(true);
         setTimeout(() => setShowSuccessToast(false), 3000);
+        
+        // Clear password fields after successful save
+        setPassword('');
+        setConfirmPassword('');
+        setPasswordStrength(0);
+        
       } catch (error) {
         console.error('Error updating user data:', error);
-        setSuccessMessage('Failed to save changes');
+        setSuccessMessage(error instanceof Error ? error.message : 'Failed to save changes');
         setShowSuccessToast(true);
         setTimeout(() => setShowSuccessToast(false), 3000);
       } finally {
@@ -295,6 +322,11 @@ export default function DashPage() {
     setPassword(pass);
   };
 
+  // Handle confirm password
+  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setConfirmPassword(e.target.value);
+  };
+
   // Handle save changes
   const handleSave = () => {
     saveUserDataToFirestore();
@@ -338,6 +370,34 @@ export default function DashPage() {
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUserData(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Handler for new vehicle input changes
+  const handleVehicleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNewVehicle(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Add new vehicle to user data
+  const handleAddVehicle = () => {
+    if (!newVehicle.name.trim()) {
+      setSuccessMessage('Please enter a vehicle name');
+      setShowSuccessToast(true);
+      setTimeout(() => setShowSuccessToast(false), 3000);
+      return;
+    }
+
+    const updatedVehicles = [...userData.vehicles, newVehicle];
+    setUserData(prev => ({ ...prev, vehicles: updatedVehicles }));
+    
+    // Close modal and reset form
+    setShowAddVehicleModal(false);
+    setNewVehicle({ name: '', type: '' });
+    
+    // Show success message
+    setSuccessMessage('Vehicle added. Don\'t forget to save your changes!');
+    setShowSuccessToast(true);
+    setTimeout(() => setShowSuccessToast(false), 3000);
   };
 
   useEffect(() => {
@@ -638,19 +698,6 @@ export default function DashPage() {
                         </div>
                         <div className="space-y-1.5">
                           <label className="text-xs text-gray-300 flex items-center gap-1">
-                            <Car className="h-3 w-3 text-gray-400" />
-                            Vehicles
-                          </label>
-                          <div className="bg-gray-800/30 rounded-md p-3 border border-gray-700/50">
-                            <p className="text-xs text-gray-400">No vehicles added yet</p>
-                            <button className="mt-2 text-xs text-amber-400 hover:text-amber-300 transition-colors">
-                              + Add Vehicle
-                            </button>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-1.5">
-                          <label className="text-xs text-gray-300 flex items-center gap-1">
                             <Phone className="h-3 w-3 text-gray-400" />
                             Phone Number
                           </label>
@@ -696,6 +743,53 @@ export default function DashPage() {
                         </div>
                       </div>
                       <div className="space-y-4">
+                        <div className="space-y-1.5">
+                          <label className="text-xs text-gray-300 flex items-center gap-1">
+                            <Car className="h-3 w-3 text-gray-400" />
+                            Vehicles
+                          </label>
+                          {userData.vehicles.length === 0 ? (
+                            <div className="grid grid-cols-2 gap-3">
+                              <div 
+                                onClick={() => setShowAddVehicleModal(true)}
+                                className="rounded-md border-2 border-dashed border-gray-700 p-4 flex flex-col items-center justify-center cursor-pointer hover:border-amber-500/50 transition-colors"
+                              >
+                                <Car className="h-6 w-6 text-gray-400 mb-2" />
+                                <span className="text-xs text-amber-400 hover:text-amber-300 transition-colors">
+                                  + Add Vehicle
+                                </span>
+                              </div>
+                              <div 
+                                onClick={() => setShowAddVehicleModal(true)}
+                                className="rounded-md border-2 border-dashed border-gray-700 p-4 flex flex-col items-center justify-center cursor-pointer hover:border-amber-500/50 transition-colors"
+                              >
+                                <Car className="h-6 w-6 text-gray-400 mb-2" />
+                                <span className="text-xs text-amber-400 hover:text-amber-300 transition-colors">
+                                  + Add Vehicle
+                                </span>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-2 gap-3">
+                              {userData.vehicles.map((vehicle, index) => (
+                                <div key={index} className="bg-gray-800/30 rounded-md p-3 border border-gray-700/50">
+                                  <p className="text-xs text-gray-200">{vehicle.name || "Unnamed Vehicle"}</p>
+                                  <p className="text-[10px] text-gray-400">{vehicle.type || "Unknown"}</p>
+                                </div>
+                              ))}
+                              <div 
+                                onClick={() => setShowAddVehicleModal(true)}
+                                className="rounded-md border-2 border-dashed border-gray-700 p-4 flex flex-col items-center justify-center cursor-pointer hover:border-amber-500/50 transition-colors"
+                              >
+                                <Car className="h-6 w-6 text-gray-400 mb-2" />
+                                <span className="text-xs text-amber-400 hover:text-amber-300 transition-colors">
+                                  + Add Vehicle
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        
                         <div className="bg-gradient-to-br from-gray-900/70 to-gray-800/40 backdrop-blur-sm rounded-lg p-4 border border-gray-800/50 shadow-inner shadow-black/10">
                           <div className="flex justify-between items-start mb-3">
                             <h3 className="text-xs font-semibold text-gray-200 flex items-center gap-1.5">
@@ -731,26 +825,6 @@ export default function DashPage() {
                               <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
                                 <div className="h-full w-0 bg-amber-400 rounded-full"></div>
                               </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="bg-gradient-to-br from-gray-900/70 to-gray-800/40 backdrop-blur-sm rounded-lg p-4 border border-gray-800/50 shadow-inner shadow-black/10">
-                          <h3 className="text-xs font-semibold text-gray-200 mb-3 flex items-center gap-1.5">
-                            <FileText className="h-3 w-3 text-gray-400" />
-                            Documents & History
-                          </h3>
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between py-2 px-3 bg-gray-800/30 rounded-md border border-gray-700/30">
-                              <div className="text-xs text-gray-400">Documents</div>
-                              <span className="text-[10px] px-1.5 py-0.5 bg-gray-800 text-gray-400 rounded">{userData.documents.length}</span>
-                            </div>
-                            <div className="flex items-center justify-between py-2 px-3 bg-gray-800/30 rounded-md border border-gray-700/30">
-                              <div className="text-xs text-gray-400">Order History</div>
-                              <span className="text-[10px] px-1.5 py-0.5 bg-gray-800 text-gray-400 rounded">{userData.history.orders.length}</span>
-                            </div>
-                            <div className="flex items-center justify-between py-2 px-3 bg-gray-800/30 rounded-md border border-gray-700/30">
-                              <div className="text-xs text-gray-400">Reservations</div>
-                              <span className="text-[10px] px-1.5 py-0.5 bg-gray-800 text-gray-400 rounded">{userData.history.reserves.length}</span>
                             </div>
                           </div>
                         </div>
@@ -851,13 +925,27 @@ export default function DashPage() {
                           <Lock className="h-3 w-3 text-gray-400" />
                           Confirm Password
                         </label>
-                        <input
-                          type="password"
-                          className="w-full bg-gray-800/50 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-200 focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-colors"
-                          placeholder="••••••••"
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                        />
+                        <div className="relative">
+                          <input
+                            type="password"
+                            className={`w-full bg-gray-800/50 border ${password && confirmPassword && password !== confirmPassword ? 'border-red-500' : 'border-gray-700'} rounded-md px-3 py-2 text-sm text-gray-200 focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-colors`}
+                            placeholder="••••••••"
+                            value={confirmPassword}
+                            onChange={handleConfirmPasswordChange}
+                          />
+                          {password && confirmPassword && (
+                            <div className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] px-1.5 py-0.5 rounded-full">
+                              {password === confirmPassword ? (
+                                <CheckCircle2 className="h-4 w-4 text-green-400" />
+                              ) : (
+                                <AlertTriangle className="h-4 w-4 text-red-400" />
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        {password && confirmPassword && password !== confirmPassword && (
+                          <p className="text-xs text-red-400 mt-1">Passwords do not match</p>
+                        )}
                       </div>
 
                       <div className="pt-3 mt-1 border-t border-gray-800/50">
@@ -892,7 +980,7 @@ export default function DashPage() {
                       </p>
                     </div>
                     <div 
-                      onClick={handleDeleteAccount}
+                      onClick={() => setShowDeleteModal(true)}
                       className="px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-md text-xs font-medium transition-colors duration-150 cursor-pointer border border-red-500/20"
                     >
                       Delete Account
@@ -952,9 +1040,87 @@ export default function DashPage() {
                         Cancel
                       </div>
                       <div
+                        onClick={handleDeleteAccount}
                         className="px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-md text-xs font-medium transition-colors duration-150 cursor-pointer border border-red-500/20"
                       >
                         Delete Account
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Add Vehicle Modal */}
+            {showAddVehicleModal && (
+              <div className="fixed inset-0 flex items-center justify-center z-50">
+                <div 
+                  className="absolute inset-0 bg-gray-950/90 backdrop-blur-sm transition-all duration-300"
+                  onClick={() => setShowAddVehicleModal(false)}
+                />
+                <div className="relative bg-gray-900/50 backdrop-blur-sm rounded-lg p-4 border border-gray-800 w-full max-w-md mx-4 shadow-2xl shadow-black/40 transform transition-all duration-300 animate-in fade-in slide-in-from-bottom-10">
+                  <div
+                    onClick={() => setShowAddVehicleModal(false)}
+                    className="absolute right-4 top-4 p-1.5 rounded-full hover:bg-gray-800/50 transition-colors duration-150 cursor-pointer"
+                  >
+                    <X className="h-4 w-4 text-gray-400" />
+                  </div>
+                  
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="p-1 rounded-full bg-amber-600/10">
+                        <Car className="h-4 w-4 text-amber-400" />
+                      </div>
+                      <h3 className="text-sm font-semibold text-gray-200">Add New Vehicle</h3>
+                    </div>
+                    <p className="text-xs text-gray-400">
+                      Add details about your vehicle to help us provide better fuel management services.
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs text-gray-300 flex items-center gap-1">
+                        <Car className="h-3 w-3 text-gray-400" />
+                        Vehicle Name
+                      </label>
+                      <input
+                        type="text"
+                        name="name"
+                        className="w-full bg-gray-800/50 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-200 focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-colors"
+                        placeholder="e.g., My BMW, Family Car"
+                        value={newVehicle.name}
+                        onChange={handleVehicleChange}
+                      />
+                    </div>
+                    
+                    <div className="space-y-1.5">
+                      <label className="text-xs text-gray-300 flex items-center gap-1">
+                        <Car className="h-3 w-3 text-gray-400" />
+                        Vehicle Type
+                      </label>
+                      <input
+                        type="text"
+                        name="type"
+                        className="w-full bg-gray-800/50 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-200 focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-colors"
+                        placeholder="e.g., Sedan, SUV, Truck"
+                        value={newVehicle.type}
+                        onChange={handleVehicleChange}
+                      />
+                    </div>
+                    
+                    <div className="flex justify-end gap-2 pt-4">
+                      <div
+                        onClick={() => setShowAddVehicleModal(false)}
+                        className="px-3 py-1.5 bg-gray-800/50 hover:bg-gray-800 border border-gray-700 rounded-md text-xs font-medium text-gray-300 transition-colors duration-150 cursor-pointer"
+                      >
+                        Cancel
+                      </div>
+                      <div
+                        onClick={handleAddVehicle}
+                        className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-500 text-gray-900 rounded-md text-xs font-bold transition-colors duration-150 cursor-pointer shadow-lg shadow-amber-900/20"
+                      >
+                        Add Vehicle
                       </div>
                     </div>
                   </div>
