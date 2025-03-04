@@ -573,6 +573,7 @@ export default function DashPage() {
                   <VehicleGrid
                     vehicles={userData.vehicles}
                     onAddVehicle={() => setShowAddVehicleModal(true)}
+                    tier={userData.tier}
                   />
                   <FuelTanksStatus tanks={userData.tanks} tier={userData.tier} />
                 </ProfileSection>
