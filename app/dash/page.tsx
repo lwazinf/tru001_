@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-import { Search, X, AlertTriangle, User, CreditCard, Mail, Lock, MapPin, Car, ChevronRight, CheckCircle2, Bell, Settings, Menu, ArrowRight, Shield, Calendar, Clock, Fuel, FileText } from 'lucide-react';
+import { Search, X, AlertTriangle, User, Mail, Lock, MapPin, Car, CheckCircle2, Bell, Settings, Menu, ArrowRight, Shield, Clock, Fuel, FileText } from 'lucide-react';
 import Script from 'next/script';
 import zxcvbn from 'zxcvbn';
 
@@ -26,6 +26,7 @@ export default function DashPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAddressLoading, setIsAddressLoading] = useState(false);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
   
   // Mock user data - replace with actual data fetching
   const [userData, setUserData] = useState({
@@ -118,6 +119,7 @@ export default function DashPage() {
       setSuccessMessage('Account deleted successfully');
       setShowSuccessToast(true);
       setTimeout(() => setShowSuccessToast(false), 3000);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setSuccessMessage('Failed to delete account');
       setShowSuccessToast(true);
@@ -133,6 +135,7 @@ export default function DashPage() {
   useEffect(() => {
     // Initialize after Google Maps script is loaded
     if (window.google) {
+      setIsGoogleMapsLoaded(true);
       initAutocomplete();
     }
 
@@ -379,7 +382,7 @@ export default function DashPage() {
                               </div>
                             )}
                           </div>
-                          {!window.google && (
+                          {!isGoogleMapsLoaded && (
                             <p className="text-xs text-amber-400/70 mt-1">
                               Loading Google Maps...
                             </p>
