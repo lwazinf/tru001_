@@ -619,8 +619,9 @@ export default function DashPage() {
     }
   }, []);
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedTier, setSelectedTier] = useState<string | null>(null);
+  // Replace the separate loading states with a more specific state
+  // that tracks which tier is being processed
+  const [processingTier, setProcessingTier] = useState<string | null>(null);
 
   // Set up the initMap callback that Google Maps will call when loaded
   useEffect(() => {
@@ -632,6 +633,58 @@ export default function DashPage() {
       (window as any).initMap = () => {};
     };
   }, []);
+
+  // Handle payment processing for membership tiers
+  const handleProcessPayment = (tier: string, amount: string) => {
+    // Set which tier is being processed (for UI feedback)
+    setProcessingTier(tier);
+    
+    // Show processing message
+    setSuccessMessage(`Processing ${tier} membership payment...`);
+    setShowSuccessToast(true);
+    
+    // Create transaction reference
+    const transactionRef = `${userData.email || "guest"}-${tier}-${Date.now()}`.substring(0, 50);
+    
+    // Process the payment
+    processPayment({
+      amount: amount,
+      transactionReference: transactionRef,
+      bankReference: `NTF ${tier} Membership`,
+    })
+    .then((paymentResponse) => {
+      console.log("Payment processed:", paymentResponse);
+      
+      // Save payment data to Firestore
+      if (paymentResponse) {
+        savePaymentToFirestore(
+          paymentResponse,
+          transactionRef,
+          tier.toLowerCase()
+        );
+      }
+      
+      // Redirect to the payment URL if available
+      if (paymentResponse && paymentResponse.url) {
+        // Set timeout to allow user to see the loading state briefly
+        setTimeout(() => {
+          // Open the payment URL in a new tab/window
+          window.location.href = paymentResponse.url;
+        }, 500);
+      } else {
+        setProcessingTier(null);
+        setSuccessMessage("Payment processing failed: No payment URL received.");
+        setShowSuccessToast(true);
+      }
+    })
+    .catch((error) => {
+      console.error("Payment failed:", error);
+      // Reset loading state
+      setProcessingTier(null);
+      setSuccessMessage("Payment processing failed. Please try again.");
+      setShowSuccessToast(true);
+    });
+  };
 
   // Add handleSignOut function after other handler functions
   const handleSignOut = async () => {
@@ -806,62 +859,19 @@ export default function DashPage() {
                           <div className="flex gap-2.5 mt-3">
                             {/* Gold option */}
                             <div
-                              onClick={() => {
-                                const transactionRef = `${
-                                  userData.email || "guest"
-                                }-Gold-${Date.now()}`.substring(0, 50);
-
-                                processPayment({
-                                  amount: "2999.00",
-                                  transactionReference: transactionRef,
-                                  bankReference: "NTF Gold Membership",
-                                })
-                                  .then((paymentResponse) => {
-                                    console.log(
-                                      "Payment processed:",
-                                      paymentResponse
-                                    );
-                                    // Save payment data to Firestore
-                                    if (paymentResponse) {
-                                      savePaymentToFirestore(
-                                        paymentResponse,
-                                        transactionRef,
-                                        "gold"
-                                      );
-                                    }
-                                    // Redirect to the payment URL if available
-                                    if (
-                                      paymentResponse &&
-                                      paymentResponse.url
-                                    ) {
-                                      // Set timeout to allow user to see the loading state briefly
-                                      setTimeout(() => {
-                                        // Open the payment URL in a new tab/window
-                                        window.location.href =
-                                          paymentResponse.url;
-                                        setIsLoading(false);
-                                      }, 500);
-                                    } else {
-                                      setIsLoading(false);
-                                      alert(
-                                        "Payment processing failed: No payment URL received."
-                                      );
-                                    }
-                                  })
-                                  .catch((error) => {
-                                    console.error("Payment failed:", error);
-                                    // Handle payment error - reset loading state
-                                    setIsLoading(false);
-                                    setSelectedTier(null);
-                                  });
-                              }}
-                              className="flex-1 bg-gradient-to-b from-amber-500/20 to-amber-700/10 border border-amber-500/20 rounded-md p-2.5 cursor-pointer group"
+                              onClick={() => processingTier ? null : handleProcessPayment("Gold", "2999.00")}
+                              className={`flex-1 bg-gradient-to-b from-amber-500/20 to-amber-700/10 border border-amber-500/20 rounded-md p-2.5 
+                                ${processingTier ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer hover:bg-amber-500/10 hover:border-amber-500/30 transition-all duration-200'}`}
                             >
                               <div className="flex items-center">
                                 <div className="flex-shrink-0 bg-amber-500 w-6 h-6 rounded-full flex items-center justify-center shadow-inner shadow-amber-700/30">
-                                  <span className="text-black font-bold text-xs">
-                                    G
-                                  </span>
+                                  {processingTier === "Gold" ? (
+                                    <div className="h-3.5 w-3.5 rounded-full border-2 border-black border-t-transparent animate-spin"></div>
+                                  ) : (
+                                    <span className="text-black font-bold text-xs">
+                                      G
+                                    </span>
+                                  )}
                                 </div>
                                 <div className="ml-2 flex-1 min-w-0">
                                   <p className="text-amber-400 text-xs font-medium truncate">
@@ -878,7 +888,11 @@ export default function DashPage() {
                             </div>
 
                             {/* Black option */}
-                            <div className="flex-1 bg-gradient-to-b from-gray-800/80 to-gray-900/80 border border-white/10 rounded-md p-2.5 cursor-pointer group relative">
+                            <div 
+                              onClick={() => processingTier ? null : handleProcessPayment("Black", "4999.00")}
+                              className={`flex-1 bg-gradient-to-b from-gray-800/80 to-gray-900/80 border border-white/10 rounded-md p-2.5 
+                                relative ${processingTier ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer hover:bg-gray-800/60 hover:border-white/20 transition-all duration-200'}`}
+                            >
                               <div className="absolute -top-1 -right-1 bg-white px-1 py-0.5 rounded-sm shadow-sm">
                                 <span className="text-black text-[7px] font-bold">
                                   BEST
@@ -886,9 +900,13 @@ export default function DashPage() {
                               </div>
                               <div className="flex items-center">
                                 <div className="flex-shrink-0 bg-black w-6 h-6 rounded-full flex items-center justify-center shadow-inner shadow-white/5 border border-white/20">
-                                  <span className="text-white font-bold text-xs">
-                                    B
-                                  </span>
+                                  {processingTier === "Black" ? (
+                                    <div className="h-3.5 w-3.5 rounded-full border-2 border-white border-t-transparent animate-spin"></div>
+                                  ) : (
+                                    <span className="text-white font-bold text-xs">
+                                      B
+                                    </span>
+                                  )}
                                 </div>
                                 <div className="ml-2 flex-1 min-w-0">
                                   <p className="text-white text-xs font-medium truncate">
@@ -906,9 +924,28 @@ export default function DashPage() {
                           </div>
 
                           <div className="mt-3">
-                            <div className="w-full py-2 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-500 text-gray-900 text-xs font-medium rounded transition-all duration-300 flex items-center justify-center group">
-                              <span>Welcome Back</span>
-                            </div>
+                            <button
+                              onClick={() => processingTier ? null : router.push('/auth?action=reactivate')}
+                              disabled={processingTier !== null}
+                              className={`w-full py-2 ${processingTier !== null
+                                ? "bg-gray-600 text-gray-400 cursor-not-allowed" 
+                                : "bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-500 text-gray-900 cursor-pointer"
+                              } text-xs font-medium rounded transition-all duration-300 flex items-center justify-center`}
+                            >
+                              {processingTier !== null ? (
+                                <span className="flex items-center">
+                                  <div className="h-3.5 w-3.5 rounded-full border-2 border-gray-500 border-t-transparent animate-spin mr-2"></div>
+                                  Processing {processingTier}...
+                                </span>
+                              ) : (
+                                <span className="flex items-center">
+                                  Welcome Back – Reactivate Now
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 ml-1.5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                  </svg>
+                                </span>
+                              )}
+                            </button>
                           </div>
                         </div>
                       </div>
