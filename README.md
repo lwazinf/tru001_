@@ -1,20 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NTF Web Application
+
+## Environment Setup
+
+This application requires the following environment variables to be set in a `.env.local` file at the root of the project:
+
+```
+# Car API Configuration
+CAR_API_KEY=your_api_key_here
+CAR_API_URL=https://api.api-ninjas.com/v1/cars
+
+# Google Maps API (for location services)
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here
+```
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository
+2. Copy `.env.local.example` to `.env.local` and fill in your API keys
+3. Install dependencies: `npm install`
+4. Run the development server: `npm run dev`
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- User authentication with Firebase
+- Vehicle management with fuel tank tracking
+- Google Maps integration for location services
+- Tier-based subscription management
+
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

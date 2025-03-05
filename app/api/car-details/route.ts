@@ -115,90 +115,106 @@ const FALLBACK_VEHICLE_DATA = [
 /**
  * Filters the fallback data based on query parameters
  */
-function filterFallbackData(makeName?: string, year?: string) {
-  let filteredData = [...FALLBACK_VEHICLE_DATA];
+// function filterFallbackData(makeName?: string, year?: string) {
+//   let filteredData = [...FALLBACK_VEHICLE_DATA];
   
-  // Filter by make if provided
-  if (makeName) {
-    const makeLower = makeName.toLowerCase();
-    filteredData = filteredData.filter(v => 
-      v.make_name.toLowerCase().includes(makeLower)
-    );
-  }
+//   // Filter by make if provided
+//   if (makeName) {
+//     const makeLower = makeName.toLowerCase();
+//     filteredData = filteredData.filter(v => 
+//       v.make_name.toLowerCase().includes(makeLower)
+//     );
+//   }
   
-  // Filter by year if provided
-  if (year) {
-    const yearNum = parseInt(year);
-    if (!isNaN(yearNum)) {
-      filteredData = filteredData.filter(v => 
-        v.year_from <= yearNum && (v.year_to == null || v.year_to >= yearNum)
-      );
-    }
-  }
+//   // Filter by year if provided
+//   if (year) {
+//     const yearNum = parseInt(year);
+//     if (!isNaN(yearNum)) {
+//       filteredData = filteredData.filter(v => 
+//         v.year_from <= yearNum && (v.year_to == null || v.year_to >= yearNum)
+//       );
+//     }
+//   }
   
-  return filteredData;
-}
+//   return filteredData;
+// }
 
 /**
  * API Route handler for car details proxy
  */
 export async function GET(request: NextRequest) {
-  // Get query parameters
   const { searchParams } = new URL(request.url);
-  const makeName = searchParams.get('makeName') || undefined;
-  const year = searchParams.get('year') || undefined;
-  
+  const makeName = searchParams.get('makeName');
+  const year = searchParams.get('year');
+
+  if (!makeName) {
+    return new Response(JSON.stringify({ error: 'Make name is required' }), {
+      status: 400,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      },
+    });
+  }
+
   try {
-    // Build the URL to the external API
+    // Get API key and URL from environment variables
+    const apiKey = process.env.CAR_API_KEY;
+    const apiUrl = process.env.CAR_API_URL || 'https://api.api-ninjas.com/v1/cars';
+    
+    if (!apiKey) {
+      console.error('API key not found in environment variables');
+      return new Response(JSON.stringify({ error: 'API configuration error' }), {
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
+        },
+      });
+    }
+
     const params = new URLSearchParams();
-    if (makeName) params.append('makeName', makeName);
+    
+    // Add search params
+    if (makeName) params.append('make', makeName);
     if (year) params.append('year', year);
     
-    const apiUrl = `http://206.189.22.2:3000/car-details?${params.toString()}`;
-    
-    // Set timeout for the fetch request
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-    
-    // Fetch data from the external API
-    const response = await fetch(apiUrl, {
-      signal: controller.signal,
+    // Make the API request with environment variables
+    const response = await fetch(`${apiUrl}?${params.toString()}`, {
       headers: {
-        'Accept': 'application/json',
-      }
+        'X-Api-Key': apiKey,
+        'Content-Type': 'application/json',
+      },
     });
-    
-    clearTimeout(timeoutId);
-    
+
     if (!response.ok) {
-      throw new Error(`External API error: ${response.status}`);
+      throw new Error(`API responded with status ${response.status}`);
     }
-    
+
     const data = await response.json();
-    
-    // Return the data with proper CORS headers
-    return NextResponse.json(data, {
+    return new Response(JSON.stringify(data), {
       status: 200,
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
-      }
+      },
     });
-  } catch (error: any) {
-    console.error('API proxy error:', error);
-    
-    // If there's an error, return the filtered fallback data
-    const fallbackData = filterFallbackData(makeName, year);
-    
-    return NextResponse.json(fallbackData, {
-      status: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
+  } catch (error) {
+    console.error('Error fetching car data:', error);
+    return new Response(
+      JSON.stringify({ error: 'Failed to fetch car data' }),
+      {
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
+        },
       }
-    });
+    );
   }
 }
 
