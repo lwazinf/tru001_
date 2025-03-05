@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Clock, Menu, ArrowRight } from 'lucide-react';
 import Script from 'next/script';
 import { useAuth } from '@/lib/firebase/AuthContext';
-import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, updateDoc, deleteDoc, Timestamp } from 'firebase/firestore';
 import { updatePassword, sendPasswordResetEmail, deleteUser, signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { AddVehicleModal } from '@/components/dashboard/AddVehicleModal';
@@ -45,14 +45,14 @@ export default function DashPage() {
   const { currentUser } = useAuth();
   const router = useRouter();
   
-  // User data state with proper type definition
+  // User data state with proper type definition for Firestore timestamp
   const [userData, setUserData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
     tier: 'basic',
-    tierDate: null as number | null,
+    tierDate: null as Timestamp | null,
     address: '',
     vehicles: [] as Array<{name: string, type: string}>,
     tanks: {
@@ -95,13 +95,59 @@ export default function DashPage() {
           
           if (userDoc.exists()) {
             const data = userDoc.data();
+            
+            // Use the Firestore Timestamp directly or set a default if missing
+            const tierDateValue = data.tierDate || Timestamp.now();
+            
+            // Check if subscription has expired (more than 30 days since tierDate)
+            let currentTier = data.tier || 'basic';
+            
+            try {
+              // If tierDate is a Firestore Timestamp, convert to JS Date for calculations
+              let tierDateJS: Date;
+              
+              if (tierDateValue instanceof Timestamp) {
+                tierDateJS = tierDateValue.toDate();
+              } else {
+                // Fallback for non-Timestamp values
+                console.warn('tierDate is not a Firestore Timestamp:', tierDateValue);
+                tierDateJS = new Date(tierDateValue);
+              }
+              
+              // Only proceed if we got a valid date
+              if (!isNaN(tierDateJS.getTime())) {
+                const now = new Date();
+                const subscriptionEndDate = new Date(tierDateJS.getTime() + (30 * 24 * 60 * 60 * 1000));
+                
+                // If subscription has expired, set tier to "Paused" and update in Firestore
+                if (now > subscriptionEndDate && currentTier !== 'Paused') {
+                  console.log('Subscription expired, setting tier to Paused');
+                  currentTier = 'Paused';
+                  
+                  // Update the tier in Firestore
+                  try {
+                    await updateDoc(userDocRef, {
+                      tier: 'Paused'
+                    });
+                    console.log('User tier updated to Paused in Firestore');
+                  } catch (error) {
+                    console.error('Error updating tier status:', error);
+                  }
+                }
+              } else {
+                console.warn('Invalid date from tierDate:', tierDateValue);
+              }
+            } catch (error) {
+              console.error('Error processing tierDate:', error);
+            }
+            
             setUserData({
               firstName: data.firstName || '',
               lastName: data.lastName || '',
               email: data.email || '',
               phone: data.phone || '',
-              tier: data.tier || 'basic',
-              tierDate: data.tierDate || Date.now(), // Default to current time if not set
+              tier: currentTier,
+              tierDate: tierDateValue,
               address: data.address || '',
               vehicles: data.vehicles || [],
               tanks: data.tanks || {
