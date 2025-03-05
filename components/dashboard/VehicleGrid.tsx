@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Car, AlertTriangle, Crown } from 'lucide-react';
+import { Car, AlertTriangle, Crown, Trash2 } from 'lucide-react';
 
 interface VehicleType {
   name: string;
@@ -12,9 +12,10 @@ interface VehicleGridProps {
   vehicles: VehicleType[];
   onAddVehicle: () => void;
   tier?: string;  // Add tier as an optional prop
+  onDeleteVehicle?: (index: number) => void;
 }
 
-export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle, tier }) => {
+export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle, tier, onDeleteVehicle }) => {
   // Determine max slots based on tier
   const getMaxSlots = () => {
     if (tier === 'Black' || tier === 'black') {
@@ -64,11 +65,24 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle
         {/* Show existing vehicles */}
         {vehicles.slice(0, maxSlots).map((vehicle, index) => (
           <div 
-            key={index} 
-            className="bg-gray-800/30 rounded-md p-3 border border-gray-700/50"
+            key={`vehicle-${index}`}
+            className="bg-gray-800/30 rounded-md p-3 border border-gray-700/50 relative group transition-all duration-200"
           >
-            <p className="text-xs text-gray-200">{vehicle.name || "Unnamed Vehicle"}</p>
-            <p className="text-[10px] text-gray-400">{vehicle.type || "Unknown"}</p>
+            {/* Delete button */}
+            <div 
+              onClick={() => onDeleteVehicle && onDeleteVehicle(index)}
+              className="absolute top-2 right-2 bg-red-500/10 hover:bg-red-500/20 p-1.5 rounded-md text-red-400 hover:text-red-300 cursor-pointer transition-colors duration-200 flex items-center gap-1.5"
+              role="button"
+              aria-label="Delete vehicle and free slot"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              <span className="text-xs font-medium">Free slot</span>
+            </div>
+            
+            <div className="pt-6 mt-2"> {/* Added top padding for button space */}
+              <p className="text-xs text-gray-200">{vehicle.name || "Unnamed Vehicle"}</p>
+              <p className="text-[10px] text-gray-400">{vehicle.type || "Unknown"}</p>
+            </div>
           </div>
         ))}
         

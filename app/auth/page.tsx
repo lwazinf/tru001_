@@ -863,7 +863,7 @@ const AuthForm = () => {
                 variants={itemVariants}
                 className="text-amber-500 text-sm tracking-wider font-medium mb-2"
               >
-                {isLoginForm ? "WELCOME BACK" : "START FOR FREE"}
+                {isLoginForm ? "WELCOME BACK" : "EXPERIENCE EFFORTLESS REFUELING"}
               </motion.p>
 
               <motion.h1

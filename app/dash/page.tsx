@@ -33,23 +33,6 @@ import { VehicleGrid } from "@/components/dashboard/VehicleGrid";
 import { auth } from "@/lib/firebase/config";
 import { processPayment } from "../utils/payment";
 
-// Add global TypeScript declarations for our fallback map system
-declare global {
-  interface Window {
-    googleMapsLoadError?: boolean;
-    L?: any; // Leaflet library
-    initMap?: () => void;
-    google?: {
-      maps?: {
-        places?: {
-          Autocomplete?: any;
-        };
-        Geocoder?: any;
-      };
-    };
-  }
-}
-
 export default function DashPage() {
   // State variables
   const [address, setAddress] = useState("");
@@ -357,16 +340,8 @@ export default function DashPage() {
 
   // Initialize Google Places Autocomplete
   const initAutocomplete = () => {
-    // Check if Google Maps failed to load
-    if (typeof window !== 'undefined' && window.googleMapsLoadError) {
-      console.warn("Using fallback map implementation due to Google Maps loading failure");
-      initializeFallbackMap();
-      return;
-    }
-
     if (!window.google) {
       console.error("Google Maps not loaded");
-      initializeFallbackMap();
       return;
     }
 
@@ -424,94 +399,6 @@ export default function DashPage() {
       console.log("Google Places Autocomplete initialized successfully");
     } catch (error) {
       console.error("Error initializing Google Places:", error);
-      initializeFallbackMap();
-    }
-  };
-
-  // Fallback map implementation using OpenStreetMap
-  const initializeFallbackMap = () => {
-    console.log("Initializing fallback map with OpenStreetMap");
-    
-    // Check if we're in the browser and if the fallback script has already been added
-    if (typeof window !== 'undefined' && !document.getElementById('leaflet-css')) {
-      // Add Leaflet CSS
-      const leafletCss = document.createElement('link');
-      leafletCss.id = 'leaflet-css';
-      leafletCss.rel = 'stylesheet';
-      leafletCss.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-      leafletCss.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
-      leafletCss.crossOrigin = '';
-      document.head.appendChild(leafletCss);
-      
-      // Add Leaflet JS
-      const leafletScript = document.createElement('script');
-      leafletScript.id = 'leaflet-js';
-      leafletScript.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-      leafletScript.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
-      leafletScript.crossOrigin = '';
-      
-      // When Leaflet loads, create the map
-      leafletScript.onload = () => {
-        // Find the map container
-        const mapContainer = document.getElementById('location-map');
-        if (mapContainer) {
-          // Clear the container in case there's any content
-          mapContainer.innerHTML = '<div id="fallback-map" style="width: 100%; height: 100%;"></div>';
-          
-          // Initialize the map
-          const L = window.L;
-          const map = L.map('fallback-map').setView([mapPosition[0], mapPosition[1]], mapZoom);
-          
-          // Add the OpenStreetMap tile layer
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap contributors'
-          }).addTo(map);
-          
-          // Add a marker
-          L.marker([mapPosition[0], mapPosition[1]]).addTo(map);
-          
-          // Listen for address input changes to manually geocode
-          const input = document.getElementById('location-input') as HTMLInputElement;
-          if (input) {
-            input.addEventListener('change', async (e) => {
-              const address = (e.target as HTMLInputElement).value;
-              if (address) {
-                try {
-                  // Use a free geocoding service
-                  const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
-                  const data = await response.json();
-                  
-                  if (data && data.length > 0) {
-                    const lat = parseFloat(data[0].lat);
-                    const lon = parseFloat(data[0].lon);
-                    
-                    // Update map and marker
-                    map.setView([lat, lon], 16);
-                    map.eachLayer((layer: any) => {
-                      if (layer instanceof L.Marker) {
-                        map.removeLayer(layer);
-                      }
-                    });
-                    L.marker([lat, lon]).addTo(map);
-                    
-                    // Update app state
-                    setMapPosition([lat, lon]);
-                    setUserData(prev => ({
-                      ...prev,
-                      address: address
-                    }));
-                  }
-                } catch (error) {
-                  console.error('Error geocoding with fallback:', error);
-                }
-              }
-            });
-          }
-        }
-      };
-      
-      document.body.appendChild(leafletScript);
     }
   };
 
@@ -705,71 +592,19 @@ export default function DashPage() {
     };
   }, []);
 
-  // Set up the initMap callback that Google Maps will call when loaded
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    // Define the global initMap function that Google Maps will call
-    (window as any).initMap = () => {
-      // Check if Google Maps actually loaded properly
-      if (window.google && window.google.maps) {
-        initAutocomplete();
-        console.log("Google Maps API loaded and initialized");
-      } else {
-        console.warn("Google Maps API callback triggered but API not available");
-        // Initialize fallback map if Google Maps isn't available
-        initializeFallbackMap();
-      }
-    };
-    
-    // If Google Maps fails to load after 5 seconds, try the fallback
-    const timeoutId = setTimeout(() => {
-      if (typeof window !== 'undefined' && (!window.google || !window.google.maps)) {
-        console.warn("Google Maps timeout - initializing fallback");
-        initializeFallbackMap();
-      }
-    }, 5000);
-    
-    return () => {
-      // Clean up
-      clearTimeout(timeoutId);
-      (window as any).initMap = () => {};
-    };
-  }, []);
-
   // Update map when address changes from outside autocomplete
   useEffect(() => {
-    // Skip if not in browser environment
-    if (typeof window === 'undefined') return;
-    
-    if (!address) {
+    if (!address || !window.google || !window.google.maps) {
       // Default to Johannesburg if no address
-      if (mapPosition[0] !== -26.2041 && mapPosition[1] !== 28.0473) {
+      if (
+        !address &&
+        mapPosition[0] !== -26.2041 &&
+        mapPosition[1] !== 28.0473
+      ) {
         setMapPosition([-26.2041, 28.0473]);
         setMapZoom(10);
       }
       return;
-    }
-    
-    // If we're using fallback map, handle address changes
-    if (window.googleMapsLoadError && window.L) {
-      const mapContainer = document.getElementById('fallback-map');
-      if (mapContainer && window.L) {
-        const map = window.L.map ? window.L.map('fallback-map') : null;
-        if (map) {
-          // Try to geocode using OpenStreetMap's Nominatim service
-          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
-            .then(response => response.json())
-            .then(data => {
-              if (data && data.length > 0) {
-                const lat = parseFloat(data[0].lat);
-                const lon = parseFloat(data[0].lon);
-                map.setView([lat, lon], 16);
-              }
-            })
-            .catch(error => console.error('Error geocoding with fallback:', error));
-        }
-      }
     }
   }, [address, mapPosition]);
 
@@ -777,26 +612,27 @@ export default function DashPage() {
   useEffect(() => {
     setIsBrowser(true);
 
-    // Check for Maps loading failure after a delay
-    const checkMapsFailure = setTimeout(() => {
-      if (typeof window !== 'undefined' && (!window.google || !window.google.maps)) {
-        console.warn("Google Maps failed to load properly, initializing fallback");
-        initializeFallbackMap();
-      }
-    }, 3000);
-
     // Default to Johannesburg if no address is set
     if (!address) {
       setMapPosition([-26.2041, 28.0473]); // Johannesburg coordinates
       setMapZoom(10);
     }
-    
-    return () => clearTimeout(checkMapsFailure);
   }, []);
 
   // Replace the separate loading states with a more specific state
   // that tracks which tier is being processed
   const [processingTier, setProcessingTier] = useState<string | null>(null);
+
+  // Set up the initMap callback that Google Maps will call when loaded
+  useEffect(() => {
+    (window as any).initMap = () => {
+      initAutocomplete();
+      console.log("Google Maps API loaded and initialized");
+    };
+    return () => {
+      (window as any).initMap = () => {};
+    };
+  }, []);
 
   // Handle payment processing for membership tiers
   const handleProcessPayment = (tier: string, amount: string) => {
@@ -866,6 +702,26 @@ export default function DashPage() {
     }
   };
 
+  // Handle vehicle deletion
+  const handleDeleteVehicle = (index: number) => {
+    // Create a copy of the vehicles array
+    const updatedVehicles = [...userData.vehicles];
+    
+    // Remove the vehicle at the specified index
+    updatedVehicles.splice(index, 1);
+    
+    // Update the state
+    setUserData(prev => ({
+      ...prev,
+      vehicles: updatedVehicles
+    }));
+    
+    // Show success message
+    setSuccessMessage("Vehicle removed. Don't forget to save your changes!");
+    setShowSuccessToast(true);
+    setTimeout(() => setShowSuccessToast(false), 3000);
+  };
+
   // If still checking auth or loading data, show loading overlay
   if (isAuthChecking) {
     return (
@@ -885,53 +741,14 @@ export default function DashPage() {
 
   return (
     <>
-      {/* Google Maps API Script with better error handling */}
+      {/* Google Maps API Script */}
       <Script
         src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&libraries=places&callback=initMap`}
-        strategy="beforeInteractive"
+        strategy="lazyOnload"
         onError={(e) => {
           console.error("Error loading Google Maps script:", e);
-          // Set a flag in window that maps failed to load - for fallback handling
-          if (typeof window !== 'undefined') {
-            window.googleMapsLoadError = true;
-          }
         }}
       />
-
-      {/* Fallback script to handle map errors */}
-      <Script id="google-maps-error-handler">{`
-        // Initialize a global variable to track if Maps loaded successfully
-        window.googleMapsLoadError = false;
-        
-        // Original initMap function - will be called if Google Maps loads
-        const originalInitMap = window.initMap || function() {};
-        
-        // Override initMap to catch errors and provide fallback
-        window.initMap = function() {
-          try {
-            if (!window.google || !window.google.maps) {
-              console.warn("Google Maps not available, using fallback");
-              window.googleMapsLoadError = true;
-              return;
-            }
-            
-            // Call the original implementation if Maps is available
-            originalInitMap();
-            console.log("Google Maps initialized successfully");
-          } catch (error) {
-            console.error("Error initializing Google Maps:", error);
-            window.googleMapsLoadError = true;
-          }
-        };
-        
-        // Additional timeout to detect if Google Maps didn't load after 5 seconds
-        setTimeout(function() {
-          if (!window.google || !window.google.maps) {
-            console.warn("Google Maps failed to load within timeout, using fallback");
-            window.googleMapsLoadError = true;
-          }
-        }, 5000);
-      `}</Script>
 
       <div className="flex min-h-screen bg-gradient-to-b from-gray-950 to-gray-900 text-gray-100">
         {/* Buffer for top navigation */}
@@ -1157,6 +974,7 @@ export default function DashPage() {
                       vehicles={userData.vehicles}
                       onAddVehicle={() => setShowAddVehicleModal(true)}
                       tier={userData.tier}
+                      onDeleteVehicle={handleDeleteVehicle}
                     />
                   )}
                   <FuelTanksStatus
