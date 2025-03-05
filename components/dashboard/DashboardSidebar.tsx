@@ -1,21 +1,49 @@
 'use client';
 
 import React from 'react';
-import { User, Lock, Clock } from 'lucide-react';
+import { User, Lock, Clock, LogOut } from 'lucide-react';
 
 interface DashboardSidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   userData: {
     tier: string;
+    tierDate: number | null;
   };
+  onSignOut: () => void;
 }
 
 export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   activeTab,
   setActiveTab,
-  userData
+  userData,
+  onSignOut
 }) => {
+  // Calculate days left and renewal date
+  const calculateRenewalInfo = () => {
+    if (!userData.tierDate) return { daysLeft: 30, renewalDate: 'Not set' };
+    
+    const tierDate = new Date(userData.tierDate);
+    const renewalDate = new Date(tierDate.getTime() + (30 * 24 * 60 * 60 * 1000)); // Add 30 days
+    const now = new Date();
+    
+    // Calculate days left
+    const daysLeft = Math.ceil((renewalDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    
+    // Format renewal date
+    const formattedDate = renewalDate.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric'
+    });
+    
+    return {
+      daysLeft: Math.max(0, daysLeft), // Ensure we don't show negative days
+      renewalDate: formattedDate
+    };
+  };
+
+  const { daysLeft, renewalDate } = calculateRenewalInfo();
+
   return (
     <div className="hidden md:block w-64 border-r border-gray-800/70">
       {/* Sidebar buffer */}
@@ -48,11 +76,19 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
             <div className="flex items-center justify-between">
               <span className="text-xs text-gray-400">
                 <Clock className="h-3 w-3 inline mr-1 text-gray-500" />
-                30 days left
+                {daysLeft} days left
               </span>
-              <span className="text-[10px] text-gray-500">Renews on Jul 15</span>
+              <span className="text-[10px] text-gray-500">Renews on {renewalDate}</span>
             </div>
           </div>
+        </div>
+        
+        <div
+          onClick={onSignOut}
+          className="flex cursor-pointer items-center gap-2 w-full mt-4 px-3 py-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors duration-150"
+        >
+          <LogOut className="h-4 w-4" />
+          <span className="text-sm font-medium">Sign Out</span>
         </div>
       </div>
     </div>

@@ -52,6 +52,7 @@ export default function DashPage() {
     email: '',
     phone: '',
     tier: 'basic',
+    tierDate: null as number | null,
     address: '',
     vehicles: [] as Array<{name: string, type: string}>,
     tanks: {
@@ -100,6 +101,7 @@ export default function DashPage() {
               email: data.email || '',
               phone: data.phone || '',
               tier: data.tier || 'basic',
+              tierDate: data.tierDate || Date.now(), // Default to current time if not set
               address: data.address || '',
               vehicles: data.vehicles || [],
               tanks: data.tanks || {
@@ -493,6 +495,22 @@ export default function DashPage() {
     };
   }, []);
 
+  // Add handleSignOut function after other handler functions
+  const handleSignOut = async () => {
+    try {
+      setLoading(true);
+      await signOut(auth);
+      router.push('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      setSuccessMessage('Failed to sign out. Please try again.');
+      setShowSuccessToast(true);
+      setTimeout(() => setShowSuccessToast(false), 3000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // If still checking auth or loading data, show loading overlay
   if (isAuthChecking) {
     return (
@@ -531,6 +549,7 @@ export default function DashPage() {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           userData={userData}
+          onSignOut={handleSignOut}
         />
 
         {/* Mobile menu button */}
@@ -547,7 +566,7 @@ export default function DashPage() {
         <div className="flex-1 overflow-auto">
           <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 mt-20 md:mt-20">
             {/* Dashboard Header */}
-            <DashboardHeader />
+            <DashboardHeader onSignOut={handleSignOut} />
             
             {/* Success Toast */}
             {showSuccessToast && (
