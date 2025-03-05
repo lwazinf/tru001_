@@ -757,7 +757,7 @@ export default function DashPage() {
     <>
       {/* Google Maps API Script */}
       <Script
-        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&libraries=places&callback=initMap`}
+        src={`https://maps.googleapis.com/maps/api/js?key=${'AIzaSyCNlia43mno54CIMoVQdSdMBe5hKtGbOpU'}&libraries=places&callback=initMap`}
         strategy="lazyOnload"
         onError={(e) => {
           console.error("Error loading Google Maps script:", e);
