@@ -78,6 +78,9 @@ export default function DashPage() {
     history: { orders: [], reserves: [] },
   });
 
+  // Add state for selected vehicle data from the API
+  const [selectedVehicleData, setSelectedVehicleData] = useState<any>(null);
+
   // Check authentication and redirect if not authenticated
   useEffect(() => {
     const checkAuth = async () => {
@@ -518,12 +521,23 @@ export default function DashPage() {
       return;
     }
 
-    const updatedVehicles = [...userData.vehicles, newVehicle];
+    // Create new vehicle with additional data if available
+    const vehicleToAdd = {
+      ...newVehicle,
+      // Include the additional data from selected vehicle
+      make_name: selectedVehicleData?.make_name || newVehicle.name.split(' ')[0],
+      model_name: selectedVehicleData?.model_name || newVehicle.name.split(' ').slice(1).join(' '),
+      year: selectedVehicleData?.year_from || selectedVehicleData?.year,
+      fuel_tank_capacity: selectedVehicleData?.fuel_tank_capacity || []
+    };
+
+    const updatedVehicles = [...userData.vehicles, vehicleToAdd];
     setUserData((prev) => ({ ...prev, vehicles: updatedVehicles }));
 
     // Close modal and reset form
     setShowAddVehicleModal(false);
     setNewVehicle({ name: "", type: "" });
+    setSelectedVehicleData(null);
 
     // Show success message
     setSuccessMessage("Vehicle added. Don't forget to save your changes!");
@@ -1020,6 +1034,7 @@ export default function DashPage() {
                 handleVehicleChange={handleVehicleChange}
                 onClose={() => setShowAddVehicleModal(false)}
                 onAdd={handleAddVehicle}
+                onVehicleSelect={(vehicleData) => setSelectedVehicleData(vehicleData)}
               />
             )}
 

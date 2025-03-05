@@ -11,6 +11,7 @@ interface AddVehicleModalProps {
   handleVehicleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onClose: () => void;
   onAdd: () => void;
+  onVehicleSelect?: (vehicleData: any) => void;
 }
 
 // Type for the fuel tank capacity data structure
@@ -30,9 +31,10 @@ interface Vehicle {
 export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
   handleVehicleChange,
   onClose,
-  onAdd
+  onAdd,
+  onVehicleSelect
 }) => {
-  type ModalState = 'FORM' | 'LOADING' | 'RESULTS';
+  type ModalState = 'FORM' | 'LOADING' | 'RESULTS' | 'CAPACITY_INPUT';
   
   const [modalState, setModalState] = useState<ModalState>('FORM');
   const [vehicleData, setVehicleData] = useState({
@@ -46,6 +48,10 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
   const [currentPage, setCurrentPage] = useState(0);
   const resultsPerPage = 3;
   const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // Add state for manual fuel capacity input
+  const [manualCapacity, setManualCapacity] = useState('');
+  const [capacityUnit, setCapacityUnit] = useState('l');
 
   // Update form values
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -180,6 +186,18 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
     if (selectedVehicleIndex !== null && apiResults.length > 0) {
       const selectedVehicle = apiResults[selectedVehicleIndex];
       
+      // Check if the vehicle has fuel tank capacity data
+      if (!selectedVehicle.fuel_tank_capacity || selectedVehicle.fuel_tank_capacity.length === 0) {
+        // If not, transition to the capacity input state
+        changeModalState('CAPACITY_INPUT');
+        return;
+      }
+      
+      // Pass the complete vehicle data to parent component
+      if (onVehicleSelect) {
+        onVehicleSelect(selectedVehicle);
+      }
+      
       // Format the vehicle name using the selected data
       const vehicleName = `${selectedVehicle.make_name} ${selectedVehicle.model_name} (${selectedVehicle.year_from})`;
       
@@ -203,6 +221,63 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
     } else {
       setError('Please select a vehicle');
     }
+  };
+
+  // Add a new function to handle manual capacity confirmation
+  const handleConfirmManualCapacity = () => {
+    if (!manualCapacity || isNaN(Number(manualCapacity)) || Number(manualCapacity) <= 0) {
+      setError('Please enter a valid fuel tank capacity');
+      return;
+    }
+
+    if (selectedVehicleIndex !== null && apiResults.length > 0) {
+      const selectedVehicle = apiResults[selectedVehicleIndex];
+      
+      // Add the manually entered fuel capacity to the vehicle data
+      const enhancedVehicle = {
+        ...selectedVehicle,
+        fuel_tank_capacity: [
+          {
+            value: manualCapacity,
+            unit: capacityUnit
+          }
+        ]
+      };
+      
+      // Pass the enhanced vehicle data to parent component
+      if (onVehicleSelect) {
+        onVehicleSelect(enhancedVehicle);
+      }
+      
+      // Format the vehicle name using the selected data
+      const vehicleName = `${selectedVehicle.make_name} ${selectedVehicle.model_name} (${selectedVehicle.year_from})`;
+      
+      // Update the original vehicle object
+      handleVehicleChange({
+        target: {
+          name: 'name',
+          value: vehicleName
+        }
+      } as React.ChangeEvent<HTMLInputElement>);
+      
+      handleVehicleChange({
+        target: {
+          name: 'type',
+          value: vehicleData.numberPlate
+        }
+      } as React.ChangeEvent<HTMLInputElement>);
+      
+      // Close modal and add vehicle
+      onAdd();
+    } else {
+      setError('No vehicle selected');
+      changeModalState('RESULTS');
+    }
+  };
+
+  // Add a function to go back to results from capacity input
+  const handleBackToResults = () => {
+    changeModalState('RESULTS');
   };
 
   // Handle back to form
@@ -524,6 +599,100 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
     </div>
   );
 
+  // Add a new render function for capacity input
+  const renderCapacityInputContent = () => {
+    const selectedVehicle = selectedVehicleIndex !== null ? apiResults[selectedVehicleIndex] : null;
+    
+    return (
+      <div className={`transition-all duration-300 ${isTransitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
+        <div className="mb-4 flex items-center justify-between">
+          <div 
+            onClick={handleBackToResults}
+            className="flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 transition-colors hover:bg-gray-800/50 px-2 py-1 rounded-md cursor-pointer"
+            role="button"
+            tabIndex={0}
+          >
+            <ChevronLeft className="h-3 w-3" />
+            <span>Back to Vehicle Selection</span>
+          </div>
+        </div>
+
+        {error && (
+          <div className="mb-4 p-2 bg-red-500/10 border border-red-500/30 rounded text-xs text-red-400 animate-in fade-in slide-in-from-top-4 duration-300">
+            {error}
+          </div>
+        )}
+
+        {selectedVehicle && (
+          <div className="mb-4 p-3 border border-amber-500/20 rounded-md bg-amber-500/5 transition-all duration-200">
+            <h4 className="text-sm font-medium text-amber-400 mb-2">
+              {selectedVehicle.make_name} {selectedVehicle.model_name}
+            </h4>
+            <p className="text-xs text-gray-300 mb-3">
+              This vehicle is missing fuel tank capacity information. Please provide it below:
+            </p>
+            
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <label className="text-xs text-gray-400 mb-1 block">
+                  Fuel Tank Capacity
+                </label>
+                <input
+                  type="number"
+                  value={manualCapacity}
+                  onChange={(e) => setManualCapacity(e.target.value)}
+                  className="w-full bg-gray-800/80 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-200 focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-all duration-200"
+                  placeholder="e.g., 65"
+                  min="1"
+                  step="0.1"
+                />
+              </div>
+              
+              <div className="w-24">
+                <label className="text-xs text-gray-400 mb-1 block">
+                  Unit
+                </label>
+                <select
+                  value={capacityUnit}
+                  onChange={(e) => setCapacityUnit(e.target.value)}
+                  className="w-full bg-gray-800/80 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-200 focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-all duration-200"
+                >
+                  <option value="l">Liters (l)</option>
+                  <option value="gal">Gallons (gal)</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="mt-3 flex items-center text-xs text-blue-400">
+              <Droplets className="h-3 w-3 mr-1" />
+              <span>This helps us calculate your fuel requirements accurately</span>
+            </div>
+          </div>
+        )}
+
+        <div className="flex justify-end gap-2 pt-4">
+          <div
+            onClick={onClose}
+            className="px-3 py-1.5 bg-gray-800/50 hover:bg-gray-800 border border-gray-700 rounded-md text-xs font-medium text-gray-300 transition-all duration-200 cursor-pointer hover:shadow-md hover:shadow-black/10 hover:translate-y-[-1px] active:translate-y-[0px]"
+            role="button"
+            tabIndex={0}
+          >
+            Cancel
+          </div>
+          <div
+            onClick={handleConfirmManualCapacity}
+            className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-500 cursor-pointer text-gray-900 rounded-md text-xs font-bold transition-all duration-200 shadow-lg shadow-amber-900/20 hover:shadow-xl hover:shadow-amber-900/20 hover:translate-y-[-1px] active:translate-y-[0px] flex items-center gap-2"
+            role="button"
+            tabIndex={0}
+          >
+            <CheckCircle className="h-3 w-3" />
+            <span>Confirm & Add Vehicle</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div 
@@ -549,6 +718,7 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
             <h3 className="text-sm font-semibold text-gray-200">
               {modalState === 'FORM' ? 'Add New Vehicle' : 
                modalState === 'RESULTS' ? 'Select a Vehicle' : 
+               modalState === 'CAPACITY_INPUT' ? 'Fuel Tank Capacity' :
                'Searching...'}
             </h3>
           </div>
@@ -557,6 +727,8 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
               ? 'Add details about your vehicle to help us provide better fuel management services.'
               : modalState === 'RESULTS'
               ? 'Select the vehicle that matches your vehicle details.'
+              : modalState === 'CAPACITY_INPUT'
+              ? 'Please provide the fuel tank capacity for your selected vehicle.'
               : 'Searching for matching vehicles in our database...'}
           </p>
         </div>
@@ -564,6 +736,7 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
         {modalState === 'FORM' && renderFormContent()}
         {modalState === 'LOADING' && renderLoadingContent()}
         {modalState === 'RESULTS' && renderResultsContent()}
+        {modalState === 'CAPACITY_INPUT' && renderCapacityInputContent()}
       </div>
     </div>
   );

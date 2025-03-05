@@ -1,11 +1,16 @@
 'use client';
 
 import React from 'react';
-import { Car, AlertTriangle, Crown, Trash2 } from 'lucide-react';
+import { Car, AlertTriangle, Crown, Trash2, Droplets } from 'lucide-react';
 
+// Enhanced Vehicle Type interface to match API data
 interface VehicleType {
   name: string;
-  type: string;
+  type: string; // Number plate
+  make_name?: string;
+  model_name?: string;
+  year?: number | string;
+  fuel_tank_capacity?: Array<{value: string, unit: string}>;
 }
 
 interface VehicleGridProps {
@@ -36,6 +41,30 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle
   
   // Create array of empty slots
   const emptySlotArray = Array(emptySlots).fill(null);
+
+  // Helper function to format fuel tank capacity
+  const formatFuelTankCapacity = (vehicle: VehicleType): string => {
+    if (vehicle.fuel_tank_capacity && vehicle.fuel_tank_capacity.length > 0) {
+      const capacity = vehicle.fuel_tank_capacity[0];
+      return `${capacity.value} ${capacity.unit}`;
+    }
+    return 'N/A';
+  };
+
+  // Helper function to extract make name
+  const getMakeName = (vehicle: VehicleType): string => {
+    if (vehicle.make_name) return vehicle.make_name;
+    // Fallback: try to extract make from name
+    return vehicle.name.split(' ')[0] || 'Unknown';
+  };
+
+  // Helper function to extract model name
+  const getModelName = (vehicle: VehicleType): string => {
+    if (vehicle.model_name) return vehicle.model_name;
+    // Fallback: try to extract model from name
+    const nameParts = vehicle.name.split(' ');
+    return nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+  };
 
   return (
     <div className="space-y-3">
@@ -80,8 +109,21 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle
             </div>
             
             <div className="pt-6 mt-2"> {/* Added top padding for button space */}
-              <p className="text-xs text-gray-200">{vehicle.name || "Unnamed Vehicle"}</p>
-              <p className="text-[10px] text-gray-400">{vehicle.type || "Unknown"}</p>
+              {/* Make and Model */}
+              <p className="text-sm text-gray-200 font-medium">
+                {getMakeName(vehicle)} {getModelName(vehicle)}
+              </p>
+              
+              {/* Number Plate */}
+              <p className="text-xs text-amber-400 font-medium uppercase mt-0.5">
+                {vehicle.type || "Unknown"}
+              </p>
+              
+              {/* Fuel Tank Capacity */}
+              <div className="flex items-center gap-1 mt-2 text-xs text-blue-400">
+                <Droplets className="h-3 w-3" />
+                <span>Tank: {formatFuelTankCapacity(vehicle)}</span>
+              </div>
             </div>
           </div>
         ))}
