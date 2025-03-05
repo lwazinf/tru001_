@@ -926,9 +926,8 @@ export default function DashPage() {
                           </div>
 
                           <div className="mt-3">
-                            <button
+                            <div
                               onClick={() => processingTier ? null : router.push('/auth?action=reactivate')}
-                              disabled={processingTier !== null}
                               className={`w-full py-2 ${processingTier !== null
                                 ? "bg-gray-600 text-gray-400 cursor-not-allowed" 
                                 : "bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-500 text-gray-900 cursor-pointer"
@@ -941,13 +940,10 @@ export default function DashPage() {
                                 </span>
                               ) : (
                                 <span className="flex items-center">
-                                  Welcome Back – Reactivate Now
-                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 ml-1.5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                  </svg>
+                                  Welcome Back
                                 </span>
                               )}
-                            </button>
+                            </div>
                           </div>
                         </div>
                       </div>
