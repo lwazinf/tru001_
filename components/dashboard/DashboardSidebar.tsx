@@ -130,20 +130,20 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       
       <div className="px-4 py-6">
         <nav className="space-y-1">
-          <button 
+          <div 
             onClick={() => setActiveTab('profile')}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium cursor-pointer ${activeTab === 'profile' ? 'bg-gray-800/50 text-amber-400' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/30'} transition-colors duration-150`}
           >
             <User className={`h-4 w-4 ${activeTab === 'profile' ? 'text-amber-400' : 'text-gray-500'}`} />
             <span>Profile & Fuel Management</span>
-          </button>
-          <button 
+          </div>
+          <div 
             onClick={() => setActiveTab('account')}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium cursor-pointer ${activeTab === 'account' ? 'bg-gray-800/50 text-amber-400' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/30'} transition-colors duration-150`}
           >
             <Lock className={`h-4 w-4 ${activeTab === 'account' ? 'text-amber-400' : 'text-gray-500'}`} />
             <span>Security</span>
-          </button>
+          </div>
         </nav>
 
         <div className="mt-8 pt-6 border-t border-gray-800/50">
@@ -179,13 +179,13 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
           </div>
         </div>
         
-        <button
+        <div
           onClick={onSignOut}
           className="flex w-full items-center gap-2 mt-4 px-3 py-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors duration-150"
         >
           <LogOut className="h-4 w-4" />
           <span className="text-sm font-medium">Sign Out</span>
-        </button>
+        </div>
       </div>
     </div>
   );
