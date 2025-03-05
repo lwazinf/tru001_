@@ -767,9 +767,11 @@ export default function DashPage() {
             {/* Status Bar */}
             <div className="mb-6 flex items-center p-3 rounded-lg bg-gray-800/30 border border-gray-700/30">
               <div className="flex-1 flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-amber-400"></div>
+                <div className={`h-2 w-2 rounded-full ${userData.tier === "Paused" ? "bg-gray-500" : "bg-amber-400"}`}></div>
                 <span className="text-xs text-gray-300">Account Status:</span>
-                <span className="text-xs font-medium text-white">Active</span>
+                <span className={`text-xs font-medium ${userData.tier === "Paused" ? "text-gray-400" : "text-white"}`}>
+                  {userData.tier === "Paused" ? "Paused" : "Active"}
+                </span>
               </div>
               <div className="text-xs text-gray-400">
                 <Clock className="h-3 w-3 inline mr-1" />
