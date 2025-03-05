@@ -43,12 +43,28 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle
   const emptySlotArray = Array(emptySlots).fill(null);
 
   // Helper function to format fuel tank capacity
-  const formatFuelTankCapacity = (vehicle: VehicleType): string => {
+  // const formatFuelTankCapacity = (vehicle: VehicleType): string => {
+  //   if (vehicle.fuel_tank_capacity && vehicle.fuel_tank_capacity.length > 0) {
+  //     const capacity = vehicle.fuel_tank_capacity[0];
+  //     return `${capacity.value} ${capacity.unit}`;
+  //   }
+  //   return 'N/A';
+  // };
+
+  // Extract just the numeric value of fuel capacity for display
+  const getFuelCapacityValue = (vehicle: VehicleType): string => {
     if (vehicle.fuel_tank_capacity && vehicle.fuel_tank_capacity.length > 0) {
-      const capacity = vehicle.fuel_tank_capacity[0];
-      return `${capacity.value} ${capacity.unit}`;
+      return vehicle.fuel_tank_capacity[0].value;
     }
     return 'N/A';
+  };
+
+  // Extract just the unit of fuel capacity for display
+  const getFuelCapacityUnit = (vehicle: VehicleType): string => {
+    if (vehicle.fuel_tank_capacity && vehicle.fuel_tank_capacity.length > 0) {
+      return vehicle.fuel_tank_capacity[0].unit;
+    }
+    return '';
   };
 
   // Helper function to extract make name
@@ -95,34 +111,35 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle
         {vehicles.slice(0, maxSlots).map((vehicle, index) => (
           <div 
             key={`vehicle-${index}`}
-            className="bg-gray-800/30 rounded-md p-3 border border-gray-700/50 relative group transition-all duration-200"
+            className="bg-gray-900 rounded-md border border-gray-800 relative transition-all duration-200 hover:bg-gray-800/80"
           >
             {/* Delete button */}
             <div 
               onClick={() => onDeleteVehicle && onDeleteVehicle(index)}
-              className="absolute top-2 right-2 bg-red-500/10 hover:bg-red-500/20 p-1.5 rounded-md text-red-400 hover:text-red-300 cursor-pointer transition-colors duration-200 flex items-center gap-1.5"
+              className="absolute top-2 right-2 bg-red-500/10 px-2 py-0.5 rounded text-red-400 cursor-pointer transition-colors duration-200 flex items-center gap-1 hover:bg-red-500/20"
               role="button"
-              aria-label="Delete vehicle and free slot"
+              aria-label="Free vehicle slot"
             >
-              <Trash2 className="h-3.5 w-3.5" />
+              <Trash2 className="h-3 w-3" />
               <span className="text-xs font-medium">Free slot</span>
             </div>
             
-            <div className="pt-6 mt-2"> {/* Added top padding for button space */}
+            <div className="p-3"> 
               {/* Make and Model */}
-              <p className="text-sm text-gray-200 font-medium">
+              <p className="text-sm text-gray-200 font-medium pt-6 mb-1">
                 {getMakeName(vehicle)} {getModelName(vehicle)}
               </p>
               
               {/* Number Plate */}
-              <p className="text-xs text-amber-400 font-medium uppercase mt-0.5">
+              <p className="text-xs text-amber-400 font-medium uppercase mb-2">
                 {vehicle.type || "Unknown"}
               </p>
               
               {/* Fuel Tank Capacity */}
-              <div className="flex items-center gap-1 mt-2 text-xs text-blue-400">
-                <Droplets className="h-3 w-3" />
-                <span>Tank: {formatFuelTankCapacity(vehicle)}</span>
+              <div className="flex items-center gap-1 mt-1 text-xs">
+                <Droplets className="h-3 w-3 text-blue-400" />
+                <span className="text-blue-400">Tank:</span>
+                <span className="text-gray-300">{getFuelCapacityValue(vehicle)}{getFuelCapacityUnit(vehicle)}</span>
               </div>
             </div>
           </div>
@@ -133,7 +150,7 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle
           <div 
             key={`empty-${index}`}
             onClick={onAddVehicle}
-            className="rounded-md border-2 border-dashed border-gray-700 p-4 flex flex-col items-center justify-center cursor-pointer hover:border-amber-500/50 transition-colors"
+            className="rounded-md border-2 border-dashed border-gray-700 p-4 flex flex-col items-center justify-center cursor-pointer hover:border-amber-500/50 transition-colors duration-200"
           >
             <Car className="h-6 w-6 text-gray-400 mb-2" />
             <span className="text-xs text-amber-400 hover:text-amber-300 transition-colors">
