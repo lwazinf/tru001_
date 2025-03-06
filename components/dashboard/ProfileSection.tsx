@@ -126,7 +126,9 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                   
                 )}
                 </div>
-                <div className={`w-full h-full bg-red-500/50 flex flex-col justify-center items-center absolute z-[10]`}></div>
+                <div className={`w-full h-full flex flex-col justify-center items-center absolute z-[10]`}>
+                <img className={`w-full h-full object-cover`} src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXah6EUKSD7zSWdEPlQoHKsjwbgBTDJ752vg&s'/>
+                </div>
               </div>
             </div>
           </div>

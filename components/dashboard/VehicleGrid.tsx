@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Car, AlertTriangle, Crown, Trash2, Droplets, Gauge } from 'lucide-react';
+import { Car, AlertTriangle, Crown, Trash2, Droplets, Gauge, Save } from 'lucide-react';
 
 // Enhanced Vehicle Type interface to match API data
 export interface VehicleType {
@@ -19,6 +19,8 @@ export interface VehicleType {
     status: string;
     lastUpdated?: string;
   };
+  // Flag for unsaved vehicles
+  isUnsaved?: boolean;
 }
 
 interface VehicleGridProps {
@@ -59,14 +61,6 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle
     return 'N/A';
   };
 
-  // Extract just the unit of fuel capacity for display
-  const getFuelCapacityUnit = (vehicle: VehicleType): string => {
-    if (vehicle.fuel_tank_capacity && vehicle.fuel_tank_capacity.length > 0) {
-      return vehicle.fuel_tank_capacity[0].unit;
-    }
-    return '';
-  };
-
   // Helper function to extract make name
   const getMakeName = (vehicle: VehicleType): string => {
     if (vehicle.make_name) return vehicle.make_name;
@@ -98,6 +92,9 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle
     }
   };
 
+  // Check if we have any unsaved vehicles
+  const hasUnsavedVehicles = vehicles.some(vehicle => vehicle.isUnsaved);
+
   return (
     <div className="space-y-3">
       <div className="flex justify-between items-center">
@@ -106,6 +103,11 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle
           Vehicles
         </label>
         <div className="flex items-center gap-2">
+          {hasUnsavedVehicles && (
+            <span className="text-xs bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full flex items-center gap-1">
+              <Save className="h-3 w-3" /> Unsaved changes
+            </span>
+          )}
           {tier === 'Black' || tier === 'black' ? (
             <span className="text-xs bg-gray-800 text-white px-2 py-0.5 rounded-full flex items-center gap-1">
               <Crown className="h-3 w-3 text-amber-500" /> Black
@@ -127,9 +129,22 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle
         {vehicles.slice(0, maxSlots).map((vehicle, index) => (
           <div 
             key={`vehicle-${index}`}
-            className={`bg-gray-900 rounded-md border ${selectedVehicleIndex === index ? 'border-amber-500' : 'border-gray-800'} relative transition-all duration-200 hover:bg-gray-800/80 cursor-pointer`}
+            className={`bg-gray-900 rounded-md border ${
+              vehicle.isUnsaved 
+                ? 'border-amber-500 bg-gradient-to-r from-amber-500/10 to-amber-400/5' 
+                : selectedVehicleIndex === index 
+                  ? 'border-amber-500' 
+                  : 'border-gray-800'
+            } relative transition-all duration-200 hover:bg-gray-800/80 cursor-pointer`}
             onClick={() => handleVehicleSelect(index)}
           >
+            {/* Unsaved badge */}
+            {vehicle.isUnsaved && (
+              <div className="absolute top-0 right-0 bg-amber-500 text-black text-[10px] font-medium py-0.5 px-1.5 rounded-bl-md">
+                Unsaved
+              </div>
+            )}
+            
             {/* Delete button */}
             <div 
               onClick={(e) => {
@@ -190,6 +205,16 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle
                         <span className="text-gray-300">{vehicle.slot.lastUpdated}</span>
                       </div>
                     )}
+                  </div>
+                </div>
+              )}
+              
+              {/* Unsaved indicator if needed */}
+              {vehicle.isUnsaved && (
+                <div className="mt-3 pt-2 border-t border-gray-800">
+                  <div className="text-xs text-amber-400 flex items-center gap-1.5">
+                    <Save className="h-3 w-3" />
+                    <span>Click "Save changes" to save permanently</span>
                   </div>
                 </div>
               )}

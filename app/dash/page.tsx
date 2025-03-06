@@ -274,6 +274,13 @@ export default function DashPage() {
           throw new Error("User document not found");
         }
 
+        // Clean vehicles data for Firestore
+        const cleanVehicles = userData.vehicles.map(vehicle => {
+          // Create a new object without the isUnsaved flag
+          const { isUnsaved, ...cleanVehicle } = vehicle;
+          return cleanVehicle;
+        });
+
         // Create the update object with all the fields from the form
         const updateData = {
           firstName: userData.firstName,
@@ -282,11 +289,20 @@ export default function DashPage() {
           address: userData.address,
           // Preserve the existing data structure for other fields
           tanks: userData.tanks,
-          vehicles: userData.vehicles,
+          vehicles: cleanVehicles,
         };
 
         // Update the document
         await updateDoc(userDocRef, updateData);
+        
+        // After successful update to Firestore, remove the isUnsaved flags in local state
+        setUserData(prev => ({
+          ...prev,
+          vehicles: prev.vehicles.map(vehicle => ({
+            ...vehicle,
+            isUnsaved: false
+          }))
+        }));
 
         // Handle password update if password was changed
         if (password && password.length >= 6) {
@@ -544,37 +560,27 @@ export default function DashPage() {
         // Ensure fuel_tank_capacity is formatted correctly
         fuel_tank_capacity: selectedVehicleData?.fuel_tank_capacity || [],
         // Use the image from selectedVehicleData or placeholder
-        image: selectedVehicleData?.image || placeholderImage
+        image: selectedVehicleData?.image || placeholderImage,
+        // Add a flag to indicate this vehicle is not yet saved to Firestore
+        isUnsaved: true
       };
 
       console.log("Adding vehicle with data:", vehicleToAdd);
       
       const updatedVehicles = [...userData.vehicles, vehicleToAdd];
       
-      // Update local state first
+      // Update local state ONLY - don't save to Firestore yet
       setUserData((prev) => ({ ...prev, vehicles: updatedVehicles }));
-
-      // If user is logged in, update in Firestore
-      if (currentUser && currentUser.uid) {
-        const db = getFirestore();
-        const userDocRef = doc(db, "users", currentUser.uid);
-        
-        await updateDoc(userDocRef, {
-          vehicles: updatedVehicles
-        });
-        
-        console.log("Vehicle added to Firestore with image:", vehicleToAdd.image);
-      }
 
       // Close modal and reset form
       setShowAddVehicleModal(false);
       setNewVehicle({ name: "", type: "" });
       setSelectedVehicleData(null);
 
-      // Show success message
-      setSuccessMessage("Vehicle added successfully!");
+      // Show success message that indicates changes need to be saved
+      setSuccessMessage("Vehicle added to dashboard. Don't forget to click 'Save changes' to save permanently!");
       setShowSuccessToast(true);
-      setTimeout(() => setShowSuccessToast(false), 3000);
+      setTimeout(() => setShowSuccessToast(false), 5000);
     } catch (error) {
       console.error("Error adding vehicle:", error);
       setSuccessMessage("Failed to add vehicle. Please try again.");
@@ -759,17 +765,24 @@ export default function DashPage() {
     // Create a copy of the vehicles array
     const updatedVehicles = [...userData.vehicles];
     
+    // Check if this vehicle was unsaved (new)
+    const isUnsavedVehicle = updatedVehicles[index]?.isUnsaved;
+    
     // Remove the vehicle at the specified index
     updatedVehicles.splice(index, 1);
     
-    // Update the state
+    // Update the state (local only)
     setUserData(prev => ({
       ...prev,
       vehicles: updatedVehicles
     }));
     
     // Show success message
-    setSuccessMessage("Vehicle removed. Don't forget to save your changes!");
+    setSuccessMessage(
+      isUnsavedVehicle 
+        ? "Vehicle removed from dashboard." 
+        : "Vehicle removed. Don't forget to save your changes!"
+    );
     setShowSuccessToast(true);
     setTimeout(() => setShowSuccessToast(false), 3000);
   };
