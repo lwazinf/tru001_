@@ -214,7 +214,7 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle
                 <div className="mt-3 pt-2 border-t border-gray-800">
                   <div className="text-xs text-amber-400 flex items-center gap-1.5">
                     <Save className="h-3 w-3" />
-                    <span>Click "Save changes" to save permanently</span>
+                    <span>Click &quot;Save changes&quot; when done</span>
                   </div>
                 </div>
               )}

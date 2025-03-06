@@ -274,23 +274,49 @@ export default function DashPage() {
           throw new Error("User document not found");
         }
 
-        // Clean vehicles data for Firestore
-        const cleanVehicles = userData.vehicles.map(vehicle => {
-          // Create a new object without the isUnsaved flag
-          const { isUnsaved, ...cleanVehicle } = vehicle;
-          return cleanVehicle;
-        });
-
-        // Create the update object with all the fields from the form
-        const updateData = {
-          firstName: userData.firstName,
-          lastName: userData.lastName,
-          phone: userData.phone,
-          address: userData.address,
-          // Preserve the existing data structure for other fields
-          tanks: userData.tanks,
-          vehicles: cleanVehicles,
+        // Deep clean function to remove undefined values and non-serializable data
+        const deepClean = (obj: any): any => {
+          if (obj === null || obj === undefined) {
+            return null;
+          }
+          
+          if (Array.isArray(obj)) {
+            return obj.map(item => deepClean(item)).filter(item => item !== null);
+          }
+          
+          if (typeof obj === 'object') {
+            const cleaned: Record<string, any> = {};
+            
+            for (const key in obj) {
+              // Skip internal flags and undefined values
+              if (key === 'isUnsaved') continue;
+              
+              const value = obj[key];
+              if (value !== undefined) {
+                cleaned[key] = deepClean(value);
+              }
+            }
+            
+            return cleaned;
+          }
+          
+          return obj;
         };
+
+        // Clean all data before sending to Firestore
+        const updateData = {
+          firstName: userData.firstName || "",
+          lastName: userData.lastName || "",
+          phone: userData.phone || "",
+          address: userData.address || "",
+          // Deep clean the vehicles array
+          vehicles: deepClean(userData.vehicles),
+          // Clean the tanks object
+          tanks: deepClean(userData.tanks),
+        };
+
+        // Log the data for debugging
+        console.log("Sending cleaned data to Firestore:", JSON.stringify(updateData));
 
         // Update the document
         await updateDoc(userDocRef, updateData);
