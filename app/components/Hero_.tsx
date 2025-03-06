@@ -269,9 +269,9 @@ const Hero_ = () => {
                 />
               </div>
               <div
-                className={`xl:flex hidden text-[35px] font-black lobster text-white/80 gabarito w-[350px]`}
+                className={`xl:flex hidden text-[25px] font-black lobster text-white/80 gabarito w-[350px]`}
               >
-                All your vehicles needs met.
+                Your one stop mobile shop for all your vehicles needs.
               </div>
               <div
                 className={`text-[60px] xl:flex hidden font-black lobster bg-gradient-to-r from-orange-500/80 to-[#9f2d01] bg-clip-text text-transparent`}
@@ -535,7 +535,7 @@ const Hero_ = () => {
             {[
               "https://images.pexels.com/photos/6873123/pexels-photo-6873123.jpeg?auto=compress&cs=tinysrgb&w=600",
               "https://images.pexels.com/photos/20500734/pexels-photo-20500734/free-photo-of-distributor-on-a-petrol-station.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
-              "https://images.pexels.com/photos/3807167/pexels-photo-3807167.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+              "https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/WhatsApp%20Image%202025-02-24%20at%2012.44.01.jpeg?alt=media&token=e2987821-bd17-41e2-b757-244e05697273",
             ].map((obj_, idx_) => {
               return (
                 <div
@@ -732,7 +732,7 @@ const Hero_ = () => {
                     </svg>
                   </div>
                   <div>
-                    <a href="tel:+27712204794" className="text-white/80 text-sm hover:text-amber-400 transition-colors">+27 71 220 4794</a>
+                    <a href="tel:+27723127869" className="text-white/80 text-sm hover:text-amber-400 transition-colors">+27 72 312 7869</a>
                   </div>
                 </div>
                 
@@ -825,7 +825,7 @@ const Hero_ = () => {
       
       {/* WhatsApp Support Bubble */}
       <a 
-        href="https://wa.me/27712204794" 
+        href="https://wa.me/27723127869" 
         target="_blank" 
         rel="noopener noreferrer"
         className="fixed bottom-6 right-6 bg-green-500 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg hover:bg-green-600 transition-all duration-300 z-50 hover:scale-110"
