@@ -1466,20 +1466,6 @@ const AuthForm = () => {
             </div>
           </motion.div>
         </div>
-
-        {/* Framer motion div with animation styles */}
-        {!isLoginForm && !formSubmitted && (
-          <motion.div
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="absolute -top-4 right-4 md:right-8 z-20 bg-white/5 backdrop-blur-sm rounded-md shadow-lg p-2 animate-pulse"
-            onClick={() => selectTitle(formData.title || "Mr")}
-          >
-            <p className="text-xs text-gray-300">Choose your title first</p>
-          </motion.div>
-        )}
       </Card>
     </div>
   );

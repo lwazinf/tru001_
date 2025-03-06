@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { Clock, Menu, ArrowRight } from "lucide-react";
+import { Clock, Menu, ArrowRight, Car } from "lucide-react";
 import Script from "next/script";
 import { useAuth } from "@/lib/firebase/AuthContext";
 import {
@@ -80,6 +80,9 @@ export default function DashPage() {
 
   // Add state for selected vehicle data from the API
   const [selectedVehicleData, setSelectedVehicleData] = useState<any>(null);
+
+  // Add state for selected vehicle
+  const [selectedVehicle, setSelectedVehicle] = useState<VehicleType | null>(null);
 
   // Check authentication and redirect if not authenticated
   useEffect(() => {
@@ -736,6 +739,77 @@ export default function DashPage() {
     setTimeout(() => setShowSuccessToast(false), 3000);
   };
 
+  // Handle vehicle selection from grid
+  const handleVehicleSelect = (vehicle: VehicleType) => {
+    setSelectedVehicle(vehicle);
+  };
+
+  // Component to display selected vehicle details
+  const VehicleDetails = ({ vehicle }: { vehicle: VehicleType }) => {
+    return (
+      <div className="mt-4 border border-gray-800 rounded-lg bg-gray-900/50 overflow-hidden">
+        <div className="border-b border-gray-800 bg-gray-900 px-4 py-2 flex justify-between items-center">
+          <h3 className="text-sm font-medium text-amber-400 flex items-center gap-1.5">
+            <Car className="h-3.5 w-3.5" />
+            Selected Vehicle Details
+          </h3>
+        </div>
+        <div className="p-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+            <div>
+              <p className="text-xs text-gray-400 mb-1">Make & Model</p>
+              <p className="text-sm text-gray-200">
+                {vehicle.make_name || 'Unknown'} {vehicle.model_name || 'Unknown'}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 mb-1">Registration</p>
+              <p className="text-sm text-amber-400 font-medium">{vehicle.type || 'Unknown'}</p>
+            </div>
+            {vehicle.year && (
+              <div>
+                <p className="text-xs text-gray-400 mb-1">Year</p>
+                <p className="text-sm text-gray-200">{vehicle.year}</p>
+              </div>
+            )}
+            {vehicle.fuel_tank_capacity && vehicle.fuel_tank_capacity.length > 0 && (
+              <div>
+                <p className="text-xs text-gray-400 mb-1">Fuel Tank Capacity</p>
+                <p className="text-sm text-gray-200">
+                  {vehicle.fuel_tank_capacity[0].value} {vehicle.fuel_tank_capacity[0].unit}
+                </p>
+              </div>
+            )}
+            {vehicle.slot && (
+              <>
+                <div>
+                  <p className="text-xs text-gray-400 mb-1">Slot ID</p>
+                  <p className="text-sm text-gray-200">{vehicle.slot.id}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 mb-1">Slot Name</p>
+                  <p className="text-sm text-gray-200">{vehicle.slot.name}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 mb-1">Slot Status</p>
+                  <p className={`text-sm ${vehicle.slot.status === 'Active' ? 'text-green-400' : 'text-yellow-400'}`}>
+                    {vehicle.slot.status}
+                  </p>
+                </div>
+                {vehicle.slot.lastUpdated && (
+                  <div>
+                    <p className="text-xs text-gray-400 mb-1">Last Updated</p>
+                    <p className="text-sm text-gray-200">{vehicle.slot.lastUpdated}</p>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // If still checking auth or loading data, show loading overlay
   if (isAuthChecking) {
     return (
@@ -989,12 +1063,14 @@ export default function DashPage() {
                       onAddVehicle={() => setShowAddVehicleModal(true)}
                       tier={userData.tier}
                       onDeleteVehicle={handleDeleteVehicle}
+                      onVehicleSelect={(index) => handleVehicleSelect(userData.vehicles[index])}
                     />
                   )}
-                  <FuelTanksStatus
-                    tanks={userData.tanks}
-                    tier={userData.tier}
-                  />
+                  
+                  {/* Display selected vehicle details below the Fuel tank status */}
+                  {selectedVehicle && (
+                    <VehicleDetails vehicle={selectedVehicle} />
+                  )}
                 </ProfileSection>
               )}
 

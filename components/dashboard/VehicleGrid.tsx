@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { Car, AlertTriangle, Crown, Trash2, Droplets } from 'lucide-react';
+import React, { useState } from 'react';
+import { Car, AlertTriangle, Crown, Trash2, Droplets, Gauge } from 'lucide-react';
 
 // Enhanced Vehicle Type interface to match API data
 interface VehicleType {
@@ -11,6 +11,13 @@ interface VehicleType {
   model_name?: string;
   year?: number | string;
   fuel_tank_capacity?: Array<{value: string, unit: string}>;
+  // Add slot details properties
+  slot?: {
+    id: string;
+    name: string;
+    status: string;
+    lastUpdated?: string;
+  };
 }
 
 interface VehicleGridProps {
@@ -18,9 +25,13 @@ interface VehicleGridProps {
   onAddVehicle: () => void;
   tier?: string;  // Add tier as an optional prop
   onDeleteVehicle?: (index: number) => void;
+  onVehicleSelect?: (index: number) => void; // Add callback for vehicle selection
 }
 
-export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle, tier, onDeleteVehicle }) => {
+export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle, tier, onDeleteVehicle, onVehicleSelect }) => {
+  // State to track selected vehicle
+  const [selectedVehicleIndex, setSelectedVehicleIndex] = useState<number | null>(null);
+  
   // Determine max slots based on tier
   const getMaxSlots = () => {
     if (tier === 'Black' || tier === 'black') {
@@ -41,15 +52,6 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle
   
   // Create array of empty slots
   const emptySlotArray = Array(emptySlots).fill(null);
-
-  // Helper function to format fuel tank capacity
-  // const formatFuelTankCapacity = (vehicle: VehicleType): string => {
-  //   if (vehicle.fuel_tank_capacity && vehicle.fuel_tank_capacity.length > 0) {
-  //     const capacity = vehicle.fuel_tank_capacity[0];
-  //     return `${capacity.value} ${capacity.unit}`;
-  //   }
-  //   return 'N/A';
-  // };
 
   // Extract just the numeric value of fuel capacity for display
   const getFuelCapacityValue = (vehicle: VehicleType): string => {
@@ -82,6 +84,19 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle
     return nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
   };
 
+  // Helper function to handle vehicle selection
+  const handleVehicleSelect = (index: number) => {
+    const newSelectedIndex = index === selectedVehicleIndex ? null : index;
+    setSelectedVehicleIndex(newSelectedIndex);
+    
+    // Call the parent component's callback if provided
+    if (onVehicleSelect) {
+      if (newSelectedIndex !== null) {
+        onVehicleSelect(newSelectedIndex);
+      }
+    }
+  };
+
   return (
     <div className="space-y-3">
       <div className="flex justify-between items-center">
@@ -111,11 +126,15 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle
         {vehicles.slice(0, maxSlots).map((vehicle, index) => (
           <div 
             key={`vehicle-${index}`}
-            className="bg-gray-900 rounded-md border border-gray-800 relative transition-all duration-200 hover:bg-gray-800/80"
+            className={`bg-gray-900 rounded-md border ${selectedVehicleIndex === index ? 'border-amber-500' : 'border-gray-800'} relative transition-all duration-200 hover:bg-gray-800/80 cursor-pointer`}
+            onClick={() => handleVehicleSelect(index)}
           >
             {/* Delete button */}
             <div 
-              onClick={() => onDeleteVehicle && onDeleteVehicle(index)}
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent triggering vehicle selection
+                onDeleteVehicle && onDeleteVehicle(index);
+              }}
               className="absolute top-2 right-2 bg-red-500/10 px-2 py-0.5 rounded text-red-400 cursor-pointer transition-colors duration-200 flex items-center gap-1 hover:bg-red-500/20"
               role="button"
               aria-label="Free vehicle slot"
@@ -141,6 +160,36 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle
                 <span className="text-blue-400">Tank:</span>
                 <span className="text-gray-300">{getFuelCapacityValue(vehicle)}{getFuelCapacityUnit(vehicle)}</span>
               </div>
+              
+              {/* Slot Details - shown when vehicle is selected and has slot data */}
+              {selectedVehicleIndex === index && vehicle.slot && (
+                <div className="mt-3 pt-2 border-t border-gray-800">
+                  <h4 className="text-xs font-medium text-amber-400 mb-1">Slot Details</h4>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-1 text-xs">
+                      <Gauge className="h-3 w-3 text-gray-400" />
+                      <span className="text-gray-400">ID:</span>
+                      <span className="text-gray-300">{vehicle.slot.id}</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs">
+                      <span className="text-gray-400">Name:</span>
+                      <span className="text-gray-300">{vehicle.slot.name}</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs">
+                      <span className="text-gray-400">Status:</span>
+                      <span className={`${vehicle.slot.status === 'Active' ? 'text-green-400' : 'text-yellow-400'}`}>
+                        {vehicle.slot.status}
+                      </span>
+                    </div>
+                    {vehicle.slot.lastUpdated && (
+                      <div className="flex items-center gap-1 text-xs">
+                        <span className="text-gray-400">Last Updated:</span>
+                        <span className="text-gray-300">{vehicle.slot.lastUpdated}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         ))}
