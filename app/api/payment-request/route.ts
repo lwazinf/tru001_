@@ -3,8 +3,8 @@ import axios from 'axios';
 import { generateSha512 } from './genSha';
 
 // Constants
-const PRIVATE_KEY = "LGHols43XVKH4pi4WdRwbdTM7ZYnYo19";
-const API_KEY = "qH5FgfIwE6qdpSI9XvpP51C9DLZ7POum";
+const PRIVATE_KEY = "YNPKFYmwzKIK9kSjeElwrXYalANQWEUP";
+const API_KEY = "IGNs0870Yu9erbN2gZsSy0ludr8TAAzA";
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,14 +14,14 @@ export async function POST(request: NextRequest) {
     
     // Base payment data
     const baseData = {
-      siteCode: "NEE-NEE-003",
+      siteCode: "NEE-NEE-004",
       countryCode: "ZA",
       currencyCode: "ZAR",
-      cancelUrl: "https://www.youtube.com/watch?v=b1SJ3UF4AWE",
+      cancelUrl: "https://www.needtofuel.com",
       errorUrl: "https://www.needtofuel.com/auth",
       successUrl: "https://www.needtofuel.com/dash",
       notifyUrl: "https://hook.eu2.make.com/3kq4t19wngrc3ojq3hfipodwhotlz1he",
-      isTest: true,
+      isTest: false,
     };
     
     // Merge request data with base data (request data takes precedence)
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     const config = {
       method: 'post',
       maxBodyLength: Infinity,
-      url: 'https://stagingapi.ozow.com/PostPaymentRequest',
+      url: 'https://api.ozow.com/PostPaymentRequest',
       headers: { 
         'ApiKey': API_KEY, 
         'Accept': 'application/json', 
