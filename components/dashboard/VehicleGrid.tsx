@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Car, AlertTriangle, Crown, Trash2, Droplets, Gauge } from 'lucide-react';
 
 // Enhanced Vehicle Type interface to match API data
-interface VehicleType {
+export interface VehicleType {
   name: string;
   type: string; // Number plate
   make_name?: string;
@@ -133,7 +133,9 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle
             <div 
               onClick={(e) => {
                 e.stopPropagation(); // Prevent triggering vehicle selection
-                onDeleteVehicle && onDeleteVehicle(index);
+                if (onDeleteVehicle) {
+                  onDeleteVehicle(index);
+                }
               }}
               className="absolute top-2 right-2 bg-red-500/10 px-2 py-0.5 rounded text-red-400 cursor-pointer transition-colors duration-200 flex items-center gap-1 hover:bg-red-500/20"
               role="button"

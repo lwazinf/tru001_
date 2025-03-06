@@ -24,7 +24,6 @@ import { AddVehicleModal } from "@/components/dashboard/AddVehicleModal";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { DeleteAccountModal } from "@/components/dashboard/DeleteAccountModal";
-import { FuelTanksStatus } from "@/components/dashboard/FuelTanksStatus";
 import { LoadingOverlay } from "@/components/dashboard/LoadingOverlay";
 import { ProfileSection } from "@/components/dashboard/ProfileSection";
 import { SecuritySection } from "@/components/dashboard/SecuritySection";
@@ -32,6 +31,9 @@ import { SuccessToast } from "@/components/dashboard/SuccessToast";
 import { VehicleGrid } from "@/components/dashboard/VehicleGrid";
 import { auth } from "@/lib/firebase/config";
 import { processPayment } from "../utils/payment";
+
+// Import VehicleType from the VehicleGrid component file
+import type { VehicleType } from "@/components/dashboard/VehicleGrid";
 
 export default function DashPage() {
   // State variables
