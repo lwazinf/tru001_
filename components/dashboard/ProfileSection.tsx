@@ -118,10 +118,15 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
               </div>
               
               {/* Map */}
-              <div className="mt-3 h-48 rounded-md overflow-hidden border border-gray-700 shadow-inner shadow-black/20">
+              <div className="mt-3 h-48 relative rounded-md overflow-hidden border border-gray-700 shadow-inner shadow-black/20">
+                
+                <div className={`w-full h-full flex flex-col justify-center items-center absolute z-[5]`}>
                 {isBrowser && (
                   <MapComponent position={mapPosition} zoom={mapZoom} address={address} />
+                  
                 )}
+                </div>
+                <div className={`w-full h-full bg-red-500/50 flex flex-col justify-center items-center absolute z-[10]`}></div>
               </div>
             </div>
           </div>
