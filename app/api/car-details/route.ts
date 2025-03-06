@@ -1,7 +1,7 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 // Define vehicle data type
-interface VehicleData {
+export interface VehicleData {
   id: string;
   make_name: string;
   model_name: string;
@@ -12,120 +12,6 @@ interface VehicleData {
   body_type: string;
   image?: string;
 }
-
-// Mock vehicle database
-const vehicleDatabase: VehicleData[] = [
-  {
-    id: "toyota-corolla",
-    make_name: "Toyota",
-    model_name: "Corolla",
-    year_from: "2020",
-    year_to: "2023",
-    fuel_tank_capacity: [{ value: "50", unit: "liters" }],
-    engine_capacity: "1.8",
-    body_type: "Sedan",
-    image: "https://firebasestorage.googleapis.com/v0/b/ntf-web-3fb77.appspot.com/o/vehicle_images%2Ftoyota_corolla.jpg?alt=media"
-  },
-  {
-    id: "toyota-camry",
-    make_name: "Toyota",
-    model_name: "Camry",
-    year_from: "2018",
-    year_to: "2023",
-    fuel_tank_capacity: [{ value: "60", unit: "liters" }],
-    engine_capacity: "2.5",
-    body_type: "Sedan",
-    image: "https://firebasestorage.googleapis.com/v0/b/ntf-web-3fb77.appspot.com/o/vehicle_images%2Ftoyota_camry.jpg?alt=media"
-  },
-  {
-    id: "toyota-rav4",
-    make_name: "Toyota",
-    model_name: "RAV4",
-    year_from: "2019",
-    year_to: "2023",
-    fuel_tank_capacity: [{ value: "55", unit: "liters" }],
-    engine_capacity: "2.0",
-    body_type: "SUV",
-    image: "https://firebasestorage.googleapis.com/v0/b/ntf-web-3fb77.appspot.com/o/vehicle_images%2Ftoyota_rav4.jpg?alt=media"
-  },
-  {
-    id: "bmw-3series",
-    make_name: "BMW",
-    model_name: "3 Series",
-    year_from: "2019",
-    year_to: "2023",
-    fuel_tank_capacity: [{ value: "59", unit: "liters" }],
-    engine_capacity: "2.0",
-    body_type: "Sedan",
-    image: "https://firebasestorage.googleapis.com/v0/b/ntf-web-3fb77.appspot.com/o/vehicle_images%2Fbmw_3series.jpg?alt=media"
-  },
-  {
-    id: "mercedes-cclass",
-    make_name: "Mercedes-Benz",
-    model_name: "C-Class",
-    year_from: "2019",
-    year_to: "2023",
-    fuel_tank_capacity: [{ value: "66", unit: "liters" }],
-    engine_capacity: "2.0",
-    body_type: "Sedan",
-    image: "https://firebasestorage.googleapis.com/v0/b/ntf-web-3fb77.appspot.com/o/vehicle_images%2Fmercedes_cclass.jpg?alt=media"
-  },
-  {
-    id: "ford-ranger",
-    make_name: "Ford",
-    model_name: "Ranger",
-    year_from: "2019",
-    year_to: "2023",
-    fuel_tank_capacity: [{ value: "80", unit: "liters" }],
-    engine_capacity: "2.2",
-    body_type: "Pickup",
-    image: "https://firebasestorage.googleapis.com/v0/b/ntf-web-3fb77.appspot.com/o/vehicle_images%2Fford_ranger.jpg?alt=media"
-  },
-  {
-    id: "honda-civic",
-    make_name: "Honda",
-    model_name: "Civic",
-    year_from: "2019",
-    year_to: "2023",
-    fuel_tank_capacity: [{ value: "47", unit: "liters" }],
-    engine_capacity: "1.5",
-    body_type: "Sedan",
-    image: "https://firebasestorage.googleapis.com/v0/b/ntf-web-3fb77.appspot.com/o/vehicle_images%2Fhonda_civic.jpg?alt=media"
-  },
-  {
-    id: "vw-golf",
-    make_name: "Volkswagen",
-    model_name: "Golf",
-    year_from: "2018",
-    year_to: "2023",
-    fuel_tank_capacity: [{ value: "50", unit: "liters" }],
-    engine_capacity: "1.4",
-    body_type: "Hatchback",
-    image: "https://firebasestorage.googleapis.com/v0/b/ntf-web-3fb77.appspot.com/o/vehicle_images%2Fvw_golf.jpg?alt=media"
-  },
-  {
-    id: "nissan-xtrail",
-    make_name: "Nissan",
-    model_name: "X-Trail",
-    year_from: "2017",
-    year_to: "2023",
-    fuel_tank_capacity: [{ value: "60", unit: "liters" }],
-    engine_capacity: "2.5",
-    body_type: "SUV",
-    image: "https://firebasestorage.googleapis.com/v0/b/ntf-web-3fb77.appspot.com/o/vehicle_images%2Fnissan_xtrail.jpg?alt=media"
-  },
-  {
-    id: "audi-a4",
-    make_name: "Audi",
-    model_name: "A4",
-    year_from: "2016",
-    year_to: "2023",
-    fuel_tank_capacity: [{ value: "58", unit: "liters" }],
-    engine_capacity: "2.0",
-    body_type: "Sedan",
-    image: "https://firebasestorage.googleapis.com/v0/b/ntf-web-3fb77.appspot.com/o/vehicle_images%2Faudi_a4.jpg?alt=media"
-  }
-];
 
 /**
  * API Route handler for car details - proxies requests to the external API
