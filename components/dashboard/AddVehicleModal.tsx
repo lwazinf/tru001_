@@ -264,6 +264,12 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
       
       // Close modal and add vehicle
       onAdd();
+      onClose(); // Ensure modal closes
+      
+      // Reset state
+      setModalState('FORM');
+      setSelectedVehicleIndex(null);
+      setApiResults([]);
     } else {
       setError('Please select a vehicle');
     }
@@ -318,6 +324,12 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
       
       // Close modal and add vehicle
       onAdd();
+      onClose(); // Ensure modal closes
+      
+      // Reset state
+      setModalState('FORM');
+      setSelectedVehicleIndex(null);
+      setApiResults([]);
     } else {
       setError('No vehicle selected');
       changeModalState('RESULTS');
