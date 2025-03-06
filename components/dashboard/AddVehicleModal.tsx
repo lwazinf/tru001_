@@ -48,7 +48,6 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
   const [currentPage, setCurrentPage] = useState(0);
   const resultsPerPage = 3;
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   // Add state for manual fuel capacity input
   const [manualCapacity, setManualCapacity] = useState('');
@@ -95,7 +94,6 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
 
   // Fetch vehicle data via our Next.js API route (proxy)
   const fetchVehicleData = async () => {
-    setIsLoading(true);
     setError(null);
     setModalState("LOADING");
     
@@ -150,8 +148,6 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
       setError(error instanceof Error ? error.message : 'An error occurred');
       changeModalState('FORM');
       return [];
-    } finally {
-      setIsLoading(false);
     }
   };
 

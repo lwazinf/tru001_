@@ -31,9 +31,7 @@ import { SuccessToast } from "@/components/dashboard/SuccessToast";
 import { VehicleGrid } from "@/components/dashboard/VehicleGrid";
 import { auth } from "@/lib/firebase/config";
 import { processPayment } from "../utils/payment";
-
-// Import VehicleType from the VehicleGrid component file
-import type { VehicleType } from "@/components/dashboard/VehicleGrid";
+import { VehicleType } from "@/components/dashboard/VehicleGrid";
 
 export default function DashPage() {
   // State variables
@@ -71,7 +69,7 @@ export default function DashPage() {
     tier: "basic",
     tierDate: null as Timestamp | null,
     address: "",
-    vehicles: [] as Array<{ name: string; type: string }>,
+    vehicles: [] as VehicleType[],
     tanks: {
       diesel: 0,
       petrol: { "93": 0, "95": 0 },
