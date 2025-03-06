@@ -575,7 +575,7 @@ const Hero_ = () => {
             {[
               "https://images.pexels.com/photos/6873123/pexels-photo-6873123.jpeg?auto=compress&cs=tinysrgb&w=600",
               "https://images.pexels.com/photos/20500734/pexels-photo-20500734/free-photo-of-distributor-on-a-petrol-station.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
-              "https://images.pexels.com/photos/3807167/pexels-photo-3807167.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+              "https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/WhatsApp%20Image%202025-02-24%20at%2012.44.01.jpeg?alt=media&token=e2987821-bd17-41e2-b757-244e05697273",
             ].map((obj_, idx_) => {
               return (
                 <div
