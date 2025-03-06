@@ -11,6 +11,7 @@ export interface VehicleType {
   model_name?: string;
   year?: number | string;
   fuel_tank_capacity?: Array<{value: string, unit: string}>;
+  image?: string;
   // Add slot details properties
   slot?: {
     id: string;
@@ -32,31 +33,28 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle
   // State to track selected vehicle
   const [selectedVehicleIndex, setSelectedVehicleIndex] = useState<number | null>(null);
   
-  // Determine max slots based on tier
-  const getMaxSlots = () => {
-    if (tier === 'Black' || tier === 'black') {
-      return 4; // Black tier gets 4 slots (2×2 grid)
-    } else if (tier === 'Gold' || tier === 'gold') {
-      return 2; // Gold tier gets 2 slots (2×1 grid)
-    } else {
-      return 1; // Default/new tier gets 1 slot
-    }
-  };
+  // Set max slots based on tier
+  let maxSlots = 1; // Basic tier
+  if (tier === 'Gold' || tier === 'gold') {
+    maxSlots = 2;
+  } else if (tier === 'Black' || tier === 'black') {
+    maxSlots = 4;
+  }
 
-  const maxSlots = getMaxSlots();
+  // Calculate empty slots
+  const emptySlots = Math.max(0, maxSlots - vehicles.length);
   
-  // Calculate how many empty slots to show
-  const filledSlots = vehicles.length;
-  const emptySlots = Math.max(0, maxSlots - filledSlots);
+  // Should we show the add button?
   const showAddButton = emptySlots > 0;
   
-  // Create array of empty slots
+  // Create an array for empty slots
   const emptySlotArray = Array(emptySlots).fill(null);
 
   // Extract just the numeric value of fuel capacity for display
   const getFuelCapacityValue = (vehicle: VehicleType): string => {
     if (vehicle.fuel_tank_capacity && vehicle.fuel_tank_capacity.length > 0) {
-      return vehicle.fuel_tank_capacity[0].value;
+      const capacity = vehicle.fuel_tank_capacity[0];
+      return `${capacity.value} ${capacity.unit}`;
     }
     return 'N/A';
   };
@@ -72,16 +70,19 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle
   // Helper function to extract make name
   const getMakeName = (vehicle: VehicleType): string => {
     if (vehicle.make_name) return vehicle.make_name;
-    // Fallback: try to extract make from name
-    return vehicle.name.split(' ')[0] || 'Unknown';
+    
+    // Fall back to first part of name
+    const parts = vehicle.name.split(' ');
+    return parts[0] || 'Unknown';
   };
 
   // Helper function to extract model name
   const getModelName = (vehicle: VehicleType): string => {
     if (vehicle.model_name) return vehicle.model_name;
-    // Fallback: try to extract model from name
-    const nameParts = vehicle.name.split(' ');
-    return nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+    
+    // Fall back to remaining parts of name
+    const parts = vehicle.name.split(' ');
+    return parts.slice(1).join(' ') || 'Unknown';
   };
 
   // Helper function to handle vehicle selection
@@ -115,7 +116,7 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle
             </span>
           ) : null}
           <span className="text-xs text-amber-400/80">
-            {filledSlots}/{maxSlots} slots
+            {vehicles.length}/{maxSlots} slots used
           </span>
         </div>
       </div>
@@ -160,7 +161,7 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({ vehicles, onAddVehicle
               <div className="flex items-center gap-1 mt-1 text-xs">
                 <Droplets className="h-3 w-3 text-blue-400" />
                 <span className="text-blue-400">Tank:</span>
-                <span className="text-gray-300">{getFuelCapacityValue(vehicle)}{getFuelCapacityUnit(vehicle)}</span>
+                <span className="text-gray-300">{getFuelCapacityValue(vehicle)}</span>
               </div>
               
               {/* Slot Details - shown when vehicle is selected and has slot data */}

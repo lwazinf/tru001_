@@ -507,7 +507,7 @@ export default function DashPage() {
   };
 
   // Add new vehicle to user data
-  const handleAddVehicle = () => {
+  const handleAddVehicle = async () => {
     // Prevent paused users from adding vehicles
     if (userData.tier === "Paused") {
       setSuccessMessage(
@@ -526,28 +526,61 @@ export default function DashPage() {
       return;
     }
 
-    // Create new vehicle with additional data if available
-    const vehicleToAdd = {
-      ...newVehicle,
-      // Include the additional data from selected vehicle
-      make_name: selectedVehicleData?.make_name || newVehicle.name.split(' ')[0],
-      model_name: selectedVehicleData?.model_name || newVehicle.name.split(' ').slice(1).join(' '),
-      year: selectedVehicleData?.year_from || selectedVehicleData?.year,
-      fuel_tank_capacity: selectedVehicleData?.fuel_tank_capacity || []
-    };
-
-    const updatedVehicles = [...userData.vehicles, vehicleToAdd];
-    setUserData((prev) => ({ ...prev, vehicles: updatedVehicles }));
-
-    // Close modal and reset form
-    setShowAddVehicleModal(false);
-    setNewVehicle({ name: "", type: "" });
-    setSelectedVehicleData(null);
-
-    // Show success message
-    setSuccessMessage("Vehicle added. Don't forget to save your changes!");
+    // Show loading message
+    setSuccessMessage("Adding vehicle...");
     setShowSuccessToast(true);
-    setTimeout(() => setShowSuccessToast(false), 3000);
+    
+    try {
+      // Default placeholder image if no image is provided
+      const placeholderImage = "https://firebasestorage.googleapis.com/v0/b/ntf-web-3fb77.appspot.com/o/vehicle_images%2Fcar-placeholder.png?alt=media&token=placeholder123";
+      
+      // Create new vehicle with additional data if available
+      const vehicleToAdd = {
+        ...newVehicle,
+        // Include the additional data from selected vehicle
+        make_name: selectedVehicleData?.make_name || newVehicle.name.split(' ')[0],
+        model_name: selectedVehicleData?.model_name || newVehicle.name.split(' ').slice(1).join(' '),
+        year: selectedVehicleData?.year_from || selectedVehicleData?.year,
+        // Ensure fuel_tank_capacity is formatted correctly
+        fuel_tank_capacity: selectedVehicleData?.fuel_tank_capacity || [],
+        // Use the image from selectedVehicleData or placeholder
+        image: selectedVehicleData?.image || placeholderImage
+      };
+
+      console.log("Adding vehicle with data:", vehicleToAdd);
+      
+      const updatedVehicles = [...userData.vehicles, vehicleToAdd];
+      
+      // Update local state first
+      setUserData((prev) => ({ ...prev, vehicles: updatedVehicles }));
+
+      // If user is logged in, update in Firestore
+      if (currentUser && currentUser.uid) {
+        const db = getFirestore();
+        const userDocRef = doc(db, "users", currentUser.uid);
+        
+        await updateDoc(userDocRef, {
+          vehicles: updatedVehicles
+        });
+        
+        console.log("Vehicle added to Firestore with image:", vehicleToAdd.image);
+      }
+
+      // Close modal and reset form
+      setShowAddVehicleModal(false);
+      setNewVehicle({ name: "", type: "" });
+      setSelectedVehicleData(null);
+
+      // Show success message
+      setSuccessMessage("Vehicle added successfully!");
+      setShowSuccessToast(true);
+      setTimeout(() => setShowSuccessToast(false), 3000);
+    } catch (error) {
+      console.error("Error adding vehicle:", error);
+      setSuccessMessage("Failed to add vehicle. Please try again.");
+      setShowSuccessToast(true);
+      setTimeout(() => setShowSuccessToast(false), 3000);
+    }
   };
 
   // Add custom styles for the autocomplete dropdown

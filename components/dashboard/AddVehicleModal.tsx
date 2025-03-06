@@ -48,6 +48,7 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
   const [currentPage, setCurrentPage] = useState(0);
   const resultsPerPage = 3;
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Add state for manual fuel capacity input
   const [manualCapacity, setManualCapacity] = useState('');
@@ -92,33 +93,65 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
     return true;
   };
 
-  // Fetch vehicle data using our internal API route
+  // Fetch vehicle data via our Next.js API route (proxy)
   const fetchVehicleData = async () => {
-    const params = new URLSearchParams();
-    
-    if (vehicleData.make.trim()) {
-      params.append('makeName', vehicleData.make.trim());
-    }
-    
-    const year = parseInt(vehicleData.year.trim());
-    if (!isNaN(year)) {
-      params.append('year', year.toString());
-    }
-    
-    // Use our internal API route instead of the external one
-    const url = `/api/car-details?${params.toString()}`;
+    setIsLoading(true);
+    setError(null);
+    setModalState("LOADING");
     
     try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error('Failed to load vehicle data');
+      const params = new URLSearchParams();
+      
+      if (vehicleData.make.trim()) {
+        params.append('makeName', vehicleData.make.trim());
       }
+      
+      const year = parseInt(vehicleData.year.trim());
+      if (!isNaN(year)) {
+        params.append('year', year.toString());
+      }
+      
+      // Use our Next.js API route as a proxy to the external API
+      const url = `/api/car-details?${params.toString()}`;
+      
+      // Add timeout to prevent hanging
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      
+      console.log(`Fetching vehicle data from: ${url}`);
+      
+      const response = await fetch(url, {
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        console.error(`API error: ${response.status} - ${await response.text()}`);
+        throw new Error(`Failed to load vehicle data: ${response.status}`);
+      }
+      
       const data = await response.json();
       console.log('API response:', data);
-      return data;
+      
+      if (Array.isArray(data) && data.length > 0) {
+        setApiResults(data);
+        setSelectedVehicleIndex(null);
+        setCurrentPage(0);
+        changeModalState('RESULTS');
+        return data;
+      } else {
+        setError('No vehicles found. Please try different search criteria.');
+        changeModalState('FORM');
+        return [];
+      }
     } catch (error) {
       console.error('Error fetching vehicle data:', error);
-      throw error;
+      setError(error instanceof Error ? error.message : 'An error occurred');
+      changeModalState('FORM');
+      return [];
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -195,7 +228,20 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
       
       // Pass the complete vehicle data to parent component
       if (onVehicleSelect) {
-        onVehicleSelect(selectedVehicle);
+        // Make sure we pass all the essential fields
+        const enhancedVehicle = {
+          ...selectedVehicle,
+          year: selectedVehicle.year_from,
+          name: `${selectedVehicle.make_name} ${selectedVehicle.model_name}`,
+          type: vehicleData.numberPlate,
+          // Ensure fuel_tank_capacity is in the right format
+          fuel_tank_capacity: selectedVehicle.fuel_tank_capacity.map((cap: { value: string | number, unit: string }) => ({
+            value: cap.value.toString(),
+            unit: cap.unit
+          }))
+        };
+        
+        onVehicleSelect(enhancedVehicle);
       }
       
       // Format the vehicle name using the selected data
@@ -236,6 +282,9 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
       // Add the manually entered fuel capacity to the vehicle data
       const enhancedVehicle = {
         ...selectedVehicle,
+        year: selectedVehicle.year_from,
+        name: `${selectedVehicle.make_name} ${selectedVehicle.model_name}`,
+        type: vehicleData.numberPlate,
         fuel_tank_capacity: [
           {
             value: manualCapacity,
