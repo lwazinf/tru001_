@@ -106,12 +106,14 @@ const Nav_ = ({ user }: NavProps) => {
         <div className="flex items-center space-x-3">
           {/* User status or auth button */}
           {user ? (
-            <div className="flex items-center space-x-2 px-3 py-1.5 bg-amber-500/10 rounded-full">
-              <FontAwesomeIcon icon={faUser} className="text-amber-500 h-4 w-4" />
-              <span className="text-white text-sm font-medium truncate max-w-[100px]">
-                {user.displayName || user.email?.split('@')[0] || 'User'}
-              </span>
-            </div>
+            <Link href="/dash">
+              <div className="flex items-center space-x-2 px-3 py-1.5 bg-amber-500/10 rounded-full hover:bg-amber-500/20 transition-all duration-300 cursor-pointer">
+                <FontAwesomeIcon icon={faUser} className="text-amber-500 h-4 w-4" />
+                <span className="text-white text-sm font-medium truncate max-w-[100px]">
+                  {user.displayName || user.email?.split('@')[0] || 'User'}
+                </span>
+              </div>
+            </Link>
           ) : (
             <Link href="/auth">
               <span className="text-white bg-amber-500/20 hover:bg-amber-500/30 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300">

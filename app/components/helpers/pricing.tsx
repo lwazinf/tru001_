@@ -47,7 +47,7 @@ const Pricing_ = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           whileHover={{ y: -10, transition: { duration: 0.2 } }}
-          className={`h-[500px] w-[350px] m-2 rounded-2xl flex flex-col justify-start items-center relative overflow-hidden border border-amber-500/20 backdrop-blur-sm bg-gradient-to-b from-amber-500/10 to-black/40`}
+          className={`min-h-[500px] w-[350px] m-2 rounded-2xl flex flex-col justify-start items-center relative overflow-hidden border border-amber-500/20 backdrop-blur-sm bg-gradient-to-b from-amber-500/10 to-black/40`}
           style={{ 
             boxShadow: "0 10px 40px -10px rgba(245, 158, 11, 0.3), 0 0 20px 0px rgba(245, 158, 11, 0.1) inset"
           }}
@@ -129,17 +129,15 @@ const Pricing_ = () => {
             <div className="flex items-center justify-between mb-3">
               <span className="text-amber-500/80 text-xs italic">Limited to 50 members</span>
             </div>
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold text-sm flex items-center justify-center group"
+            <div
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold text-sm flex items-center justify-center cursor-pointer group"
             >
               Get Started
               <FontAwesomeIcon
                 icon={faArrowRight}
                 className="ml-2 h-3 w-3 group-hover:translate-x-1 transition-transform"
               />
-            </motion.button>
+            </div>
           </div>
         </motion.div>
         
@@ -149,7 +147,7 @@ const Pricing_ = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
           whileHover={{ y: -10, transition: { duration: 0.2 } }}
-          className={`h-[520px] w-[350px] m-2 rounded-2xl flex flex-col justify-start items-center relative overflow-hidden border border-white/10 backdrop-blur-sm bg-gradient-to-b from-white/10 to-black/60 z-10`}
+          className={`min-h-[520px] w-[350px] m-2 rounded-2xl flex flex-col justify-start items-center relative overflow-hidden border border-white/10 backdrop-blur-sm bg-gradient-to-b from-white/10 to-black/60 z-10`}
           style={{ 
             boxShadow: "0 10px 50px -10px rgba(0, 0, 0, 0.8), 0 0 30px 0px rgba(255, 255, 255, 0.05) inset"
           }}
@@ -236,19 +234,17 @@ const Pricing_ = () => {
           {/* CTA */}
           <div className="w-full px-6 pb-8">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-white/80 text-xs italic">Limited to 25 members</span>
+              <span className="text-white/80 text-xs italic">Limited to 50 members</span>
             </div>
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-              className="w-full py-3 rounded-xl bg-white text-black font-bold text-sm flex items-center justify-center group"
+            <div
+              className="w-full py-3 rounded-xl bg-white text-black font-bold text-sm flex items-center justify-center group cursor-pointer"
             >
               Get Started
               <FontAwesomeIcon
                 icon={faArrowRight}
                 className="ml-2 h-3 w-3 group-hover:translate-x-1 transition-transform"
               />
-            </motion.button>
+            </div>
           </div>
         </motion.div>
       </motion.div>

@@ -914,49 +914,90 @@ const AuthForm = () => {
 
               <motion.div variants={itemVariants} className="space-y-4">
                 {!isLoginForm && !formSubmitted && (
-                  <motion.div
-                    initial={{ opacity: 1 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className={`${
-                      fieldErrors.title ? "bg-red-500 red-glow" : "bg-amber-500"
-                    } text-white text-xs font-black ml-[-12px] px-3 py-1 rounded-sm absolute z-10 mt-[-8px] cursor-pointer transition-all duration-300`}
-                    onClick={() => setTitleDropdownOpen(!titleDropdownOpen)}
-                  >
-                    <span>{formData.title || "Title"}</span>
+                  <>
+                    {/* Desktop title dropdown (hidden on mobile) */}
+                    <motion.div
+                      initial={{ opacity: 1 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.5 }}
+                      className={`hidden md:block ${
+                        fieldErrors.title ? "bg-red-500 red-glow" : "bg-amber-500"
+                      } text-white text-xs font-black ml-[-12px] px-3 py-1 rounded-sm absolute z-10 mt-[-8px] cursor-pointer transition-all duration-300`}
+                      onClick={() => setTitleDropdownOpen(!titleDropdownOpen)}
+                    >
+                      <span>{formData.title || "Title"}</span>
 
-                    {/* Title dropdown menu */}
-                    {titleDropdownOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        className="absolute z-10 overflow-hidden shadow-lg bg-amber-500/95 rounded-sm mt-2 ml-[-12px] border border-amber-600/40"
-                        style={{ width: "fit-content", minWidth: "45px" }}
-                        onMouseEnter={handleDropdownMouseEnter}
-                        onMouseLeave={handleDropdownMouseLeave}
+                      {/* Title dropdown menu */}
+                      {titleDropdownOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0 }}
+                          className="absolute z-10 overflow-hidden shadow-lg bg-amber-500/95 rounded-sm mt-2 ml-[-12px] border border-amber-600/40"
+                          style={{ width: "fit-content", minWidth: "45px" }}
+                          onMouseEnter={handleDropdownMouseEnter}
+                          onMouseLeave={handleDropdownMouseLeave}
+                        >
+                          <div className="py-0.5">
+                            {["Mr.", "Mrs.", "Ms.", "Dr.", "Prof.", "Adv."].map(
+                              (title, index) => (
+                                <div
+                                  key={title}
+                                  onClick={() => selectTitle(title)}
+                                  className={`px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-600 cursor-pointer transition-colors ${
+                                    index !== 0
+                                      ? "border-t border-amber-400/20"
+                                      : ""
+                                  }`}
+                                >
+                                  {title}
+                                </div>
+                              )
+                            )}
+                          </div>
+                        </motion.div>
+                      )}
+                    </motion.div>
+
+                    {/* Mobile title select (hidden on desktop) */}
+                    <div className="md:hidden relative mb-4">
+                      <select
+                        name="title"
+                        value={formData.title}
+                        onChange={(e) => selectTitle(e.target.value)}
+                        className={`w-full bg-black/60 backdrop-blur-sm rounded-md px-4 py-3 text-white border-0 ring-1 ${
+                          fieldErrors.title
+                            ? "ring-red-500"
+                            : "ring-gray-700"
+                        } transition-all duration-300 focus:ring-2 focus:ring-amber-500 text-base appearance-none`}
                       >
-                        <div className="py-0.5">
-                          {["Mr.", "Mrs.", "Ms.", "Dr.", "Prof.", "Adv."].map(
-                            (title, index) => (
-                              <div
-                                key={title}
-                                onClick={() => selectTitle(title)}
-                                className={`px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-600 cursor-pointer transition-colors ${
-                                  index !== 0
-                                    ? "border-t border-amber-400/20"
-                                    : ""
-                                }`}
-                              >
-                                {title}
-                              </div>
-                            )
-                          )}
-                        </div>
-                      </motion.div>
-                    )}
-                  </motion.div>
+                        <option value="" disabled>Title</option>
+                        {["Mr.", "Mrs.", "Ms.", "Dr.", "Prof.", "Adv."].map(
+                          (title) => (
+                            <option key={title} value={title}>
+                              {title}
+                            </option>
+                          )
+                        )}
+                      </select>
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500">
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                      </div>
+                      {fieldErrors.title && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 3 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="absolute -bottom-6 left-0 flex items-center text-red-400 text-xs pl-1"
+                        >
+                          <AlertTriangle size={12} className="mr-1" />
+                          {fieldErrors.title}
+                        </motion.div>
+                      )}
+                    </div>
+                  </>
                 )}
                 {/* Signup-only fields */}
                 <AnimatePresence>
