@@ -522,8 +522,8 @@ const AuthForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black md:p-4">
-      <Card className="w-full h-full md:h-auto md:max-w-4xl rounded-none md:rounded-3xl overflow-hidden bg-gray-900 shadow-2xl flex flex-col md:flex-row border-0 relative">
+    <div className={`min-h-screen flex items-center justify-center bg-black ${showThankYou ? 'p-0' : 'md:p-4'}`}>
+      <Card className={`w-full ${showThankYou ? 'h-screen' : 'h-full'} md:h-auto md:max-w-4xl rounded-none md:rounded-3xl overflow-hidden bg-gray-900 shadow-2xl flex flex-col md:flex-row border-0 relative`}>
         {/* Thank you message */}
         <AnimatePresence>
           {showThankYou && (
@@ -532,14 +532,14 @@ const AuthForm = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -50 }}
               transition={{ duration: 0.5 }}
-              className="absolute left-0 top-0 bottom-0 w-full md:w-1/2 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-8 z-10"
+              className="absolute left-0 top-0 bottom-0 w-full md:w-1/2 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4 sm:p-8 z-10"
             >
-              <div className="text-center">
+              <div className="text-center w-full max-w-md mx-auto">
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.3, type: "spring" }}
-                  className="w-24 h-24 mx-auto mb-8 bg-amber-500 rounded-full p-4 shadow-lg shadow-amber-500/20"
+                  className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-6 sm:mb-8 bg-amber-500 rounded-full p-4 shadow-lg shadow-amber-500/20"
                 >
                   <img
                     src="/assets/images/main_logo.png"
@@ -551,7 +551,7 @@ const AuthForm = () => {
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.5 }}
-                  className="text-3xl font-bold text-amber-500 mt-12 text-center"
+                  className="text-2xl sm:text-3xl font-bold text-amber-500 mt-4 sm:mt-12 text-center"
                 >
                   Thanks for choosing NTF
                 </motion.h2>
@@ -559,7 +559,7 @@ const AuthForm = () => {
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.7 }}
-                  className="text-gray-300 mb-8 text-center"
+                  className="text-gray-300 mb-4 sm:mb-8 text-center"
                 >
                   We&apos;re excited to have you on board!
                 </motion.p>
@@ -567,7 +567,7 @@ const AuthForm = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.9 }}
-                  className="text-2xl font-semibold text-amber-500 mb-6 text-center"
+                  className="text-xl sm:text-2xl font-semibold text-amber-500 mb-4 sm:mb-6 text-center"
                 >
                   SELECT YOUR MEMBERSHIP
                 </motion.h3>
@@ -575,7 +575,7 @@ const AuthForm = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 1 }}
-                  className="flex flex-col sm:flex-row gap-6 mx-auto max-w-2xl px-4 mb-12"
+                  className={`flex flex-col ${showThankYou ? 'sm:flex-row' : ''} gap-4 sm:gap-6 mx-auto max-w-2xl px-2 sm:px-4 mb-6 sm:mb-12`}
                 >
                   {/* Gold Tier Option */}
                   <motion.div
@@ -1451,62 +1451,64 @@ const AuthForm = () => {
           </motion.div>
         </div>
 
-        {/* Mobile background image - only visible on small screens, now at bottom of page */}
-        <div className="relative h-48 md:hidden mt-auto">
-          <AnimatePresence mode="wait">
-            {backgroundImages.map(
-              (image, index) =>
-                index === currentImageIndex && (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 1 }}
-                    className="absolute inset-0 bg-cover bg-center"
-                    style={{
-                      backgroundImage: `url('${image}')`,
-                    }}
-                  />
-                )
-            )}
-          </AnimatePresence>
+        {/* Mobile background image - only visible on small screens when thank you is not shown */}
+        {!showThankYou && (
+          <div className="relative h-48 md:hidden mt-auto">
+            <AnimatePresence mode="wait">
+              {backgroundImages.map(
+                (image, index) =>
+                  index === currentImageIndex && (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 1 }}
+                      className="absolute inset-0 bg-cover bg-center"
+                      style={{
+                        backgroundImage: `url('${image}')`,
+                      }}
+                    />
+                  )
+              )}
+            </AnimatePresence>
 
-          {/* Image indicators for mobile */}
-          <div className="absolute bottom-4 right-4 z-20 flex space-x-2">
-            {backgroundImages.map((_, index) => (
-              <motion.div
-                key={index}
-                className={`w-2 h-2 rounded-full ${
-                  index === currentImageIndex ? "bg-amber-500" : "bg-gray-500"
-                }`}
-                animate={{
-                  scale: index === currentImageIndex ? 1.2 : 1,
-                }}
-                transition={{ duration: 0.3 }}
-              />
-            ))}
-          </div>
-
-          {/* Dark gradient overlay for mobile */}
-          <div className="absolute inset-0 bg-gradient-to-b from-gray-900 to-transparent z-10"></div>
-
-          {/* Logo in the bottom right for mobile */}
-          <motion.div
-            className="absolute bottom-4 left-4 z-20"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
-            <div className="w-[50px] h-[50px] overflow-visible flex relative items-center justify-center">
-              <img
-                src="/assets/images/white_logo.png"
-                alt="Logo"
-                className="w-[200px] absolute"
-              />
+            {/* Image indicators for mobile */}
+            <div className="absolute bottom-4 right-4 z-20 flex space-x-2">
+              {backgroundImages.map((_, index) => (
+                <motion.div
+                  key={index}
+                  className={`w-2 h-2 rounded-full ${
+                    index === currentImageIndex ? "bg-amber-500" : "bg-gray-500"
+                  }`}
+                  animate={{
+                    scale: index === currentImageIndex ? 1.2 : 1,
+                  }}
+                  transition={{ duration: 0.3 }}
+                />
+              ))}
             </div>
-          </motion.div>
-        </div>
+
+            {/* Dark gradient overlay for mobile */}
+            <div className="absolute inset-0 bg-gradient-to-b from-gray-900 to-transparent z-10"></div>
+
+            {/* Logo in the bottom right for mobile */}
+            <motion.div
+              className="absolute bottom-4 left-4 z-20"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <div className="w-[50px] h-[50px] overflow-visible flex relative items-center justify-center">
+                <img
+                  src="/assets/images/white_logo.png"
+                  alt="Logo"
+                  className="w-[200px] absolute"
+                />
+              </div>
+            </motion.div>
+          </div>
+        )}
       </Card>
     </div>
   );
