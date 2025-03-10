@@ -89,16 +89,44 @@ export default function DashPage() {
     const checkAuth = async () => {
       setIsAuthChecking(true);
 
-      // Wait a moment to ensure auth state is properly loaded
-      setTimeout(() => {
-        if (!currentUser) {
-          // User is not authenticated, redirect to auth page
-          router.push("/auth");
+      if (!currentUser) {
+        // User is not authenticated, redirect to auth page immediately
+        router.push("/auth");
+        return;
+      }
+      
+      try {
+        // User is authenticated, now check if they have the correct tier
+        const db = getFirestore();
+        const userDocRef = doc(db, "users", currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+        
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          const userTier = data.tier || "new";
+          
+          // Only allow access if user has appropriate tier
+          if (userTier !== "Gold" && 
+              userTier !== "Black" && 
+              userTier !== "CEO" && 
+              userTier !== "Paused") {
+            // Redirect to auth page with appropriate query parameter
+            router.push("/auth?tier=required");
+            return;
+          }
         } else {
-          // User is authenticated, allow access to dashboard
-          setIsAuthChecking(false);
+          // No user document found
+          router.push("/auth");
+          return;
         }
-      }, 1000);
+        
+        // User is authenticated and has correct tier
+        setIsAuthChecking(false);
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        // On error, default to redirecting to auth
+        router.push("/auth");
+      }
     };
 
     checkAuth();

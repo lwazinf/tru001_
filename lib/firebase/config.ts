@@ -12,6 +12,9 @@ const firebaseConfig = {
   appId: "1:330023364100:web:148f3f505efd7b889c3751"
 };
 
+// Export the Firebase config
+export { firebaseConfig };
+
 // Initialize Firebase only if it hasn't been initialized already
 let firebaseApp;
 let firebaseAuth;

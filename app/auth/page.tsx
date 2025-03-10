@@ -98,6 +98,7 @@ const AuthForm = () => {
   const [showThankYou, setShowThankYou] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [, setPaymentError] = useState(false);
+  const [tierRequiredError, setTierRequiredError] = useState(false);
 
   useEffect(() => {
     if (currentUser) {
@@ -114,6 +115,7 @@ const AuthForm = () => {
             if (
               userData.tier === "Gold" ||
               userData.tier === "Black" ||
+              userData.tier === "CEO" ||
               userData.tier === "Paused"
             ) {
               router.push("/dash");
@@ -136,19 +138,48 @@ const AuthForm = () => {
     }
   }, [currentUser, router]);
 
-  // Check for payment error in URL
+  // Check for URL parameters
   useEffect(() => {
     if (typeof window !== "undefined") {
       const url = new URL(window.location.href);
       const status = url.searchParams.get("Status");
+      const tierRequired = url.searchParams.get("tier");
 
       if (status === "Error") {
         setPaymentError(true);
         // Optional: Scroll to top to make error visible
         window.scrollTo(0, 0);
       }
+      
+      if (tierRequired === "required") {
+        setTierRequiredError(true);
+        // Show the thank you page with tier selection if user is authenticated
+        if (currentUser) {
+          setShowThankYou(true);
+        }
+        // Scroll to top to make error visible
+        window.scrollTo(0, 0);
+      }
     }
-  }, []);
+  }, [currentUser]);
+
+  // Auto-hide tier required message after 4 seconds
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
+    if (tierRequiredError) {
+      timeoutId = setTimeout(() => {
+        setTierRequiredError(false);
+      }, 4000); // 4 seconds
+    }
+    
+    // Cleanup function to clear the timeout if component unmounts or tierRequiredError changes
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [tierRequiredError]);
 
   // Set up image rotation interval
   useEffect(() => {
@@ -523,7 +554,41 @@ const AuthForm = () => {
 
   return (
     <div className={`min-h-screen flex items-center justify-center bg-black ${showThankYou ? 'p-0' : 'md:p-4'}`}>
-      <Card className={`w-full ${showThankYou ? 'h-screen' : 'h-full'} md:h-auto md:max-w-4xl rounded-none md:rounded-3xl overflow-hidden bg-gray-900 shadow-2xl flex flex-col md:flex-row border-0 relative`}>
+      <Card className={`w-full h-screen md:h-auto md:max-w-4xl md:min-h-[600px] md:max-h-[800px] rounded-none md:rounded-3xl overflow-hidden bg-gray-900 shadow-2xl flex flex-col md:flex-row border-0 relative`}>
+        {/* Display error message if tier is required */}
+        <AnimatePresence>
+          {tierRequiredError && !showThankYou && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="absolute top-0 left-0 right-0 bg-amber-600 text-white p-3 z-20 text-center"
+            >
+              <div className="flex items-center justify-center gap-2">
+                <AlertCircle size={20} />
+                <span>You need to upgrade your membership to access the dashboard.</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        
+        {/* Add tier required message to the thank you page as well */}
+        <AnimatePresence>
+          {tierRequiredError && showThankYou && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="absolute top-0 left-0 right-0 bg-amber-600 text-white p-3 z-20 text-center"
+            >
+              <div className="flex items-center justify-center gap-2">
+                <AlertCircle size={20} />
+                <span>Please select a membership plan to access the dashboard.</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        
         {/* Thank you message */}
         <AnimatePresence>
           {showThankYou && (
@@ -532,26 +597,29 @@ const AuthForm = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -50 }}
               transition={{ duration: 0.5 }}
-              className="absolute left-0 top-0 bottom-0 w-full md:w-1/2 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4 sm:p-8 z-10"
+              className="absolute left-0 top-0 bottom-0 w-full md:w-1/2 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4 sm:p-8 z-10 overflow-y-auto h-screen md:h-auto max-h-screen pb-24 sm:pb-4"
             >
-              <div className="text-center w-full max-w-md mx-auto">
+              <div className="text-center w-full max-w-md mx-auto py-4 pt-10 sm:pt-4">
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.3, type: "spring" }}
-                  className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-6 sm:mb-8 bg-amber-500 rounded-full p-4 shadow-lg shadow-amber-500/20"
+                  className="flex items-center justify-center mb-6"
                 >
-                  <img
-                    src="/assets/images/main_logo.png"
-                    alt="NTF Logo"
-                    className="w-full h-full object-contain"
-                  />
+                  <div className="w-[50px] h-[50px] sm:w-[70px] sm:h-[70px] overflow-visible flex relative items-center justify-center mr-[-10px]">
+                    <img
+                      src="/assets/images/white_logo.png"
+                      alt="Need To Fuel"
+                      className="w-[200px] sm:w-[300px] absolute"
+                    />
+                  </div>
+                  <span className="text-white font-medium ml-2">Need To Fuel</span>
                 </motion.div>
                 <motion.h2
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.5 }}
-                  className="text-2xl sm:text-3xl font-bold text-amber-500 mt-4 sm:mt-12 text-center"
+                  className="text-xl sm:text-2xl font-bold text-amber-500 mt-2 text-center"
                 >
                   Thanks for choosing NTF
                 </motion.h2>
@@ -559,7 +627,7 @@ const AuthForm = () => {
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.7 }}
-                  className="text-gray-300 mb-4 sm:mb-8 text-center"
+                  className="text-gray-300 mb-2 text-center text-sm sm:text-base"
                 >
                   We&apos;re excited to have you on board!
                 </motion.p>
@@ -567,7 +635,7 @@ const AuthForm = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.9 }}
-                  className="text-xl sm:text-2xl font-semibold text-amber-500 mb-4 sm:mb-6 text-center"
+                  className="text-lg sm:text-xl font-semibold text-amber-500 mb-3 text-center"
                 >
                   SELECT YOUR MEMBERSHIP
                 </motion.h3>
@@ -575,7 +643,7 @@ const AuthForm = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 1 }}
-                  className={`flex flex-col ${showThankYou ? 'sm:flex-row' : ''} gap-4 sm:gap-6 mx-auto max-w-2xl px-2 sm:px-4 mb-6 sm:mb-12`}
+                  className={`flex flex-col sm:flex-row gap-4 sm:gap-6 mx-auto max-w-2xl px-2 sm:px-4 mb-4 pb-16 sm:pb-0`}
                 >
                   {/* Gold Tier Option */}
                   <motion.div
@@ -638,7 +706,7 @@ const AuthForm = () => {
                           setSelectedTier(null);
                         });
                     }}
-                    className="bg-gradient-to-b from-amber-500/30 to-amber-600/20 border border-amber-500/40 rounded-xl p-6 cursor-pointer flex-1 min-w-[120px] flex flex-col items-center shadow-lg transition-all duration-500 relative h-full"
+                    className="bg-gradient-to-b from-amber-500/30 to-amber-600/20 border border-amber-500/40 rounded-xl p-3 cursor-pointer flex-1 min-w-[120px] flex flex-col items-center shadow-lg transition-all duration-500 relative h-auto"
                   >
                     <motion.div
                       className="absolute inset-0 rounded-xl bg-amber-500/0"
@@ -655,7 +723,7 @@ const AuthForm = () => {
                         repeatType: "loop",
                       }}
                     />
-                    <div className="bg-amber-500 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-3 shadow-amber-500/40 shadow-inner">
+                    <div className="bg-amber-500 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mb-2 shadow-amber-500/40 shadow-inner">
                       {selectedTier === "gold" && isLoading ? (
                         <motion.span
                           animate={{ rotate: 360 }}
@@ -672,10 +740,10 @@ const AuthForm = () => {
                         </span>
                       )}
                     </div>
-                    <span className="text-amber-500 font-semibold text-xl mt-2 mb-1">
+                    <span className="text-amber-500 font-semibold text-xl mt-1 mb-1">
                       Gold
                     </span>
-                    <span className="text-gray-400 text-sm mb-4">
+                    <span className="text-gray-400 text-sm mb-2">
                       R2,999/mo
                     </span>
                   </motion.div>
@@ -724,7 +792,7 @@ const AuthForm = () => {
                             // Set timeout to allow user to see the loading state briefly
                             setTimeout(() => {
                               // Open the payment URL in a new tab/window
-                              window.open(paymentResponse.url, "_blank");
+                              window.location.href = paymentResponse.url;
                               setIsLoading(false);
                             }, 500);
                           } else {
@@ -741,27 +809,14 @@ const AuthForm = () => {
                           setSelectedTier(null);
                         });
                     }}
-                    className="bg-gradient-to-b from-gray-700/50 to-gray-900/50 border border-white/20 rounded-xl p-6 cursor-pointer flex-1 min-w-[120px] flex flex-col items-center shadow-lg transition-all duration-500 relative overflow-hidden h-full"
+                    className="bg-gradient-to-b from-gray-800/50 to-gray-900/30 border border-gray-600/40 rounded-xl p-3 cursor-pointer flex-1 min-w-[120px] flex flex-col items-center shadow-lg transition-all duration-500 relative h-auto"
                   >
-                    <motion.div
-                      className="absolute inset-0 rounded-xl bg-white/0"
-                      animate={{
-                        boxShadow: [
-                          "0 0 0px 0px rgba(255, 255, 255, 0)",
-                          "0 0 15px 2px rgba(255, 255, 255, 0.1)",
-                          "0 0 0px 0px rgba(255, 255, 255, 0)",
-                        ],
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        repeatType: "loop",
-                      }}
-                    />
-                    <div className="absolute top-0 right-0 bg-white text-[9px] sm:text-[10px] text-black font-bold py-0.5 px-2 rotate-[45deg] translate-x-[8px] translate-y-[-2px] shadow-sm">
-                      POPULAR
+                    <div className="absolute -top-3 right-0 left-0">
+                      <div className="bg-amber-500 text-black text-xs font-bold py-1 px-2 rounded-full shadow-lg shadow-amber-500/20 max-w-[100px] mx-auto">
+                        Popular
+                      </div>
                     </div>
-                    <div className="bg-black border border-white/40 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-3 shadow-white/20 shadow-inner">
+                    <div className="bg-gray-800 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mb-2 shadow-black/10 shadow-inner">
                       {selectedTier === "black" && isLoading ? (
                         <motion.span
                           animate={{ rotate: 360 }}
@@ -778,10 +833,10 @@ const AuthForm = () => {
                         </span>
                       )}
                     </div>
-                    <span className="text-white font-semibold text-xl mt-2 mb-1">
+                    <span className="text-gray-100 font-semibold text-xl mt-1 mb-1">
                       Black
                     </span>
-                    <span className="text-gray-400 text-sm mb-4">
+                    <span className="text-gray-400 text-sm mb-2">
                       R4,999/mo
                     </span>
                   </motion.div>
@@ -913,7 +968,7 @@ const AuthForm = () => {
               </AnimatePresence>
 
               <motion.div variants={itemVariants} className="space-y-4">
-                {!isLoginForm && !formSubmitted && (
+                {!isLoginForm && !formSubmitted && !showThankYou && (
                   <>
                     {/* Desktop title dropdown (hidden on mobile) */}
                     <motion.div
@@ -1001,7 +1056,7 @@ const AuthForm = () => {
                 )}
                 {/* Signup-only fields */}
                 <AnimatePresence>
-                  {!isLoginForm && (
+                  {!isLoginForm && !showThankYou && (
                     <motion.div
                       className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4"
                       initial={{ opacity: 0, height: 0 }}
@@ -1318,7 +1373,7 @@ const AuthForm = () => {
 
                 {/* Mobile-only fixed button at bottom */}
                 <AnimatePresence>
-                  {!isLoginForm && (
+                  {!isLoginForm && !showThankYou && (
                     <motion.div
                       className="fixed bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black to-transparent z-30 md:hidden"
                       initial={{ y: 100, opacity: 0 }}
