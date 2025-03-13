@@ -17,6 +17,8 @@ import TermsModal from "./helpers/termsModal";
 import { PolicyState } from "./atoms/atoms";
 import { useAtom } from "jotai";
 import { useRouter } from "next/navigation";
+import { db } from "../../lib/firebase/config";
+import { collection, addDoc, serverTimestamp, query, where, getDocs } from "firebase/firestore";
 // import VerticalGallery from "./helpers/sideSwipe";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -44,6 +46,40 @@ const Hero_ = () => {
   // State for newsletter subscription form
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [emailValue, setEmailValue] = useState("");
+  
+  // Handle newsletter subscription
+  const handleSubscription = async () => {
+    if (emailValue.trim() === "") return;
+    
+    try {
+      // Check if user already exists in users collection
+      const userEmail = emailValue.trim().toLowerCase();
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("email", "==", userEmail));
+      const querySnapshot = await getDocs(q);
+      const isMember = !querySnapshot.empty;
+      
+      // Save to subscriptions collection
+      await addDoc(collection(db, "subscriptions"), {
+        email: userEmail,
+        date: serverTimestamp(),
+        isMember: isMember
+      });
+      
+      console.log(`Subscription saved to Firestore. Member status: ${isMember}`);
+      
+      // Update UI state
+      setIsSubscribed(true);
+      
+      // Reset the form after 3 seconds
+      setTimeout(() => {
+        setIsSubscribed(false);
+        setEmailValue("");
+      }, 3000);
+    } catch (error) {
+      console.error("Error saving subscription: ", error);
+    }
+  };
   
   useEffect(() => {
     const timer = setInterval(() => {
@@ -1307,14 +1343,8 @@ const Hero_ = () => {
                   <form 
                     className="flex flex-col sm:flex-row gap-3 animate-fade-in" 
                     onSubmit={(e) => { 
-                      e.preventDefault(); 
-                      setIsSubscribed(true);
-                      
-                      // Reset the form after 3 seconds
-                      setTimeout(() => {
-                        setIsSubscribed(false);
-                        setEmailValue("");
-                      }, 3000);
+                      e.preventDefault();
+                      handleSubscription();
                     }}
                   >
                     <input 
@@ -1326,32 +1356,14 @@ const Hero_ = () => {
                       onChange={(e) => setEmailValue(e.target.value)}
                     />
                     <div 
-                      onClick={() => {
-                        if (emailValue.trim() !== "") {
-                          setIsSubscribed(true);
-                          
-                          // Reset the form after 3 seconds
-                          setTimeout(() => {
-                            setIsSubscribed(false);
-                            setEmailValue("");
-                          }, 3000);
-                        }
-                      }}
+                      onClick={handleSubscription}
                       className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black font-medium rounded-full px-5 py-2 transition-all whitespace-nowrap cursor-pointer flex items-center justify-center select-none shadow-md hover:shadow-amber-500/20"
                       role="button"
                       tabIndex={0}
                       onKeyDown={(e) => { 
                         if (e.key === 'Enter' || e.key === ' ') { 
-                          e.preventDefault(); 
-                          if (emailValue.trim() !== "") {
-                            setIsSubscribed(true);
-                            
-                            // Reset the form after 3 seconds
-                            setTimeout(() => {
-                              setIsSubscribed(false);
-                              setEmailValue("");
-                            }, 3000);
-                          }
+                          e.preventDefault();
+                          handleSubscription();
                         } 
                       }}
                       aria-label="Subscribe to newsletter"

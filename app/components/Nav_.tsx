@@ -27,6 +27,7 @@ const navLinks = [
   { name: 'Services', href: '/#services', scrollTo: 'services_section' },
   { name: 'Case Studies', href: '/#case-studies', scrollTo: 'case_studies_section' },
   { name: 'Pricing', href: '/#pricing', scrollTo: 'pricing_section' },
+  { name: 'FAQ', href: '/#faq', scrollTo: 'faq_section' },
 ];
 
 const Nav_ = ({ user }: NavProps) => {
