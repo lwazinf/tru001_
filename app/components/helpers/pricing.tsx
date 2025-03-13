@@ -12,6 +12,9 @@ import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-mo
 import { useState, useRef } from "react";
 import { Eye, EyeOff, CheckCircle2, AlertTriangle } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { processPayment } from "@/app/utils/payment";
+import { useAuth } from "@/lib/firebase/AuthContext";
+import { doc, setDoc, getFirestore, Timestamp, updateDoc, getDoc } from "firebase/firestore";
 
 const springTransition = {
   type: "spring",
@@ -69,6 +72,26 @@ const Pricing_ = () => {
   const [focusedCard, setFocusedCard] = useState<"gold" | "black" | null>(null);
   const pricingSectionRef = useRef<HTMLDivElement>(null);
   const [isExiting, setIsExiting] = useState(false);
+  
+  // Auth context with error handling
+  const [authContextLoaded, setAuthContextLoaded] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  let authContext;
+  try {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    authContext = useAuth();
+    if (!authContextLoaded) setAuthContextLoaded(true);
+  } catch (error) {
+    if (!authError) {
+      console.error("Auth context error:", error);
+      setAuthError("Authentication system is initializing");
+    }
+  }
+
+  const { currentUser } = authContext || {
+    currentUser: null,
+  };
   
   // Form state
   const [formData, setFormData] = useState({
@@ -137,6 +160,64 @@ const Pricing_ = () => {
     }, 400); // Match the exit animation duration
   };
   
+  // Function to save payment response to Firestore
+  const savePaymentToFirestore = async (
+    paymentResponse: any,
+    transactionRef: string,
+    tierSelected: string
+  ) => {
+    try {
+      const db = getFirestore();
+      const now = new Date();
+
+      // Create the payment document
+      await setDoc(doc(db, "Payments", paymentResponse.paymentRequestId), {
+        paymentRequestId: paymentResponse.paymentRequestId,
+        transactionReference: transactionRef,
+        timestamp: now,
+        userId: currentUser ? currentUser.uid : null, // Add user ID if available
+        tier: tierSelected,
+      });
+
+      // Update user's tier if logged in
+      if (currentUser && !authError) {
+        const userDocRef = doc(db, "users", currentUser.uid);
+        // Check if the user document exists first
+        const userDoc = await getDoc(userDocRef);
+        
+        if (userDoc.exists()) {
+          // Update existing user document
+          await updateDoc(userDocRef, {
+            tier: tierSelected === "gold" ? "Gold" : "Black",
+          });
+        } else {
+          // Create new user document if it doesn't exist
+          await setDoc(userDocRef, {
+            tier: tierSelected === "gold" ? "Gold" : "Black",
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            title: formData.title,
+            since: Timestamp.now(),
+          });
+        }
+      } else {
+        // Save tier choice in localStorage for non-logged in users
+        localStorage.setItem('selectedTier', tierSelected);
+        localStorage.setItem('userFormData', JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          title: formData.title,
+        }));
+      }
+
+      console.log("Payment saved to Firestore successfully");
+    } catch (error) {
+      console.error("Error saving payment to Firestore:", error);
+    }
+  };
+  
   // Validate form fields
   const validateForm = () => {
     let isValid = true;
@@ -188,20 +269,63 @@ const Pricing_ = () => {
     return isValid;
   };
   
-  // Handle form submission
+  // Handle form submission with payment processing
   const handleSubmit = (tier: "gold" | "black") => {
     if (validateForm()) {
       setIsSubmitting(true);
       
-      // Simulate form submission
-      setTimeout(() => {
-        console.log("Form submitted for", tier, "tier with data:", formData);
-        alert(`Account created successfully! Redirecting to ${tier} tier payment.`);
-        setIsSubmitting(false);
-        handleResetFocus();
+      // If user is not logged in or there's an auth error, store the selection and redirect to auth
+      if (!currentUser || authError) {
+        // Store tier choice and form data in localStorage
+        localStorage.setItem('selectedTier', tier);
+        localStorage.setItem('pricingFormData', JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          title: formData.title
+        }));
         
-        // Here you would normally redirect to the payment page or process the account creation
-      }, 1500);
+        // Redirect to auth page with tier parameter
+        window.location.href = `/auth?tier=${tier}`;
+        return;
+      }
+      
+      // Process payment
+      const transactionRef = `${formData.email || "guest"}-${tier.charAt(0).toUpperCase() + tier.slice(1)}-${Date.now()}`.substring(0, 50);
+      const amount = tier === "gold" ? "2999.00" : "4999.00";
+      const bankReference = `NTF ${tier.charAt(0).toUpperCase() + tier.slice(1)} Membership`;
+      
+      processPayment({
+        amount,
+        transactionReference: transactionRef,
+        bankReference
+      })
+        .then((paymentResponse) => {
+          console.log("Payment processed:", paymentResponse);
+          
+          // Save payment data to Firestore
+          if (paymentResponse) {
+            savePaymentToFirestore(paymentResponse, transactionRef, tier);
+          }
+          
+          // Redirect to payment URL
+          if (paymentResponse && paymentResponse.url) {
+            // Set timeout to allow user to see the loading state briefly
+            setTimeout(() => {
+              window.location.href = paymentResponse.url;
+              setIsSubmitting(false);
+            }, 500);
+          } else {
+            setIsSubmitting(false);
+            alert("Payment processing failed: No payment URL received.");
+          }
+        })
+        .catch((error) => {
+          console.error("Payment failed:", error);
+          // Handle payment error - reset loading state
+          setIsSubmitting(false);
+          alert(`Payment processing failed: ${error.message || "Unknown error"}`);
+        });
     }
   };
 
