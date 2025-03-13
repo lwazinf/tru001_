@@ -5,20 +5,887 @@ import {
   faGem,
   faShieldAlt,
   faCrown,
+  faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { motion, useMotionValue, useTransform } from "framer-motion";
+import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
+import { useState, useRef } from "react";
+import { Eye, EyeOff, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+
+const springTransition = {
+  type: "spring",
+  stiffness: 300,
+  damping: 30
+};
+
+const cardBounceTransition = {
+  type: "spring",
+  stiffness: 400,
+  damping: 25
+};
+
+const staggerChildren = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  },
+  exit: {
+    opacity: 0,
+    transition: {
+      staggerChildren: 0.05,
+      staggerDirection: -1
+    }
+  }
+};
+
+const itemVariant = {
+  hidden: { opacity: 0, y: 20 },
+  show: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 300,
+      damping: 30
+    }
+  },
+  exit: { 
+    opacity: 0, 
+    y: -10,
+    transition: {
+      type: "tween",
+      duration: 0.2
+    }
+  }
+};
 
 const Pricing_ = () => {
   const y = useMotionValue(0);
   const yRange = useTransform(y, [0, 2.5], [0, 100]);
+  const [focusedCard, setFocusedCard] = useState<"gold" | "black" | null>(null);
+  const pricingSectionRef = useRef<HTMLDivElement>(null);
+  const [isExiting, setIsExiting] = useState(false);
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    title: "",
+  });
+  
+  // State for field-specific validation errors
+  const [fieldErrors, setFieldErrors] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    title: "",
+  });
+  
+  // State for password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  
+  // State for form submission
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Handle input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    // Clear field-specific error when user types
+    if (fieldErrors[name as keyof typeof fieldErrors]) {
+      setFieldErrors({
+        ...fieldErrors,
+        [name]: "",
+      });
+    }
+
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+  
+  // Toggle password visibility
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleGetStarted = (cardType: "gold" | "black") => {
+    setFocusedCard(cardType);
+  };
+
+  const handleResetFocus = () => {
+    setIsExiting(true);
+    setTimeout(() => {
+      setFocusedCard(null);
+      setIsExiting(false);
+      
+      // Scroll back to the pricing section when exiting focus mode
+      setTimeout(() => {
+        pricingSectionRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
+    }, 400); // Match the exit animation duration
+  };
+  
+  // Validate form fields
+  const validateForm = () => {
+    let isValid = true;
+    const errors = {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      title: "",
+    };
+
+    // Basic validation for firstName
+    if (!formData.firstName.trim()) {
+      errors.firstName = "First name is required";
+      isValid = false;
+    }
+
+    // Basic validation for lastName
+    if (!formData.lastName.trim()) {
+      errors.lastName = "Last name is required";
+      isValid = false;
+    }
+
+    // Basic validation for email
+    if (!formData.email.trim()) {
+      errors.email = "Email is required";
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = "Please enter a valid email";
+      isValid = false;
+    }
+
+    // Basic validation for password
+    if (!formData.password.trim()) {
+      errors.password = "Password is required";
+      isValid = false;
+    } else if (formData.password.length < 6) {
+      errors.password = "Password must be at least 6 characters";
+      isValid = false;
+    }
+
+    setFieldErrors(errors);
+    return isValid;
+  };
+  
+  // Handle form submission
+  const handleSubmit = (tier: "gold" | "black") => {
+    if (validateForm()) {
+      setIsSubmitting(true);
+      
+      // Simulate form submission
+      setTimeout(() => {
+        console.log("Form submitted for", tier, "tier with data:", formData);
+        alert(`Account created successfully! Redirecting to ${tier} tier payment.`);
+        setIsSubmitting(false);
+        handleResetFocus();
+        
+        // Here you would normally redirect to the payment page or process the account creation
+      }, 1500);
+    }
+  };
 
   return (
     <div
-      className={`w-full xl:h-[90vh] min-h-screen flex flex-col justify-center items-center top_fade py-20`}
+      className={`w-full xl:h-[90vh] min-h-screen flex flex-col justify-center items-center top_fade py-20 relative overflow-hidden`}
+      ref={pricingSectionRef}
     >
+      {/* Overlay for when a card is focused */}
+      <AnimatePresence>
+        {focusedCard && (
+          <motion.div 
+            className="fixed inset-0 bg-black/80 backdrop-blur-md z-40 flex items-center justify-center"
+            onClick={handleResetFocus}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <motion.div 
+              className="absolute top-6 right-6 text-white/80 hover:text-white cursor-pointer z-50"
+              onClick={handleResetFocus}
+              initial={{ opacity: 0, scale: 0.8, rotate: -90 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              exit={{ opacity: 0, scale: 0.8, rotate: 90 }}
+              transition={springTransition}
+              whileHover={{ scale: 1.2 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <FontAwesomeIcon icon={faTimes} className="w-6 h-6" />
+            </motion.div>
+            
+            {/* Centered card container */}
+            <motion.div 
+              className="relative z-50 w-[350px] h-auto max-h-[90vh] overflow-y-auto"
+              initial={{ scale: 0.9, y: 30 }}
+              animate={{ scale: 1.1, y: 0 }}
+              exit={{ scale: 0.9, y: 30, opacity: 0 }}
+              transition={{ 
+                ...springTransition,
+                exit: { duration: 0.3 } 
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {focusedCard === "gold" && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className={`w-full rounded-2xl flex flex-col justify-between items-center relative overflow-hidden border border-amber-500/50 backdrop-blur-none bg-gradient-to-b from-black to-black/95`}
+                  style={{ 
+                    boxShadow: "0 10px 50px -10px rgba(245, 158, 11, 0.5), 0 0 30px 0px rgba(245, 158, 11, 0.2) inset"
+                  }}
+                >
+                  <motion.div 
+                    className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500/0 via-amber-500 to-amber-500/0"
+                    animate={{ 
+                      scaleX: [1, 1.2, 1],
+                      opacity: [1, 0.7, 1]
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  />
+                  
+                  {/* Gold header */}
+                  <motion.div 
+                    className="w-full pt-10 pb-6 px-8 relative"
+                    variants={staggerChildren}
+                    initial="hidden"
+                    animate={isExiting ? "exit" : "show"}
+                  >
+                    <motion.div 
+                      className="absolute top-5 right-8"
+                      variants={itemVariant}
+                      whileHover={{ scale: 1.2, rotate: 15 }}
+                      transition={{ type: "spring", stiffness: 400 }}
+                    >
+                      <FontAwesomeIcon
+                        icon={faGem}
+                        className="text-amber-500 h-5 w-5"
+                      />
+                    </motion.div>
+                    <motion.span 
+                      variants={itemVariant}
+                      className="bg-amber-500/20 text-amber-500 text-[10px] tracking-wider font-bold px-3 py-1 rounded-full inline-block"
+                    >
+                      GOLD TIER
+                    </motion.span>
+                    <motion.h3 
+                      variants={itemVariant}
+                      className="text-white text-2xl font-bold mt-3"
+                    >
+                      Premium
+                    </motion.h3>
+                    <motion.div 
+                      variants={itemVariant}
+                      className="flex items-baseline mt-2"
+                    >
+                      <span className="text-white text-3xl font-bold">R2,999</span>
+                      <span className="text-white/60 ml-1 text-sm">/month</span>
+                    </motion.div>
+                    <motion.p 
+                      variants={itemVariant}
+                      className="text-white/60 text-xs mt-3 leading-relaxed"
+                    >
+                      For businesses that need quality service and dedicated support
+                    </motion.p>
+                  </motion.div>
+                  
+                  {/* Divider */}
+                  <motion.div 
+                    className="w-full h-px mb-4 bg-gradient-to-r from-amber-500/0 via-amber-500/40 to-amber-500/0"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ delay: 0.2, duration: 0.4 }}
+                  />
+                  
+                  {/* Auth Form Section */}
+                  <motion.div
+                    className="w-full px-8 mb-4"
+                    variants={staggerChildren}
+                    initial="hidden"
+                    animate={isExiting ? "exit" : "show"}
+                  >
+                    <motion.div variants={itemVariant} className="space-y-4">
+                      {/* First name and Last name */}
+                      <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
+                        <div className="relative w-full sm:w-1/2">
+                          <div className={`relative group ${fieldErrors.firstName ? "mb-5" : ""}`}>
+                            <Input
+                              type="text"
+                              name="firstName"
+                              value={formData.firstName}
+                              onChange={handleInputChange}
+                              placeholder="First name"
+                              className={`w-full bg-black/60 backdrop-blur-sm rounded-md px-4 py-3 text-white border-0 ring-1 ${
+                                fieldErrors.firstName ? "ring-red-500" : "ring-gray-700"
+                              } transition-all duration-300 focus:ring-2 focus:ring-amber-500 text-sm`}
+                              required
+                            />
+                            {fieldErrors.firstName && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 3 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="absolute -bottom-5 left-0 flex items-center text-red-400 text-xs"
+                              >
+                                <AlertTriangle size={12} className="mr-1" />
+                                <span>{fieldErrors.firstName}</span>
+                              </motion.div>
+                            )}
+                            {formData.firstName && !fieldErrors.firstName && (
+                              <motion.div
+                                initial={{ scale: 0, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ type: "spring", stiffness: 500 }}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                              >
+                                <CheckCircle2 size={16} className="text-amber-500" />
+                              </motion.div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="relative w-full sm:w-1/2">
+                          <div className={`relative group ${fieldErrors.lastName ? "mb-5" : ""}`}>
+                            <Input
+                              type="text"
+                              name="lastName"
+                              value={formData.lastName}
+                              onChange={handleInputChange}
+                              placeholder="Last name"
+                              className={`w-full bg-black/60 backdrop-blur-sm rounded-md px-4 py-3 text-white border-0 ring-1 ${
+                                fieldErrors.lastName ? "ring-red-500" : "ring-gray-700"
+                              } transition-all duration-300 focus:ring-2 focus:ring-amber-500 text-sm`}
+                              required
+                            />
+                            {fieldErrors.lastName && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 3 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="absolute -bottom-5 left-0 flex items-center text-red-400 text-xs"
+                              >
+                                <AlertTriangle size={12} className="mr-1" />
+                                <span>{fieldErrors.lastName}</span>
+                              </motion.div>
+                            )}
+                            {formData.lastName && !fieldErrors.lastName && (
+                              <motion.div
+                                initial={{ scale: 0, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ type: "spring", stiffness: 500 }}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                              >
+                                <CheckCircle2 size={16} className="text-amber-500" />
+                              </motion.div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Email field */}
+                      <div className="relative mb-4">
+                        <div className={`relative group ${fieldErrors.email ? "mb-5" : ""}`}>
+                          <Input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
+                            placeholder="Email address"
+                            className={`w-full bg-black/60 backdrop-blur-sm rounded-md px-4 py-3 text-white border-0 ring-1 ${
+                              fieldErrors.email ? "ring-red-500" : "ring-gray-700"
+                            } transition-all duration-300 focus:ring-2 focus:ring-amber-500 text-sm`}
+                            required
+                          />
+                          {fieldErrors.email && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 3 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="absolute -bottom-5 left-0 flex items-center text-red-400 text-xs"
+                            >
+                              <AlertTriangle size={12} className="mr-1" />
+                              <span>{fieldErrors.email}</span>
+                            </motion.div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Password field */}
+                      <div className="relative mb-4">
+                        <div className={`relative group ${fieldErrors.password ? "mb-5" : ""}`}>
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            value={formData.password}
+                            onChange={handleInputChange}
+                            placeholder="Password"
+                            className={`w-full bg-black/60 backdrop-blur-sm rounded-md px-4 py-3 text-white border-0 ring-1 ${
+                              fieldErrors.password ? "ring-red-500" : "ring-amber-500/60"
+                            } transition-all duration-300 focus:ring-2 focus:ring-amber-500 text-sm`}
+                            required
+                          />
+                          {fieldErrors.password && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 3 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="absolute -bottom-5 left-0 flex items-center text-red-400 text-xs"
+                            >
+                              <AlertTriangle size={12} className="mr-1" />
+                              <span>{fieldErrors.password}</span>
+                            </motion.div>
+                          )}
+                          {formData.password && (
+                            <motion.div
+                              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+                              onClick={togglePasswordVisibility}
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                            >
+                              {showPassword ? (
+                                <EyeOff size={16} className="text-amber-500" />
+                              ) : (
+                                <Eye size={16} className="text-amber-500" />
+                              )}
+                            </motion.div>
+                          )}
+                        </div>
+                        {formData.password && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            transition={{ duration: 0.3 }}
+                            className="mt-1 overflow-hidden"
+                          >
+                            <div className="flex gap-1">
+                              <div
+                                className={`h-1 w-full rounded-full ${
+                                  formData.password.length > 3 ? "bg-amber-500" : "bg-gray-600"
+                                }`}
+                              ></div>
+                              <div
+                                className={`h-1 w-full rounded-full ${
+                                  formData.password.length > 5 ? "bg-amber-500" : "bg-gray-600"
+                                }`}
+                              ></div>
+                              <div
+                                className={`h-1 w-full rounded-full ${
+                                  formData.password.length > 7 ? "bg-amber-500" : "bg-gray-600"
+                                }`}
+                              ></div>
+                            </div>
+                            <p className="text-xs text-gray-400 mt-1">
+                              {formData.password.length < 4
+                                ? "Weak password"
+                                : formData.password.length < 6
+                                ? "Fair password"
+                                : formData.password.length < 8
+                                ? "Good password"
+                                : "Strong password"}
+                            </p>
+                          </motion.div>
+                        )}
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                  
+                  {/* CTA */}
+                  <motion.div 
+                    className="w-full px-8 pb-10 mt-auto"
+                    variants={staggerChildren}
+                    initial="hidden"
+                    animate={isExiting ? "exit" : "show"}
+                  >
+                    <motion.div 
+                      variants={itemVariant}
+                      className="flex items-center justify-between mb-5"
+                    >
+                      <span className="text-amber-500/80 text-[10px] italic">Limited to 50 members</span>
+                    </motion.div>
+                    <motion.div
+                      variants={itemVariant}
+                      onClick={() => !isSubmitting && handleSubmit("gold")}
+                      className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold text-xs flex items-center justify-center cursor-pointer group hover:brightness-110 transition-all"
+                      whileHover={{ y: -3 }}
+                      whileTap={{ y: 1 }}
+                    >
+                      {isSubmitting ? (
+                        <motion.span
+                          animate={{ rotate: 360 }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            ease: "linear",
+                          }}
+                          className="w-4 h-4 border-2 border-black border-t-transparent rounded-full"
+                        />
+                      ) : (
+                        <>
+                          Buy Now
+                          <motion.div
+                            animate={{ x: [0, 5, 0] }}
+                            transition={{ 
+                              duration: 1.5, 
+                              repeat: Infinity,
+                              repeatType: "loop",
+                              ease: "easeInOut",
+                              times: [0, 0.6, 1]
+                            }}
+                          >
+                            <FontAwesomeIcon
+                              icon={faArrowRight}
+                              className="ml-2 h-2.5 w-2.5 group-hover:translate-x-1 transition-transform"
+                            />
+                          </motion.div>
+                        </>
+                      )}
+                    </motion.div>
+                  </motion.div>
+                </motion.div>
+              )}
+              
+              {focusedCard === "black" && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className={`w-full rounded-2xl flex flex-col justify-between items-center relative overflow-hidden border border-white/30 backdrop-blur-none bg-gradient-to-b from-black to-black/95`}
+                  style={{ 
+                    boxShadow: "0 10px 50px -10px rgba(255, 255, 255, 0.3), 0 0 30px 0px rgba(255, 255, 255, 0.1) inset"
+                  }}
+                >
+                  {/* Popular badge removed from focused view */}
+                  
+                  <motion.div 
+                    className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-white/0 via-white/80 to-white/0"
+                    animate={{ 
+                      scaleX: [1, 1.2, 1],
+                      opacity: [1, 0.7, 1]
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  />
+                  
+                  {/* Black header */}
+                  <motion.div 
+                    className="w-full pt-10 pb-6 px-8 relative"
+                    variants={staggerChildren}
+                    initial="hidden"
+                    animate={isExiting ? "exit" : "show"}
+                  >
+                    <motion.div 
+                      className="absolute top-5 right-8"
+                      variants={itemVariant}
+                      whileHover={{ scale: 1.2, rotate: 15 }}
+                      transition={{ type: "spring", stiffness: 400 }}
+                    >
+                      <FontAwesomeIcon
+                        icon={faCrown}
+                        className="text-white h-5 w-5"
+                      />
+                    </motion.div>
+                    <motion.span 
+                      variants={itemVariant}
+                      className="bg-white/20 text-white text-[10px] tracking-wider font-bold px-3 py-1 rounded-full inline-block"
+                    >
+                      BLACK TIER
+                    </motion.span>
+                    <motion.h3 
+                      variants={itemVariant}
+                      className="text-white text-2xl font-bold mt-3"
+                    >
+                      Executive
+                    </motion.h3>
+                    <motion.div 
+                      variants={itemVariant}
+                      className="flex items-baseline mt-2"
+                    >
+                      <span className="text-white text-3xl font-bold">R4,999</span>
+                      <span className="text-white/60 ml-1 text-sm">/month</span>
+                    </motion.div>
+                    <motion.p 
+                      variants={itemVariant}
+                      className="text-white/60 text-xs mt-3 leading-relaxed"
+                    >
+                      For demanding executives who need premium service and priority
+                    </motion.p>
+                  </motion.div>
+                  
+                  {/* Divider */}
+                  <motion.div 
+                    className="w-full h-px mb-4 bg-gradient-to-r from-white/0 via-white/40 to-white/0"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ delay: 0.2, duration: 0.4 }}
+                  />
+                  
+                  {/* Auth Form Section */}
+                  <motion.div
+                    className="w-full px-8 mb-4"
+                    variants={staggerChildren}
+                    initial="hidden"
+                    animate={isExiting ? "exit" : "show"}
+                  >
+                    <motion.div variants={itemVariant} className="space-y-4">
+                      {/* First name and Last name */}
+                      <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
+                        <div className="relative w-full sm:w-1/2">
+                          <div className={`relative group ${fieldErrors.firstName ? "mb-5" : ""}`}>
+                            <Input
+                              type="text"
+                              name="firstName"
+                              value={formData.firstName}
+                              onChange={handleInputChange}
+                              placeholder="First name"
+                              className={`w-full bg-black/60 backdrop-blur-sm rounded-md px-4 py-3 text-white border-0 ring-1 ${
+                                fieldErrors.firstName ? "ring-red-500" : "ring-gray-700"
+                              } transition-all duration-300 focus:ring-2 focus:ring-white text-sm`}
+                              required
+                            />
+                            {fieldErrors.firstName && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 3 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="absolute -bottom-5 left-0 flex items-center text-red-400 text-xs"
+                              >
+                                <AlertTriangle size={12} className="mr-1" />
+                                <span>{fieldErrors.firstName}</span>
+                              </motion.div>
+                            )}
+                            {formData.firstName && !fieldErrors.firstName && (
+                              <motion.div
+                                initial={{ scale: 0, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ type: "spring", stiffness: 500 }}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                              >
+                                <CheckCircle2 size={16} className="text-white" />
+                              </motion.div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="relative w-full sm:w-1/2">
+                          <div className={`relative group ${fieldErrors.lastName ? "mb-5" : ""}`}>
+                            <Input
+                              type="text"
+                              name="lastName"
+                              value={formData.lastName}
+                              onChange={handleInputChange}
+                              placeholder="Last name"
+                              className={`w-full bg-black/60 backdrop-blur-sm rounded-md px-4 py-3 text-white border-0 ring-1 ${
+                                fieldErrors.lastName ? "ring-red-500" : "ring-gray-700"
+                              } transition-all duration-300 focus:ring-2 focus:ring-white text-sm`}
+                              required
+                            />
+                            {fieldErrors.lastName && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 3 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="absolute -bottom-5 left-0 flex items-center text-red-400 text-xs"
+                              >
+                                <AlertTriangle size={12} className="mr-1" />
+                                <span>{fieldErrors.lastName}</span>
+                              </motion.div>
+                            )}
+                            {formData.lastName && !fieldErrors.lastName && (
+                              <motion.div
+                                initial={{ scale: 0, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ type: "spring", stiffness: 500 }}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                              >
+                                <CheckCircle2 size={16} className="text-white" />
+                              </motion.div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Email field */}
+                      <div className="relative mb-4">
+                        <div className={`relative group ${fieldErrors.email ? "mb-5" : ""}`}>
+                          <Input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
+                            placeholder="Email address"
+                            className={`w-full bg-black/60 backdrop-blur-sm rounded-md px-4 py-3 text-white border-0 ring-1 ${
+                              fieldErrors.email ? "ring-red-500" : "ring-gray-700"
+                            } transition-all duration-300 focus:ring-2 focus:ring-white text-sm`}
+                            required
+                          />
+                          {fieldErrors.email && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 3 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="absolute -bottom-5 left-0 flex items-center text-red-400 text-xs"
+                            >
+                              <AlertTriangle size={12} className="mr-1" />
+                              <span>{fieldErrors.email}</span>
+                            </motion.div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Password field */}
+                      <div className="relative mb-4">
+                        <div className={`relative group ${fieldErrors.password ? "mb-5" : ""}`}>
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            value={formData.password}
+                            onChange={handleInputChange}
+                            placeholder="Password"
+                            className={`w-full bg-black/60 backdrop-blur-sm rounded-md px-4 py-3 text-white border-0 ring-1 ${
+                              fieldErrors.password ? "ring-red-500" : "ring-white/60"
+                            } transition-all duration-300 focus:ring-2 focus:ring-white text-sm`}
+                            required
+                          />
+                          {fieldErrors.password && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 3 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="absolute -bottom-5 left-0 flex items-center text-red-400 text-xs"
+                            >
+                              <AlertTriangle size={12} className="mr-1" />
+                              <span>{fieldErrors.password}</span>
+                            </motion.div>
+                          )}
+                          {formData.password && (
+                            <motion.div
+                              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+                              onClick={togglePasswordVisibility}
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                            >
+                              {showPassword ? (
+                                <EyeOff size={16} className="text-white" />
+                              ) : (
+                                <Eye size={16} className="text-white" />
+                              )}
+                            </motion.div>
+                          )}
+                        </div>
+                        {formData.password && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            transition={{ duration: 0.3 }}
+                            className="mt-1 overflow-hidden"
+                          >
+                            <div className="flex gap-1">
+                              <div
+                                className={`h-1 w-full rounded-full ${
+                                  formData.password.length > 3 ? "bg-white" : "bg-gray-600"
+                                }`}
+                              ></div>
+                              <div
+                                className={`h-1 w-full rounded-full ${
+                                  formData.password.length > 5 ? "bg-white" : "bg-gray-600"
+                                }`}
+                              ></div>
+                              <div
+                                className={`h-1 w-full rounded-full ${
+                                  formData.password.length > 7 ? "bg-white" : "bg-gray-600"
+                                }`}
+                              ></div>
+                            </div>
+                            <p className="text-xs text-gray-400 mt-1">
+                              {formData.password.length < 4
+                                ? "Weak password"
+                                : formData.password.length < 6
+                                ? "Fair password"
+                                : formData.password.length < 8
+                                ? "Good password"
+                                : "Strong password"}
+                            </p>
+                          </motion.div>
+                        )}
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                  
+                  {/* CTA */}
+                  <motion.div 
+                    className="w-full px-8 pb-10 mt-auto"
+                    variants={staggerChildren}
+                    initial="hidden"
+                    animate={isExiting ? "exit" : "show"}
+                  >
+                    <motion.div 
+                      variants={itemVariant}
+                      className="flex items-center justify-between mb-5"
+                    >
+                      <span className="text-white/80 text-[10px] italic">Limited to 50 members</span>
+                    </motion.div>
+                    <motion.div
+                      variants={itemVariant}
+                      onClick={() => !isSubmitting && handleSubmit("black")}
+                      className="w-full py-3 rounded-xl bg-white text-black font-bold text-xs flex items-center justify-center group cursor-pointer hover:brightness-110 transition-all"
+                      whileHover={{ y: -3 }}
+                      whileTap={{ y: 1 }}
+                    >
+                      {isSubmitting ? (
+                        <motion.span
+                          animate={{ rotate: 360 }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            ease: "linear",
+                          }}
+                          className="w-4 h-4 border-2 border-black border-t-transparent rounded-full"
+                        />
+                      ) : (
+                        <>
+                          Buy Now
+                          <motion.div
+                            animate={{ x: [0, 5, 0] }}
+                            transition={{ 
+                              duration: 1.5, 
+                              repeat: Infinity,
+                              repeatType: "loop",
+                              ease: "easeInOut",
+                              times: [0, 0.6, 1]
+                            }}
+                          >
+                            <FontAwesomeIcon
+                              icon={faArrowRight}
+                              className="ml-2 h-2.5 w-2.5 group-hover:translate-x-1 transition-transform"
+                            />
+                          </motion.div>
+                        </>
+                      )}
+                    </motion.div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div
-        className={`w-full min-h-2 flex flex-col mt-[30px] mb-[60px] justify-center items-center`}
+        className={`w-full min-h-2 flex flex-col mt-[30px] mb-[60px] justify-center items-center transition-opacity duration-500 ${focusedCard ? 'opacity-0' : 'opacity-100'}`}
       >
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -38,7 +905,7 @@ const Pricing_ = () => {
         </motion.h2>
       </div>
       <motion.div
-        className={`flex xl:flex-row flex-col justify-center items-center w-full min-h-2 mb-2 gap-8`}
+        className={`flex xl:flex-row flex-col justify-center items-center w-full min-h-2 mb-2 gap-8 transition-opacity duration-500 ${focusedCard ? 'opacity-0' : 'opacity-100'}`}
         style={{ y: yRange }}
       >
         {/* Gold Tier */}
@@ -46,8 +913,14 @@ const Pricing_ = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          whileHover={{ y: -10, transition: { duration: 0.2 } }}
-          className={`min-h-[500px] w-[350px] m-2 rounded-2xl flex flex-col justify-start items-center relative overflow-hidden border border-amber-500/20 backdrop-blur-sm bg-gradient-to-b from-amber-500/10 to-black/40`}
+          whileHover={!focusedCard ? { 
+            y: -10, 
+            rotateY: 5,
+            rotateX: -5,
+            scale: 1.02,
+            transition: { duration: 0.3, type: "spring" } 
+          } : {}}
+          className={`min-h-[500px] w-[350px] m-2 rounded-2xl flex flex-col justify-start items-center relative overflow-hidden border border-amber-500/20 backdrop-blur-sm bg-gradient-to-b from-amber-500/10 to-black/40 transition-all duration-500`}
           style={{ 
             boxShadow: "0 10px 40px -10px rgba(245, 158, 11, 0.3), 0 0 20px 0px rgba(245, 158, 11, 0.1) inset"
           }}
@@ -129,15 +1002,19 @@ const Pricing_ = () => {
             <div className="flex items-center justify-between mb-3">
               <span className="text-amber-500/80 text-xs italic">Limited to 50 members</span>
             </div>
-            <div
+            <motion.div
+              onClick={() => handleGetStarted("gold")}
               className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold text-sm flex items-center justify-center cursor-pointer group"
+              whileHover={{ y: -3, scale: 1.01 }}
+              whileTap={{ y: 1, scale: 0.98 }}
+              transition={cardBounceTransition}
             >
               Get Started
               <FontAwesomeIcon
                 icon={faArrowRight}
                 className="ml-2 h-3 w-3 group-hover:translate-x-1 transition-transform"
               />
-            </div>
+            </motion.div>
           </div>
         </motion.div>
         
@@ -146,8 +1023,14 @@ const Pricing_ = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          whileHover={{ y: -10, transition: { duration: 0.2 } }}
-          className={`min-h-[520px] w-[350px] m-2 rounded-2xl flex flex-col justify-start items-center relative overflow-hidden border border-white/10 backdrop-blur-sm bg-gradient-to-b from-white/10 to-black/60 z-10`}
+          whileHover={!focusedCard ? { 
+            y: -10, 
+            rotateY: 5,
+            rotateX: -5,
+            scale: 1.02,
+            transition: { duration: 0.3, type: "spring" } 
+          } : {}}
+          className={`min-h-[520px] w-[350px] m-2 rounded-2xl flex flex-col justify-start items-center relative overflow-hidden border border-white/10 backdrop-blur-sm bg-gradient-to-b from-white/10 to-black/60 z-10 transition-all duration-500`}
           style={{ 
             boxShadow: "0 10px 50px -10px rgba(0, 0, 0, 0.8), 0 0 30px 0px rgba(255, 255, 255, 0.05) inset"
           }}
@@ -236,15 +1119,19 @@ const Pricing_ = () => {
             <div className="flex items-center justify-between mb-3">
               <span className="text-white/80 text-xs italic">Limited to 50 members</span>
             </div>
-            <div
+            <motion.div
+              onClick={() => handleGetStarted("black")}
               className="w-full py-3 rounded-xl bg-white text-black font-bold text-sm flex items-center justify-center group cursor-pointer"
+              whileHover={{ y: -3, scale: 1.01 }}
+              whileTap={{ y: 1, scale: 0.98 }}
+              transition={cardBounceTransition}
             >
               Get Started
               <FontAwesomeIcon
                 icon={faArrowRight}
                 className="ml-2 h-3 w-3 group-hover:translate-x-1 transition-transform"
               />
-            </div>
+            </motion.div>
           </div>
         </motion.div>
       </motion.div>
