@@ -95,7 +95,7 @@ const Pricing_ = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Handle input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
 
     // Clear field-specific error when user types
@@ -157,6 +157,12 @@ const Pricing_ = () => {
     // Basic validation for lastName
     if (!formData.lastName.trim()) {
       errors.lastName = "Last name is required";
+      isValid = false;
+    }
+    
+    // Basic validation for title
+    if (!formData.title) {
+      errors.title = "Please select a title";
       isValid = false;
     }
 
@@ -396,6 +402,65 @@ const Pricing_ = () => {
                               </motion.div>
                             )}
                           </div>
+                        </div>
+                      </div>
+                      
+                      {/* Title dropdown */}
+                      <div className="relative mb-4">
+                        <div className={`relative group ${fieldErrors.title ? "mb-5" : ""}`}>
+                          <select
+                            name="title"
+                            value={formData.title}
+                            onChange={handleInputChange}
+                            className={`w-full bg-black/60 backdrop-blur-sm rounded-md px-4 py-3 text-white border-0 ring-1 ${
+                              fieldErrors.title ? "ring-red-500" : "ring-gray-700"
+                            } transition-all duration-300 focus:ring-2 focus:ring-amber-500 text-sm appearance-none`}
+                            required
+                          >
+                            <option value="" disabled>Select title</option>
+                            <option value="Mr">Mr</option>
+                            <option value="Mrs">Mrs</option>
+                            <option value="Ms">Ms</option>
+                            <option value="Dr">Dr</option>
+                            <option value="Prof">Prof</option>
+                            <option value="Other">Other</option>
+                          </select>
+                          <div className="absolute top-1/2 right-4 transform -translate-y-1/2 pointer-events-none">
+                            <svg 
+                              xmlns="http://www.w3.org/2000/svg" 
+                              width="12" 
+                              height="12" 
+                              viewBox="0 0 24 24" 
+                              fill="none" 
+                              stroke="currentColor" 
+                              strokeWidth="2" 
+                              strokeLinecap="round" 
+                              strokeLinejoin="round" 
+                              className="text-amber-500"
+                            >
+                              <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                          </div>
+                          {fieldErrors.title && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 3 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="absolute -bottom-5 left-0 flex items-center text-red-400 text-xs"
+                            >
+                              <AlertTriangle size={12} className="mr-1" />
+                              <span>{fieldErrors.title}</span>
+                            </motion.div>
+                          )}
+                          {formData.title && !fieldErrors.title && (
+                            <motion.div
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              transition={{ type: "spring", stiffness: 500 }}
+                              className="absolute right-10 top-1/2 transform -translate-y-1/2"
+                            >
+                              <CheckCircle2 size={16} className="text-amber-500" />
+                            </motion.div>
+                          )}
                         </div>
                       </div>
                       
@@ -717,6 +782,65 @@ const Pricing_ = () => {
                               </motion.div>
                             )}
                           </div>
+                        </div>
+                      </div>
+                      
+                      {/* Title dropdown */}
+                      <div className="relative mb-4">
+                        <div className={`relative group ${fieldErrors.title ? "mb-5" : ""}`}>
+                          <select
+                            name="title"
+                            value={formData.title}
+                            onChange={handleInputChange}
+                            className={`w-full bg-black/60 backdrop-blur-sm rounded-md px-4 py-3 text-white border-0 ring-1 ${
+                              fieldErrors.title ? "ring-red-500" : "ring-gray-700"
+                            } transition-all duration-300 focus:ring-2 focus:ring-white text-sm appearance-none`}
+                            required
+                          >
+                            <option value="" disabled>Select title</option>
+                            <option value="Mr">Mr</option>
+                            <option value="Mrs">Mrs</option>
+                            <option value="Ms">Ms</option>
+                            <option value="Dr">Dr</option>
+                            <option value="Prof">Prof</option>
+                            <option value="Other">Other</option>
+                          </select>
+                          <div className="absolute top-1/2 right-4 transform -translate-y-1/2 pointer-events-none">
+                            <svg 
+                              xmlns="http://www.w3.org/2000/svg" 
+                              width="12" 
+                              height="12" 
+                              viewBox="0 0 24 24" 
+                              fill="none" 
+                              stroke="currentColor" 
+                              strokeWidth="2" 
+                              strokeLinecap="round" 
+                              strokeLinejoin="round" 
+                              className="text-white"
+                            >
+                              <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                          </div>
+                          {fieldErrors.title && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 3 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="absolute -bottom-5 left-0 flex items-center text-red-400 text-xs"
+                            >
+                              <AlertTriangle size={12} className="mr-1" />
+                              <span>{fieldErrors.title}</span>
+                            </motion.div>
+                          )}
+                          {formData.title && !fieldErrors.title && (
+                            <motion.div
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              transition={{ type: "spring", stiffness: 500 }}
+                              className="absolute right-10 top-1/2 transform -translate-y-1/2"
+                            >
+                              <CheckCircle2 size={16} className="text-white" />
+                            </motion.div>
+                          )}
                         </div>
                       </div>
                       
