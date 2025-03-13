@@ -40,7 +40,11 @@ const Hero_ = () => {
   
   // Track whether the user is currently scrolling
   const [isScrolling, setIsScrolling] = useState(false);
-
+  
+  // State for newsletter subscription form
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [emailValue, setEmailValue] = useState("");
+  
   useEffect(() => {
     const timer = setInterval(() => {
       setIsVisible((prev) => !prev);
@@ -950,12 +954,12 @@ const Hero_ = () => {
             <div className="inline-flex items-center justify-center px-6 py-3 border border-white/10 rounded-full bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 group cursor-pointer">
               <p className="text-white/80 text-sm group-hover:text-white transition-colors mr-2">Have more questions about our services?</p>
               <a 
-                href="tel:+27712204794" 
+                href="mailto:support@needtofuel.com" 
                 className="text-amber-500 text-sm font-medium group-hover:text-amber-400 transition-colors flex items-center"
               >
-                Call us
+                Email us
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
               </a>
             </div>
@@ -1288,27 +1292,77 @@ const Hero_ = () => {
                 <p className="text-white/60 text-sm">Stay updated with our latest offers, services, and fuel tips. We promise not to spam your inbox!</p>
               </div>
               <div className="md:col-span-5">
-                <form className="flex flex-col sm:flex-row gap-3" onSubmit={(e) => { e.preventDefault(); }}>
-                  <input 
-                    type="email" 
-                    placeholder="Your email address" 
-                    className="bg-white/10 border border-white/20 rounded-full px-4 py-2 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-amber-500/50 flex-grow"
-                    required
-                  />
+                {isSubscribed ? (
                   <div 
-                    onClick={() => { alert('Thanks for subscribing!'); }}
-                    className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black font-medium rounded-full px-5 py-2 transition-all whitespace-nowrap cursor-pointer flex items-center justify-center select-none shadow-md hover:shadow-amber-500/20"
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alert('Thanks for subscribing!'); } }}
-                    aria-label="Subscribe to newsletter"
+                    className="h-full flex items-center justify-center text-amber-400 font-medium animate-fade-in"
                   >
-                    <span className="mr-1">Subscribe</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
+                    <div className="flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Thanks for subscribing!</span>
+                    </div>
                   </div>
-                </form>
+                ) : (
+                  <form 
+                    className="flex flex-col sm:flex-row gap-3 animate-fade-in" 
+                    onSubmit={(e) => { 
+                      e.preventDefault(); 
+                      setIsSubscribed(true);
+                      
+                      // Reset the form after 3 seconds
+                      setTimeout(() => {
+                        setIsSubscribed(false);
+                        setEmailValue("");
+                      }, 3000);
+                    }}
+                  >
+                    <input 
+                      type="email" 
+                      placeholder="Your email address" 
+                      className="bg-white/10 border border-white/20 rounded-full px-4 py-2 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-amber-500/50 flex-grow"
+                      required
+                      value={emailValue}
+                      onChange={(e) => setEmailValue(e.target.value)}
+                    />
+                    <div 
+                      onClick={() => {
+                        if (emailValue.trim() !== "") {
+                          setIsSubscribed(true);
+                          
+                          // Reset the form after 3 seconds
+                          setTimeout(() => {
+                            setIsSubscribed(false);
+                            setEmailValue("");
+                          }, 3000);
+                        }
+                      }}
+                      className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black font-medium rounded-full px-5 py-2 transition-all whitespace-nowrap cursor-pointer flex items-center justify-center select-none shadow-md hover:shadow-amber-500/20"
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => { 
+                        if (e.key === 'Enter' || e.key === ' ') { 
+                          e.preventDefault(); 
+                          if (emailValue.trim() !== "") {
+                            setIsSubscribed(true);
+                            
+                            // Reset the form after 3 seconds
+                            setTimeout(() => {
+                              setIsSubscribed(false);
+                              setEmailValue("");
+                            }, 3000);
+                          }
+                        } 
+                      }}
+                      aria-label="Subscribe to newsletter"
+                    >
+                      <span className="mr-1">Subscribe</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </div>
+                  </form>
+                )}
               </div>
             </div>
           </div>
@@ -1405,6 +1459,13 @@ const Hero_ = () => {
         }
         .animate-slow-spin {
           animation: slow-spin 240s linear infinite;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.5s ease-in-out;
         }
       `}</style>
     </div>
