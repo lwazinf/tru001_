@@ -1380,11 +1380,11 @@ const Hero_ = () => {
                   </div>
                   <div className="group-hover:text-white transition-colors">
                     <p className="text-white/80 text-sm">
-                      97 Sun valley place
+                      {/* 97 Sun valley place
                       <br />
                       Oakdene, Johannesburg
                       <br />
-                      2190 - South Africa
+                      2190 - South Africa */}
                     </p>
                   </div>
                 </div>
