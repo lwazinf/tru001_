@@ -25,6 +25,10 @@ import {
   query,
   where,
   getDocs,
+  doc,
+  setDoc,
+  increment,
+  getDoc,
 } from "firebase/firestore";
 // import VerticalGallery from "./helpers/sideSwipe";
 
@@ -91,6 +95,176 @@ const Hero_ = () => {
   };
 
   useEffect(() => {
+    // Track visitor stats
+    const trackVisitorStats = async () => {
+      try {
+        // Check if this visitor has been tracked before
+        const visitorId = localStorage.getItem('ntf_visitor_id') || crypto.randomUUID();
+        const isReturning = !!localStorage.getItem('ntf_visitor_id');
+        
+        // Save/update the visitor ID
+        if (!isReturning) {
+          localStorage.setItem('ntf_visitor_id', visitorId);
+        }
+        
+        // Record session start time
+        const sessionStartTime = new Date().getTime();
+        localStorage.setItem('ntf_session_start', sessionStartTime.toString());
+        
+        // Get visitor IP and geolocation info via server API
+        const response = await fetch('/api/visitor-analytics', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (response.ok) {
+          const { ipAddress, country, city, region } = await response.json();
+          
+          // Reference to this specific visitor's document
+          const visitorRef = doc(db, "visitors", visitorId);
+          const visitorSnap = await getDoc(visitorRef);
+          
+          // Create a session document to track this visit
+          const sessionRef = await addDoc(collection(db, "sessions"), {
+            visitorId: visitorId,
+            startTime: serverTimestamp(),
+            isActive: true,
+            ipAddress,
+            country,
+            city,
+            region,
+            userAgent: navigator.userAgent,
+            pathname: window.location.pathname
+          });
+          
+          // Store session ID for later updates
+          localStorage.setItem('ntf_current_session', sessionRef.id);
+          
+          // Add to stats collection
+          await addDoc(collection(db, "stats"), {
+            visitorId: visitorId,
+            timestamp: serverTimestamp(),
+            isNewVisitor: !isReturning,
+            ipAddress,
+            country,
+            city,
+            region,
+            userAgent: navigator.userAgent,
+            screenWidth: window.innerWidth,
+            screenHeight: window.innerHeight,
+            language: navigator.language,
+            referrer: document.referrer || 'direct',
+            pathname: window.location.pathname
+          });
+          
+          // Update or create visitor document
+          if (visitorSnap.exists()) {
+            // Existing visitor - update stats
+            await setDoc(visitorRef, {
+              lastVisit: serverTimestamp(),
+              visitCount: increment(1),
+              ipAddress, // Update in case it changed
+              country,   // Update location data
+              lastUserAgent: navigator.userAgent
+            }, { merge: true });
+          } else {
+            // New visitor - create record
+            await setDoc(visitorRef, {
+              firstVisit: serverTimestamp(),
+              lastVisit: serverTimestamp(),
+              visitCount: 1,
+              ipAddress,
+              country,
+              city,
+              region,
+              userAgent: navigator.userAgent
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error tracking visitor stats:", error);
+      }
+    };
+    
+    // Function to end the session and record duration
+    const endSession = async () => {
+      try {
+        const sessionId = localStorage.getItem('ntf_current_session');
+        const sessionStartTime = localStorage.getItem('ntf_session_start');
+        
+        if (sessionId && sessionStartTime) {
+          const startTime = parseInt(sessionStartTime);
+          const endTime = new Date().getTime();
+          const durationMs = endTime - startTime;
+          const durationSeconds = Math.round(durationMs / 1000);
+          
+          // Update the session with end time and duration
+          const sessionRef = doc(db, "sessions", sessionId);
+          await setDoc(sessionRef, {
+            endTime: serverTimestamp(),
+            isActive: false,
+            durationSeconds: durationSeconds,
+            durationFormatted: formatDuration(durationSeconds)
+          }, { merge: true });
+          
+          // Clear the session data
+          localStorage.removeItem('ntf_current_session');
+          localStorage.removeItem('ntf_session_start');
+        }
+      } catch (error) {
+        console.error("Error ending session:", error);
+      }
+    };
+    
+    // Helper function to format duration
+    const formatDuration = (seconds: any) => {
+      if (seconds < 60) return `${seconds}s`;
+      if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+      return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
+    };
+    
+    // Set up beforeunload event to track when users leave
+    const handleBeforeUnload = () => {
+      endSession();
+    };
+    
+    // Call tracking function to initialize
+    trackVisitorStats();
+    
+    // Add event listener for when the user leaves
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    // Also track session heartbeats every minute to handle cases
+    // where beforeunload doesn't fire (browser crashes, etc.)
+    const heartbeatInterval = setInterval(() => {
+      // Update the active session with a heartbeat
+      const updateSessionHeartbeat = async () => {
+        try {
+          const sessionId = localStorage.getItem('ntf_current_session');
+          if (sessionId) {
+            const sessionStartTime = localStorage.getItem('ntf_session_start');
+            if (sessionStartTime) {
+              const startTime = parseInt(sessionStartTime);
+              const currentTime = new Date().getTime();
+              const durationMs = currentTime - startTime;
+              const durationSeconds = Math.round(durationMs / 1000);
+              
+              // Update the session with the current duration
+              const sessionRef = doc(db, "sessions", sessionId);
+              await setDoc(sessionRef, {
+                lastHeartbeat: serverTimestamp(),
+                currentDurationSeconds: durationSeconds
+              }, { merge: true });
+            }
+          }
+        } catch (error) {
+          console.error("Error updating session heartbeat:", error);
+        }
+      };
+      
+      updateSessionHeartbeat();
+    }, 60000); // Update every minute
+    
     const timer = setInterval(() => {
       setIsVisible((prev) => !prev);
     }, 5000);
@@ -303,11 +477,15 @@ const Hero_ = () => {
     });
     animations.push(lastSectionZoom);
 
+    // Clean up event listeners and intervals
     return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      clearInterval(heartbeatInterval);
+      clearInterval(timer);
+      // Call endSession when component unmounts
+      endSession();
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
       animations.forEach((animation) => animation.kill());
-      clearInterval(timer);
-      window.removeEventListener("scroll", handleScroll);
     };
   }, [isScrolling]);
 
