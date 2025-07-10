@@ -38,10 +38,9 @@ const ParallaxSection = () => {
   return (
     <div ref={containerRef} className="w-full h-screen relative overflow-hidden">
       <img
-        ref={imgRef}
-        src="/assets/images/main.jpg"
-        className="w-full h-full object-cover"
-        alt="Background"
+        src="/assets/images/main_logo.png"
+        alt="TruWatchAI Logo"
+        className="h-auto"
       />
       {/* Your other content */}
     </div>

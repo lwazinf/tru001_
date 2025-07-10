@@ -8,7 +8,6 @@
  * @returns Promise with payment response data
  */
 export const processPayment = async (data: object) => {
-  console.log("Processing payment:", data);
   try {
     const response = await fetch('/api/payment-request', {
       method: 'POST',
@@ -26,7 +25,6 @@ export const processPayment = async (data: object) => {
     const result = await response.json();
     return result.data;
   } catch (error) {
-    console.error('Payment processing error:', error);
     throw error;
   }
 };

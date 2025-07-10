@@ -17,8 +17,8 @@ const VerticalGallery = () => {
         >
           <img
             src={image.src}
-            className="w-full h-48 object-cover"
-            alt={`Frame ${index + 1}`}
+            alt={`Gallery image ${index + 1}`}
+            className="w-full h-full object-cover rounded-lg"
           />
           <div className="flex flex-col justify-center items-center rounded-[3px] backdrop-blur-md bg-white/10 text-white/50 font-bold absolute right-2 bottom-2 px-6 py-2">
             {image.text}

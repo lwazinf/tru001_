@@ -1,0 +1,190 @@
+
+> tru001_@0.1.0 lint
+> next lint
+
+
+./app/api/car-details/route.ts
+25:3  Warning: Unexpected console statement.  no-console
+46:5  Warning: Unexpected console statement.  no-console
+64:9  Warning: Unexpected console statement.  no-console
+79:7  Warning: Unexpected console statement.  no-console
+83:5  Warning: Unexpected console statement.  no-console
+
+./app/api/payment-request/route.ts
+13:5  Warning: Unexpected console statement.  no-console
+61:5  Warning: Unexpected console statement.  no-console
+62:5  Warning: Unexpected console statement.  no-console
+63:5  Warning: Unexpected console statement.  no-console
+64:5  Warning: Unexpected console statement.  no-console
+65:5  Warning: Unexpected console statement.  no-console
+83:5  Warning: Unexpected console statement.  no-console
+102:5  Warning: Unexpected console statement.  no-console
+114:5  Warning: Unexpected console statement.  no-console
+116:7  Warning: Unexpected console statement.  no-console
+117:7  Warning: Unexpected console statement.  no-console
+
+./app/api/visitor-analytics/route.ts
+24:7  Warning: Unexpected console statement.  no-console
+35:5  Warning: Unexpected console statement.  no-console
+
+./app/auth/page.tsx
+1:1  Warning: Unused eslint-disable directive (no problems were reported from '@typescript-eslint/ban-ts-comment').
+43:12  Warning: 'error' is defined but never used.  no-unused-vars
+43:12  Error: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+112:18  Warning: 'error' is defined but never used.  no-unused-vars
+112:18  Error: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+119:6  Warning: React Hook useEffect has an unnecessary dependency: 'checkTierAccess'. Either exclude it or remove the dependency array. Outer scope values like 'checkTierAccess' aren't valid dependencies because mutating them doesn't re-render the component.  react-hooks/exhaustive-deps
+131:16  Warning: 'error' is defined but never used.  no-unused-vars
+131:16  Error: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+192:6  Warning: React Hook useEffect has a missing dependency: 'backgroundImages.length'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+239:14  Warning: 'error' is defined but never used.  no-unused-vars
+239:14  Error: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+605:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+695:33  Warning: 'error' is defined but never used.  no-unused-vars
+695:33  Error: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+795:33  Warning: 'error' is defined but never used.  no-unused-vars
+795:33  Error: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+853:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+877:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+1489:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+1547:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/components/Hero_.tsx
+23:3  Warning: 'query' is defined but never used.  no-unused-vars
+23:3  Error: 'query' is defined but never used.  @typescript-eslint/no-unused-vars
+24:3  Warning: 'where' is defined but never used.  no-unused-vars
+24:3  Error: 'where' is defined but never used.  @typescript-eslint/no-unused-vars
+25:3  Warning: 'getDocs' is defined but never used.  no-unused-vars
+25:3  Error: 'getDocs' is defined but never used.  @typescript-eslint/no-unused-vars
+33:8  Warning: 'Link' is defined but never used.  no-unused-vars
+33:8  Error: 'Link' is defined but never used.  @typescript-eslint/no-unused-vars
+35:8  Warning: 'Image' is defined but never used.  no-unused-vars
+35:8  Error: 'Image' is defined but never used.  @typescript-eslint/no-unused-vars
+60:24  Warning: 'setIsSubscribed' is assigned a value but never used.  no-unused-vars
+60:24  Error: 'setIsSubscribed' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+63:11  Warning: 'user' is assigned a value but never used.  no-unused-vars
+63:11  Error: 'user' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+65:10  Warning: 'isSubscribing' is assigned a value but never used.  no-unused-vars
+65:10  Error: 'isSubscribing' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+66:9  Warning: 'videoRef' is assigned a value but never used.  no-unused-vars
+66:9  Error: 'videoRef' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+67:10  Warning: 'currentSection' is assigned a value but never used.  no-unused-vars
+67:10  Error: 'currentSection' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+67:26  Warning: 'setCurrentSection' is assigned a value but never used.  no-unused-vars
+67:26  Error: 'setCurrentSection' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+77:14  Warning: 'error' is defined but never used.  no-unused-vars
+77:14  Error: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+82:9  Warning: 'handleSubmit' is assigned a value but never used.  no-unused-vars
+82:9  Error: 'handleSubmit' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+121:20  Warning: 'error' is defined but never used.  no-unused-vars
+121:20  Error: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+134:20  Warning: 'error' is defined but never used.  no-unused-vars
+134:20  Error: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+145:16  Warning: 'error' is defined but never used.  no-unused-vars
+145:16  Error: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+246:16  Warning: 'error' is defined but never used.  no-unused-vars
+246:16  Error: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+275:16  Warning: 'error' is defined but never used.  no-unused-vars
+275:16  Error: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+320:18  Warning: 'error' is defined but never used.  no-unused-vars
+320:18  Error: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+576:9  Warning: 'sections' is assigned a value but never used.  no-unused-vars
+576:9  Error: 'sections' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+584:9  Warning: 'navLinks' is assigned a value but never used.  no-unused-vars
+584:9  Error: 'navLinks' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+599:9  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+599:9  Warning: img elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+610:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+610:15  Warning: img elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+620:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+620:15  Warning: img elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+631:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+647:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+753:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+772:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+814:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+829:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+848:9  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+848:9  Warning: img elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+930:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+930:21  Warning: img elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+993:19  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+1002:25  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+1075:23  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+1086:25  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+1127:25  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+1159:25  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+1491:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+1537:19  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/components/Nav_.tsx
+18:9  Warning: The 'navLinks' array makes the dependencies of useEffect Hook (at line 79) change on every render. To fix this, wrap the initialization of 'navLinks' in its own useMemo() Hook.  react-hooks/exhaustive-deps
+
+./app/components/helpers/hero.tsx
+46:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/components/helpers/paralex.tsx
+40:7  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/components/helpers/pricing.tsx
+85:12  Warning: 'error' is defined but never used.  no-unused-vars
+85:12  Error: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+214:14  Warning: 'error' is defined but never used.  no-unused-vars
+214:14  Error: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/components/helpers/sideSwipe.tsx
+18:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/dash/page.tsx
+403:8  Error: Parsing error: Declaration or statement expected.
+
+./app/mydata/page.tsx
+51:14  Warning: 'err' is defined but never used.  no-unused-vars
+163:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/privacy/page.tsx
+97:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/utils/payment.ts
+11:3  Warning: Unexpected console statement.  no-console
+29:5  Warning: Unexpected console statement.  no-console
+
+./components/dashboard/AddVehicleModal.tsx
+11:25  Warning: 'e' is defined but never used.  no-unused-vars
+14:22  Warning: 'vehicleData' is defined but never used.  no-unused-vars
+788:14  Warning: 'id' is defined but never used.  no-unused-vars
+893:15  Warning: 'id' is defined but never used.  no-unused-vars
+
+./components/dashboard/DashboardSidebar.tsx
+9:18  Warning: 'tab' is defined but never used.  no-unused-vars
+
+./components/dashboard/DeleteAccountModal.tsx
+8:27  Warning: 'value' is defined but never used.  no-unused-vars
+
+./components/dashboard/ProfileSection.tsx
+14:22  Warning: 'e' is defined but never used.  no-unused-vars
+16:25  Warning: 'e' is defined but never used.  no-unused-vars
+
+./components/dashboard/SecuritySection.tsx
+14:17  Warning: 'password' is defined but never used.  no-unused-vars
+15:25  Warning: 'strength' is defined but never used.  no-unused-vars
+16:33  Warning: 'e' is defined but never used.  no-unused-vars
+
+./components/dashboard/VehicleGrid.tsx
+30:22  Warning: 'index' is defined but never used.  no-unused-vars
+31:22  Warning: 'index' is defined but never used.  no-unused-vars
+
+./lib/firebase/AuthContext.tsx
+22:12  Warning: 'firstName' is defined but never used.  no-unused-vars
+22:31  Warning: 'lastName' is defined but never used.  no-unused-vars
+22:49  Warning: 'email' is defined but never used.  no-unused-vars
+22:64  Warning: 'password' is defined but never used.  no-unused-vars
+23:11  Warning: 'email' is defined but never used.  no-unused-vars
+23:26  Warning: 'password' is defined but never used.  no-unused-vars
+25:19  Warning: 'email' is defined but never used.  no-unused-vars
+152:6  Warning: React Hook useEffect has a missing dependency: 'checkTierAccess'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./lib/firebase/config.ts
+35:3  Warning: Unexpected console statement.  no-console
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules

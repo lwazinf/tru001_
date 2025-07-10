@@ -10,7 +10,6 @@ export async function POST(request: NextRequest) {
   try {
     // Get request data
     const requestData = await request.json();
-    console.log("Received request data:", requestData);
     
     // Base payment data
     const baseData = {
@@ -58,11 +57,6 @@ export async function POST(request: NextRequest) {
     // 4. Generate SHA512 hash
     const hashCheck = generateSha512(lowercaseString);
     
-    console.log("Hash Generation:");
-    console.log("1. Concatenated String:", concatenatedString);
-    console.log("2. With Private Key (partial):", concatenatedString.substring(0, 20) + "..." + PRIVATE_KEY.substring(0, 3) + "...");
-    console.log("3. Lowercase String (partial):", lowercaseString.substring(0, 30) + "...");
-    console.log("4. Final Hash:", hashCheck);
     
     // Final data object for the API (exclude privateKey)
     const dataToSend = {
@@ -80,7 +74,6 @@ export async function POST(request: NextRequest) {
       hashCheck: hashCheck
     };
     
-    console.log("Final payment data:", dataToSend);
 
     // API configuration
     const config = {
@@ -99,7 +92,6 @@ export async function POST(request: NextRequest) {
     const response = await axios.request(config);
     
     // Log the response to server console
-    console.log("Payment API Response:", JSON.stringify(response.data, null, 2));
     
     // Return the response to the client
     return NextResponse.json(
@@ -111,10 +103,7 @@ export async function POST(request: NextRequest) {
     );
   } catch (error: any) {
     // Log error to server console
-    console.error("Payment API Error:", error.message);
     if (error.response) {
-      console.error("Response data:", error.response.data);
-      console.error("Response status:", error.response.status);
     }
     
     // Return error to client

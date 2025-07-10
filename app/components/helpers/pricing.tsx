@@ -82,9 +82,8 @@ const Pricing_ = () => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     authContext = useAuth();
     if (!authContextLoaded) setAuthContextLoaded(true);
-  } catch (error) {
+  } catch {
     if (!authError) {
-      console.error("Auth context error:", error);
       setAuthError("Authentication system is initializing");
     }
   }
@@ -212,9 +211,7 @@ const Pricing_ = () => {
         }));
       }
 
-      console.log("Payment saved to Firestore successfully");
-    } catch (error) {
-      console.error("Error saving payment to Firestore:", error);
+    } catch {
     }
   };
   
@@ -301,7 +298,6 @@ const Pricing_ = () => {
         bankReference
       })
         .then((paymentResponse) => {
-          console.log("Payment processed:", paymentResponse);
           
           // Save payment data to Firestore
           if (paymentResponse) {
@@ -321,7 +317,6 @@ const Pricing_ = () => {
           }
         })
         .catch((error) => {
-          console.error("Payment failed:", error);
           // Handle payment error - reset loading state
           setIsSubmitting(false);
           alert(`Payment processing failed: ${error.message || "Unknown error"}`);

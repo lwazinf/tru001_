@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -42,7 +41,6 @@ const AuthForm = () => {
     if (!authContextLoaded) setAuthContextLoaded(true);
   } catch (error) {
     if (!authError) {
-      console.error("Auth context error:", error);
       setAuthError("Authentication system is initializing");
     }
   }
@@ -128,7 +126,6 @@ const AuthForm = () => {
             setShowThankYou(true);
           }
         } catch (error) {
-          console.error("Error checking user tier:", error);
           // On error, default to showing thank you page
           setShowThankYou(true);
         }
@@ -181,17 +178,16 @@ const AuthForm = () => {
     };
   }, [tierRequiredError]);
 
-  // Set up image rotation interval
+  // Background image rotation effect
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setCurrentImageIndex(
-        (prevIndex) => (prevIndex + 1) % backgroundImages.length
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => 
+        (prevIndex + 1) % backgroundImages.length
       );
-    }, 5000); // Change image every 5 seconds
+    }, 5000);
 
-    // Clean up interval on component unmount
-    return () => clearInterval(intervalId);
-  }, []);
+    return () => clearInterval(interval);
+  }, [backgroundImages.length]);
 
   // Handle input changes
   const handleInputChange = (e: any) => {
@@ -238,9 +234,7 @@ const AuthForm = () => {
         });
       }
 
-      console.log("Payment saved to Firestore successfully");
     } catch (error) {
-      console.error("Error saving payment to Firestore:", error);
     }
   };
 
@@ -405,7 +399,6 @@ const AuthForm = () => {
         // Don't redirect - let the useEffect handle it
       }
     } catch (err: any) {
-      console.error("Authentication error:", err);
       setError(getReadableErrorMessage(err));
       // If there's an error, allow showing the title button again
       setFormSubmitted(false);
@@ -662,7 +655,6 @@ const AuthForm = () => {
                     whileTap={{ scale: 0.92 }}
                     onClick={() => {
                       // Handle Gold tier selection
-                      console.log("Gold tier selected");
                       setSelectedTier("gold");
                       setIsLoading(true);
                       // Process payment before navigating
@@ -675,7 +667,6 @@ const AuthForm = () => {
                         bankReference: "NTF Gold Membership",
                       })
                         .then((paymentResponse) => {
-                          console.log("Payment processed:", paymentResponse);
                           // Save payment data to Firestore
                           if (paymentResponse) {
                             savePaymentToFirestore(
@@ -700,7 +691,6 @@ const AuthForm = () => {
                           }
                         })
                         .catch((error) => {
-                          console.error("Payment failed:", error);
                           // Handle payment error - reset loading state
                           setIsLoading(false);
                           setSelectedTier(null);
@@ -765,7 +755,6 @@ const AuthForm = () => {
                     whileTap={{ scale: 0.92 }}
                     onClick={() => {
                       // Handle Black tier selection
-                      console.log("Black tier selected");
                       setSelectedTier("black");
                       setIsLoading(true);
                       // Process payment before navigating
@@ -778,7 +767,6 @@ const AuthForm = () => {
                         bankReference: "NTF Black Membership",
                       })
                         .then((paymentResponse) => {
-                          console.log("Payment processed:", paymentResponse);
                           // Save payment data to Firestore
                           if (paymentResponse) {
                             savePaymentToFirestore(
@@ -803,7 +791,6 @@ const AuthForm = () => {
                           }
                         })
                         .catch((error) => {
-                          console.error("Payment failed:", error);
                           // Handle payment error - reset loading state
                           setIsLoading(false);
                           setSelectedTier(null);

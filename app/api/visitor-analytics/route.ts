@@ -20,8 +20,11 @@ export async function POST(req: NextRequest) {
         city = geoData.city || 'Unknown';
         region = geoData.region || 'Unknown';
       }
-    } catch (geoError) {
-      console.error("Error getting geolocation:", geoError);
+    } catch {
+      return NextResponse.json(
+        { error: "Failed to save visitor data" },
+        { status: 500 }
+      );
     }
     
     return NextResponse.json({
@@ -31,10 +34,9 @@ export async function POST(req: NextRequest) {
       region,
       timestamp: new Date().toISOString()
     });
-  } catch (error) {
-    console.error("Error in visitor analytics endpoint:", error);
+  } catch {
     return NextResponse.json(
-      { error: "Failed to process visitor analytics" },
+      { error: "Failed to save visitor data" },
       { status: 500 }
     );
   }

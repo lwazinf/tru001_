@@ -3,15 +3,11 @@
 import React, { useState } from 'react';
 import { Car, X, Calendar, FileText, CheckCircle, ChevronLeft, ChevronRight, Search, Droplets, Trash2 } from 'lucide-react';
 
-interface AddVehicleModalProps {
-  newVehicle: {
-    name: string;
-    type: string;
-  };
-  handleVehicleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+export interface AddVehicleModalProps {
+  isOpen: boolean;
   onClose: () => void;
-  onAdd: () => void;
-  onVehicleSelect?: (vehicleData: any) => void;
+  onAddVehicle: (vehicleData: any) => void;
+  vehicleOptions?: any[];
 }
 
 // Type for the fuel tank capacity data structure
@@ -28,9 +24,10 @@ interface Vehicle {
   numberPlate?: string;
 }
 
-export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
-  handleVehicleChange,
+const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
+  isOpen,
   onClose,
+  onAddVehicle,
   onAdd,
   onVehicleSelect
 }) => {
@@ -116,8 +113,6 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 8000);
       
-      console.log(`Fetching vehicle data from: ${url}`);
-      
       const response = await fetch(url, {
         signal: controller.signal
       });
@@ -125,12 +120,10 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
       clearTimeout(timeoutId);
       
       if (!response.ok) {
-        console.error(`API error: ${response.status} - ${await response.text()}`);
         throw new Error(`Failed to load vehicle data: ${response.status}`);
       }
       
       const data = await response.json();
-      console.log('API response:', data);
       
       if (Array.isArray(data) && data.length > 0) {
         setApiResults(data);
@@ -144,7 +137,6 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
         return [];
       }
     } catch (error) {
-      console.error('Error fetching vehicle data:', error);
       setError(error instanceof Error ? error.message : 'An error occurred');
       changeModalState('FORM');
       return [];

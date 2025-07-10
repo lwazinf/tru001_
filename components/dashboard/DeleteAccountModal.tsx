@@ -11,10 +11,9 @@ interface DeleteAccountModalProps {
 }
 
 export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
-  deleteConfirmation,
-  setDeleteConfirmation,
+  isOpen,
   onClose,
-  onConfirm
+  onConfirm,
 }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">

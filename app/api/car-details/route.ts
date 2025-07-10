@@ -22,7 +22,6 @@ export async function GET(request: NextRequest) {
   const makeName = searchParams.get('makeName');
   const year = searchParams.get('year');
   
-  console.log(`Car details API called with make: ${makeName}, year: ${year}`);
   
   if (!makeName) {
     return new Response(JSON.stringify({ error: 'Make name is required' }), {
@@ -43,7 +42,6 @@ export async function GET(request: NextRequest) {
     // External API URL
     const externalApiUrl = `http://206.189.22.2:3000/car-details`;
     
-    console.log(`Proxying request to: ${externalApiUrl}?${params.toString()}`);
     
     // Set a timeout to prevent hanging requests
     const controller = new AbortController();
@@ -61,7 +59,6 @@ export async function GET(request: NextRequest) {
       clearTimeout(timeoutId);
       
       if (!response.ok) {
-        console.error(`External API error: ${response.status}`);
         throw new Error(`External API returned ${response.status}`);
       }
       
@@ -76,11 +73,9 @@ export async function GET(request: NextRequest) {
         },
       });
     } catch (apiError) {
-      console.error('Error calling external API:', apiError);
       throw apiError;
     }
   } catch (error) {
-    console.error('Error processing request:', error);
     
     return new Response(JSON.stringify({ 
       error: 'Failed to fetch car data',

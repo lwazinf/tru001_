@@ -44,9 +44,9 @@ const Hero__ = () => {
       <ReactLenis root>
         <section ref={firstSectionRef} className="w-full h-screen relative para overflow-hidden">
           <img
-            ref={imgRef}
-            src="/assets/images/main.jpg"
-            className="w-full h-full object-cover"
+            src="/images/tru001_logo_green.png"
+            alt="TRU001 Logo"
+            className="h-8 w-auto transition-all duration-300 hover:scale-105"
           />
           {/* Rest of your content */}
         </section>
