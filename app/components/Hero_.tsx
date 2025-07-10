@@ -9,9 +9,7 @@ import {
   faTiktok,
   faWhatsapp,
 } from "@fortawesome/free-brands-svg-icons";
-import Pricing_ from "./helpers/pricing";
 import Marquee from "./Marquee";
-import { motion } from "framer-motion";
 import { faAngleDoubleDown } from "@fortawesome/free-solid-svg-icons";
 import TermsModal from "./helpers/termsModal";
 import { PolicyState } from "./atoms/atoms";
@@ -30,6 +28,8 @@ import {
   increment,
   getDoc,
 } from "firebase/firestore";
+import { motion } from "framer-motion";
+// import Pricing_ from "./Pricing_";
 // import VerticalGallery from "./helpers/sideSwipe";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -597,12 +597,12 @@ const Hero_ = () => {
               <div
                 className={`min-w-2 min-h-2 flex-row justify-center items-center mt-4 xl:flex hidden`}
               >
-                {["Get Started"].map((obj_, idx_) => {
+                {["Get App"].map((obj_, idx_) => {
                   return (
                     <div
                       key={idx_}
                       className={`min-w-8 h-8 px-4 text-[12px] text-white bg-orange-600 font-semibold flex flex-col justify-center items-center rounded-[20px] cursor-pointer`}
-                      onClick={() => router.push("/auth")}
+                      onClick={() => window.open("https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-arm64-v8a-release.apk?alt=media&token=b140d23b-f333-4f3e-aead-6ad5d59a8667")}
                     >
                       {obj_}
                     </div>
@@ -627,7 +627,7 @@ const Hero_ = () => {
                     icon: faGooglePlay,
                     func: () => {
                       window.open(
-                        "https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-release.apk?alt=media&token=c4885d23-b5c4-4ff7-b438-eca7cff59a30"
+                        "https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-arm64-v8a-release.apk?alt=media&token=b140d23b-f333-4f3e-aead-6ad5d59a8667"
                       );
                     },
                   },
@@ -731,7 +731,7 @@ const Hero_ = () => {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-5 mt-6 mb-8">
               <a
-                href="https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-release.apk?alt=media&token=c4885d23-b5c4-4ff7-b438-eca7cff59a30"
+                href="https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-arm64-v8a-release.apk?alt=media&token=b140d23b-f333-4f3e-aead-6ad5d59a8667"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-40 sm:w-48 hover:scale-105 transition-transform shadow-lg rounded-lg overflow-hidden"
@@ -910,7 +910,6 @@ const Hero_ = () => {
               clients.
             </p>
           </div>
-
           {/* Featured Success Stories Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Main featured story - left side (5 columns) */}
@@ -1138,12 +1137,12 @@ const Hero_ = () => {
         </div>
       </section>
 
-      <section
+      {/* <section
         id="pricing_section"
         className="third-section w-full min-h-screen flex flex-col justify-center items-center bg-black relative overflow-hidden"
       >
         <Pricing_ />
-      </section>
+      </section> */}
 
       <section
         id="faq_section"
@@ -2059,3 +2058,4 @@ const Hero_ = () => {
 };
 
 export default Hero_;
+

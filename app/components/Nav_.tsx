@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { User } from 'firebase/auth';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   faFacebook,
@@ -12,25 +11,17 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import { 
   faBars,
-  faXmark,
-  faUser,
-  faSignInAlt
+  faXmark
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-interface NavProps {
-  user: User | null;
-}
-
 const navLinks = [
   { name: 'Home', href: '/', scrollTo: 'top' },
-  { name: 'Services', href: '/#services', scrollTo: 'services_section' },
   { name: 'Case Studies', href: '/#case-studies', scrollTo: 'case_studies_section' },
-  { name: 'Pricing', href: '/#pricing', scrollTo: 'pricing_section' },
   { name: 'FAQ', href: '/#faq', scrollTo: 'faq_section' },
 ];
 
-const Nav_ = ({ user }: NavProps) => {
+const Nav_ = () => {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -152,30 +143,11 @@ const Nav_ = ({ user }: NavProps) => {
 
         {/* Auth and action buttons */}
         <div className="flex items-center space-x-3">
-          {/* Auth button - Sign In or User Profile based on authentication status */}
-          {user ? (
-            <Link href="/dash">
-              <div className="flex items-center space-x-2 px-3 py-1.5 bg-amber-500/10 rounded-full hover:bg-amber-500/20 transition-all duration-300 cursor-pointer">
-                <FontAwesomeIcon icon={faUser} className="text-amber-500 h-4 w-4" />
-                <span className="text-white text-sm font-medium truncate max-w-[100px]">
-                  {user.displayName || user.email?.split('@')[0] || 'User'}
-                </span>
-              </div>
-            </Link>
-          ) : (
-            <Link href="/auth">
-              <span className="flex items-center space-x-1 text-white bg-amber-500/20 hover:bg-amber-500/30 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300">
-                <FontAwesomeIcon icon={faSignInAlt} className="h-3.5 w-3.5 mr-1" />
-                Sign in
-              </span>
-            </Link>
-          )}
-
           {/* Get app button */}
           <button
-            onClick={() => {
-              window.open("https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-release.apk?alt=media&token=c4885d23-b5c4-4ff7-b438-eca7cff59a30")
-            }}
+            onClick={() =>
+              window.open("https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-arm64-v8a-release.apk?alt=media&token=b140d23b-f333-4f3e-aead-6ad5d59a8667")
+            }
             className="hidden sm:flex items-center space-x-1 bg-amber-500 hover:bg-amber-600 px-4 py-1.5 rounded-full text-sm font-medium text-black transition-all duration-300 transform hover:scale-105"
           >
             Get app
@@ -232,27 +204,10 @@ const Nav_ = ({ user }: NavProps) => {
                 </a>
               ))}
               
-              {/* Add auth option to mobile menu */}
-              {!user ? (
-                <Link href="/auth" onClick={() => setMobileMenuOpen(false)}>
-                  <div className="flex items-center space-x-2 text-amber-500 font-medium">
-                    <FontAwesomeIcon icon={faSignInAlt} className="h-4 w-4" />
-                    <span>Sign in</span>
-                  </div>
-                </Link>
-              ) : (
-                <Link href="/dash" onClick={() => setMobileMenuOpen(false)}>
-                  <div className="flex items-center space-x-2 text-amber-500 font-medium">
-                    <FontAwesomeIcon icon={faUser} className="h-4 w-4" />
-                    <span>Dashboard</span>
-                  </div>
-                </Link>
-              )}
-              
               <div className="pt-4 border-t border-white/10">
                 <button
                   onClick={() => {
-                    window.open("https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-release.apk?alt=media&token=c4885d23-b5c4-4ff7-b438-eca7cff59a30");
+                    window.open("https://firebasestorage.googleapis.com/v0/b/tru001-c96b3.firebasestorage.app/o/app-arm64-v8a-release.apk?alt=media&token=b140d23b-f333-4f3e-aead-6ad5d59a8667");
                     setMobileMenuOpen(false);
                   }}
                   className="w-full flex items-center justify-center bg-amber-500 hover:bg-amber-600 px-4 py-3 rounded-xl text-base font-medium text-black transition-all duration-300 transform hover:scale-105"
