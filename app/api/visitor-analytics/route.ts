@@ -21,10 +21,7 @@ export async function POST(req: NextRequest) {
         region = geoData.region || 'Unknown';
       }
     } catch {
-      return NextResponse.json(
-        { error: "Failed to save visitor data" },
-        { status: 500 }
-      );
+      // Silently handle geo error
     }
     
     return NextResponse.json({
@@ -36,7 +33,7 @@ export async function POST(req: NextRequest) {
     });
   } catch {
     return NextResponse.json(
-      { error: "Failed to save visitor data" },
+      { error: "Failed to process visitor analytics" },
       { status: 500 }
     );
   }

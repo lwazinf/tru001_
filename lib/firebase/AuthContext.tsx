@@ -73,7 +73,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
       
       return false;
-    } catch {
+    } catch (error) {
+      console.error("Error checking tier access:", error);
       return false;
     }
   }

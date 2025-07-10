@@ -12,7 +12,6 @@ import {
   deleteDoc,
   Timestamp,
   setDoc,
-  serverTimestamp,
 } from "firebase/firestore";
 import {
   updatePassword,
@@ -88,64 +87,172 @@ export default function DashPage() {
   // Check authentication and redirect if not authenticated
   useEffect(() => {
     const checkAuth = async () => {
-      if (loading) return;
+      setIsAuthChecking(true);
 
       if (!currentUser) {
-        router.push('/auth');
+        // User is not authenticated, redirect to auth page immediately
+        router.push("/auth");
         return;
       }
-
+      
       try {
-        const hasAccess = await checkTierAccess();
-        if (!hasAccess) {
-          router.push('/auth');
+        // User is authenticated, now check if they have the correct tier
+        const db = getFirestore();
+        const userDocRef = doc(db, "users", currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+        
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          const userTier = data.tier || "new";
+          
+          // Only allow access if user has appropriate tier
+          if (userTier !== "Gold" && 
+              userTier !== "Black" && 
+              userTier !== "CEO" && 
+              userTier !== "Paused") {
+            // Redirect to auth page with appropriate query parameter
+            router.push("/auth?tier=required");
+            return;
+          }
         } else {
-          setIsAuthenticated(true);
+          // No user document found
+          router.push("/auth");
+          return;
         }
+        
+        // User is authenticated and has correct tier
+        setIsAuthChecking(false);
       } catch (error) {
-        // Error handling without console logging
-        router.push('/auth');
+        console.error("Error checking authentication:", error);
+        // On error, default to redirecting to auth
+        router.push("/auth");
       }
     };
 
     checkAuth();
-  }, [currentUser, loading, router, checkTierAccess]);
+  }, [currentUser, router]);
 
   // Fetch user data from Firestore
   useEffect(() => {
-    if (!isAuthenticated || !currentUser) return;
-
     const fetchUserData = async () => {
-      try {
-        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          setUserData(userData);
+      if (currentUser && currentUser.uid) {
+        setIsDataLoading(true);
+        try {
+          const db = getFirestore();
+          const userDocRef = doc(db, "users", currentUser.uid);
+          const userDoc = await getDoc(userDocRef);
 
-          const tierDateValue = userData.tierDate;
-          if (tierDateValue && typeof tierDateValue.toDate === 'function') {
-            const tierDate = tierDateValue.toDate();
-            const now = new Date();
-            const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+          if (userDoc.exists()) {
+            const data = userDoc.data();
 
-            if (tierDate < thirtyDaysAgo) {
-              // Subscription expired, update tier to Paused
-              await updateDoc(doc(db, "users", currentUser.uid), {
-                tier: "Paused",
-                previousTier: userData.tier || "Gold",
-                pausedDate: serverTimestamp()
-              });
-              setUserData(prev => prev ? { ...prev, tier: "Paused" } : null);
+            // Use the Firestore Timestamp directly or set a default if missing
+            const tierDateValue = data.tierDate || Timestamp.now();
+
+            // Check if subscription has expired (more than 30 days since tierDate)
+            let currentTier = data.tier || "basic";
+
+            try {
+              // If tierDate is a Firestore Timestamp, convert to JS Date for calculations
+              let tierDateJS: Date;
+
+              if (tierDateValue instanceof Timestamp) {
+                tierDateJS = tierDateValue.toDate();
+              } else {
+                // Fallback for non-Timestamp values
+                console.warn(
+                  "tierDate is not a Firestore Timestamp:",
+                  tierDateValue
+                );
+                tierDateJS = new Date(tierDateValue);
+              }
+
+              // Only proceed if we got a valid date
+              if (!isNaN(tierDateJS.getTime())) {
+                const now = new Date();
+                const subscriptionEndDate = new Date(
+                  tierDateJS.getTime() + 30 * 24 * 60 * 60 * 1000
+                );
+
+                // If subscription has expired, set tier to "Paused" and update in Firestore
+                if (now > subscriptionEndDate && currentTier !== "Paused") {
+                  console.log("Subscription expired, setting tier to Paused");
+                  currentTier = "Paused";
+
+                  // Update the tier in Firestore
+                  try {
+                    await updateDoc(userDocRef, {
+                      tier: "Paused",
+                    });
+                    console.log("User tier updated to Paused in Firestore");
+                  } catch (error) {
+                    console.error("Error updating tier status:", error);
+                  }
+                }
+              } else {
+                console.warn("Invalid date from tierDate:", tierDateValue);
+              }
+            } catch (error) {
+              console.error("Error processing tierDate:", error);
             }
+
+            setUserData({
+              firstName: data.firstName || "",
+              lastName: data.lastName || "",
+              email: data.email || "",
+              phone: data.phone || "",
+              tier: currentTier,
+              tierDate: tierDateValue,
+              address: data.address || "",
+              vehicles: data.vehicles || [],
+              tanks: data.tanks || {
+                diesel: 0,
+                petrol: { "93": 0, "95": 0 },
+              },
+              documents: data.documents || [],
+              history: data.history || { orders: [], reserves: [] },
+            });
+
+            // Update address state to match user data
+            setAddress(data.address || "");
+
+            // If user has address with coordinates, update map
+            if (data.address && window.google && window.google.maps) {
+              const geocoder = new window.google.maps.Geocoder();
+              geocoder.geocode({ address: data.address }, (results: any, status: any) => {
+                if (
+                  status === "OK" &&
+                  results &&
+                  results[0] &&
+                  results[0].geometry
+                ) {
+                  const location = results[0].geometry.location;
+                  setMapPosition([location.lat(), location.lng()]);
+                  setMapZoom(15);
+                }
+              });
+            } else {
+              // Default to Johannesburg if no address
+              setMapPosition([-26.2041, 28.0473]);
+              setMapZoom(10);
+            }
+          } else {
+            console.log("No user document found!");
           }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        } finally {
+          setIsDataLoading(false);
         }
-      } catch (error) {
-        // Error handling without console logging
+      } else {
+        setIsDataLoading(false);
       }
     };
 
-    fetchUserData();
-  }, [isAuthenticated, currentUser]);
+    // Only fetch data if user is authenticated and auth check is complete
+    if (currentUser && !isAuthChecking) {
+      fetchUserData();
+    }
+  }, [currentUser, isAuthChecking]);
 
   const savePaymentToFirestore = async (
     paymentResponse: any,
@@ -173,7 +280,9 @@ export default function DashPage() {
         });
       }
 
+      console.log("Payment saved to Firestore successfully");
     } catch (error) {
+      console.error("Error saving payment to Firestore:", error);
     }
   };
 
@@ -233,6 +342,7 @@ export default function DashPage() {
         };
 
         // Log the data for debugging
+        console.log("Sending cleaned data to Firestore:", JSON.stringify(updateData));
 
         // Update the document
         await updateDoc(userDocRef, updateData);
@@ -255,6 +365,7 @@ export default function DashPage() {
           try {
             // Try to update the password directly
             await updatePassword(currentUser, password);
+            console.log("Password updated successfully");
 
             // Clear password fields after successful save
             setPassword("");
@@ -264,6 +375,7 @@ export default function DashPage() {
             // Show success toast
             setSuccessMessage("Profile and password updated successfully!");
           } catch (passwordError: any) {
+            console.error("Error updating password:", passwordError);
 
             // If the error is due to requiring recent authentication
             if (passwordError.code === "auth/requires-recent-login") {
@@ -286,6 +398,7 @@ export default function DashPage() {
         setShowSuccessToast(true);
         setTimeout(() => setShowSuccessToast(false), 3000);
       } catch (error) {
+        console.error("Error updating user data:", error);
         setSuccessMessage(
           error instanceof Error ? error.message : "Failed to save changes"
         );
@@ -304,11 +417,13 @@ export default function DashPage() {
   // Initialize Google Places Autocomplete
   const initAutocomplete = () => {
     if (!window.google) {
+      console.error("Google Maps not loaded");
       return;
     }
 
     const input = document.getElementById("location-input") as HTMLInputElement;
     if (!input) {
+      console.error("Location input not found");
       return;
     }
 
@@ -357,7 +472,9 @@ export default function DashPage() {
       });
 
       autocompleteRef.current = autoComplete;
+      console.log("Google Places Autocomplete initialized successfully");
     } catch (error) {
+      console.error("Error initializing Google Places:", error);
     }
   };
 
@@ -398,6 +515,11 @@ export default function DashPage() {
         // First delete the user document from Firestore
         await deleteDoc(doc(db, "users", currentUser.uid));
 
+        // Log the deletion for debugging
+        console.log(
+          `Deleting user data for UID: ${currentUser.uid}, Email: ${currentUser.email}`
+        );
+
         // Then delete the user authentication account
         // This removes email, password, and all authentication data
         await deleteUser(currentUser);
@@ -416,6 +538,7 @@ export default function DashPage() {
         router.push("/");
       }
     } catch (error) {
+      console.error("Failed to delete account:", error);
 
       // If error is due to auth session timeout, try to sign out anyway
       if ((error as any).code === "auth/requires-recent-login") {
@@ -424,6 +547,7 @@ export default function DashPage() {
           await signOut(auth);
           router.push("/");
         } catch (signOutError) {
+          console.error("Error signing out:", signOutError);
         }
       }
 
@@ -493,6 +617,7 @@ export default function DashPage() {
         isUnsaved: true
       };
 
+      console.log("Adding vehicle with data:", vehicleToAdd);
       
       const updatedVehicles = [...userData.vehicles, vehicleToAdd];
       
@@ -509,6 +634,7 @@ export default function DashPage() {
       setShowSuccessToast(true);
       setTimeout(() => setShowSuccessToast(false), 5000);
     } catch (error) {
+      console.error("Error adding vehicle:", error);
       setSuccessMessage("Failed to add vehicle. Please try again.");
       setShowSuccessToast(true);
       setTimeout(() => setShowSuccessToast(false), 3000);
@@ -611,6 +737,7 @@ export default function DashPage() {
   useEffect(() => {
     (window as any).initMap = () => {
       initAutocomplete();
+      console.log("Google Maps API loaded and initialized");
     };
     return () => {
       (window as any).initMap = () => {};
@@ -636,6 +763,7 @@ export default function DashPage() {
       bankReference: `NTF ${tier} Membership`,
     })
     .then((paymentResponse) => {
+      console.log("Payment processed:", paymentResponse);
       
       // Save payment data to Firestore
       if (paymentResponse) {
@@ -660,6 +788,7 @@ export default function DashPage() {
       }
     })
     .catch((error) => {
+      console.error("Payment failed:", error);
       // Reset loading state
       setProcessingTier(null);
       setSuccessMessage("Payment processing failed. Please try again.");
@@ -674,6 +803,7 @@ export default function DashPage() {
       await signOut(auth);
       router.push("/");
     } catch (error) {
+      console.error("Error signing out:", error);
       setSuccessMessage("Failed to sign out. Please try again.");
       setShowSuccessToast(true);
       setTimeout(() => setShowSuccessToast(false), 3000);
@@ -804,6 +934,7 @@ export default function DashPage() {
         src={`https://maps.googleapis.com/maps/api/js?key=${'AIzaSyCNlia43mno54CIMoVQdSdMBe5hKtGbOpU'}&libraries=places&callback=initMap`}
         strategy="lazyOnload"
         onError={(e) => {
+          console.error("Error loading Google Maps script:", e);
         }}
       />
 

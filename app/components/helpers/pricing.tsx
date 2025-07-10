@@ -212,6 +212,7 @@ const Pricing_ = () => {
       }
 
     } catch {
+      // Silently handle firestore error
     }
   };
   

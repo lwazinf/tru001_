@@ -1,96 +1,128 @@
 'use client';
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import { User, Lock, Clock, LogOut } from 'lucide-react';
 import { Timestamp } from 'firebase/firestore';
 
 interface DashboardSidebarProps {
   activeTab: string;
-  onTabChange: (newTab: string) => void;
-  userTier: string;
+  setActiveTab: (tab: string) => void;
+  userData: {
+    tier: string;
+    tierDate: Timestamp | null;
+  };
+  onSignOut: () => void;
 }
 
-const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
+export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   activeTab,
-  onTabChange,
-  userTier,
+  setActiveTab,
+  userData,
+  onSignOut
 }) => {
-  const calculateRenewalInfo = useMemo(() => {
-    try {
-      if (!userData?.tierDate) {
-        return {
-          daysRemaining: 0,
-          renewalDate: new Date(),
-          isExpiringSoon: false,
-          isExpired: true
-        };
-      }
-
-      let tierDate: Date;
-
-      // Handle Firestore Timestamp
-      if (userData.tierDate && typeof userData.tierDate.toDate === 'function') {
-        tierDate = userData.tierDate.toDate();
-      } else if (userData.tierDate instanceof Date) {
-        tierDate = userData.tierDate;
-      } else {
-        // Fallback for other date formats
-        tierDate = new Date(userData.tierDate);
-      }
-
-      // Validate the date
-      if (isNaN(tierDate.getTime())) {
-        return {
-          daysRemaining: 0,
-          renewalDate: new Date(),
-          isExpiringSoon: false,
-          isExpired: true
-        };
-      }
-
-      const now = new Date();
-      const renewalDate = new Date(tierDate.getTime() + (30 * 24 * 60 * 60 * 1000));
-      const timeDiff = renewalDate.getTime() - now.getTime();
-      const daysRemaining = Math.ceil(timeDiff / (1000 * 3600 * 24));
-
-      const isExpired = daysRemaining <= 0;
-      const isExpiringSoon = daysRemaining <= 7 && daysRemaining > 0;
-
-      const formatDate = (date: Date) => {
-        try {
-          return date.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-          });
-        } catch {
-          return 'Invalid Date';
-        }
-      };
-
-      const result = {
-        daysRemaining: Math.max(0, daysRemaining),
-        renewalDate,
-        renewalDateFormatted: formatDate(renewalDate),
-        isExpiringSoon,
-        isExpired
-      };
-
-      return result;
-    } catch {
-      return {
-        daysRemaining: 0,
-        renewalDate: new Date(),
-        isExpiringSoon: false,
-        isExpired: true
+  // Calculate days left and renewal date
+  const calculateRenewalInfo = () => {
+    // Handle case when tierDate is missing or null
+    if (!userData.tierDate) {
+      console.log('Missing tierDate:', userData.tierDate);
+      return { 
+        daysLeft: '–', // Em dash instead of a number
+        renewalDate: 'Not available',
+        isExpired: false 
       };
     }
-  }, [userData?.tierDate]);
+    
+    try {
+      // Convert Firestore Timestamp to JavaScript Date
+      let tierDate: Date;
+      
+      // Check if tierDate is a Firestore Timestamp
+      if (userData.tierDate instanceof Timestamp) {
+        // Convert to JavaScript Date
+        tierDate = userData.tierDate.toDate();
+        console.log('Converted Firestore Timestamp to Date:', tierDate.toString());
+      } else {
+        // Fallback for other formats
+        console.log('tierDate is not a Firestore Timestamp:', userData.tierDate);
+        try {
+          // Try to handle it as a number or string
+          tierDate = new Date(userData.tierDate as any);
+        } catch (error) {
+          console.error('Error converting tierDate to Date:', error);
+          return { 
+            daysLeft: '–', 
+            renewalDate: 'Not available',
+            isExpired: false 
+          };
+        }
+      }
+      
+      // Validate that tierDate is a valid date
+      if (isNaN(tierDate.getTime())) {
+        console.log('Invalid date object created from tierDate:', userData.tierDate);
+        return { 
+          daysLeft: '–', 
+          renewalDate: 'Not available',
+          isExpired: false 
+        };
+      }
+      
+      const renewalDate = new Date(tierDate.getTime() + (30 * 24 * 60 * 60 * 1000)); // Add 30 days
+      const now = new Date();
+      
+      // Calculate days left
+      const daysLeft = Math.ceil((renewalDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      const isExpired = daysLeft <= 0;
+      
+      // Format renewal date with error handling
+      let formattedDate;
+      try {
+        formattedDate = renewalDate.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric'
+        });
+      } catch (error) {
+        console.error('Error formatting date:', error);
+        formattedDate = 'Not available';
+      }
+      
+      // Log success for debugging
+      console.log('Successfully calculated renewal info:', { 
+        tierDate: tierDate.toString(),
+        renewalDate: renewalDate.toString(),
+        daysLeft,
+        formattedDate,
+        isExpired
+      });
+      
+      return {
+        daysLeft: Math.max(0, daysLeft), // Ensure we don't show negative days
+        renewalDate: formattedDate,
+        isExpired
+      };
+    } catch (error) {
+      console.error('Error in calculateRenewalInfo:', error);
+      return { 
+        daysLeft: '–', 
+        renewalDate: 'Not available',
+        isExpired: false 
+      };
+    }
+  };
 
-  useEffect(() => {
-    // Component rendered successfully
-  }, [userData, calculateRenewalInfo]);
+  const { daysLeft, renewalDate, isExpired } = calculateRenewalInfo();
   
+  // Log for debugging
+  useEffect(() => {
+    console.log('Sidebar rendered with:', { 
+      activeTab, 
+      tier: userData.tier, 
+      daysLeft, 
+      renewalDate, 
+      isExpired 
+    });
+  }, [activeTab, userData.tier, daysLeft, renewalDate, isExpired]);
+
   return (
     <div className="hidden md:block w-64 border-r border-gray-800/70">
       {/* Sidebar buffer */}
@@ -119,13 +151,13 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-gray-300">Current Plan</span>
               <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                userData.tier === 'Paused' || calculateRenewalInfo.isExpired
+                userData.tier === 'Paused' || isExpired
                   ? 'bg-red-500/20 text-red-400' 
                   : 'bg-amber-500/20 text-amber-400'
               }`}>{userData.tier}</span>
             </div>
             <div className="flex items-center justify-between">
-              {userData.tier === 'Paused' || calculateRenewalInfo.isExpired ? (
+              {userData.tier === 'Paused' || isExpired ? (
                 <span className="text-xs text-red-400">
                   <Clock className="h-3 w-3 inline mr-1 text-red-500" />
                   Subscription expired
@@ -133,14 +165,14 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
               ) : (
                 <span className="text-xs text-gray-400">
                   <Clock className="h-3 w-3 inline mr-1 text-gray-500" />
-                  {typeof calculateRenewalInfo.daysRemaining === 'number' ? `${calculateRenewalInfo.daysRemaining} days left` : calculateRenewalInfo.daysRemaining}
+                  {typeof daysLeft === 'number' ? `${daysLeft} days left` : daysLeft}
                 </span>
               )}
-              {userData.tier === 'Paused' || calculateRenewalInfo.isExpired ? (
+              {userData.tier === 'Paused' || isExpired ? (
                 <span className="text-[10px] text-red-500">Renew now</span>
               ) : (
                 <span className="text-[10px] text-gray-500">
-                  {calculateRenewalInfo.renewalDateFormatted !== 'Invalid Date' ? `Renews on ${calculateRenewalInfo.renewalDateFormatted}` : calculateRenewalInfo.renewalDateFormatted}
+                  {renewalDate !== 'Not available' ? `Renews on ${renewalDate}` : renewalDate}
                 </span>
               )}
             </div>

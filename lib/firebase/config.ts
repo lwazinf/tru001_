@@ -31,7 +31,7 @@ try {
   
   firebaseAuth = getAuth(firebaseApp);
   firestoreDb = getFirestore(firebaseApp);
-} catch (error) {
+} catch {
   // Initialize with empty app in case of error to prevent crashes
   firebaseApp = {} as any;
   firebaseAuth = {} as any;
